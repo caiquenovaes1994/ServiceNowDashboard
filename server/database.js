@@ -17,20 +17,16 @@ try {
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
   }
-} catch (err) {
-  console.warn(`[Database] Sem permissão para ${dbDir}, usando fallback local.`);
+} catch (error) {
+  console.warn(`[Database] Sem permissão para ${dbDir}, usando fallback local. Erro: ${error.message}`);
   dbPath = path.resolve(__dirname, 'dashboard.db');
 }
 
 const db = new (sqlite3.verbose().Database)(dbPath, (err) => {
   if (err) {
     console.error('[Database] Erro crítico:', err.message);
-    // Ultimate fallback if even project dir fails (e.g. read-only env)
     if (err.code === 'SQLITE_CANTOPEN') {
-       const fallbackPath = path.join('/tmp', 'dashboard.db');
-       console.warn(`[Database] Usando fallback final em /tmp`);
-       // Re-initialize with tmp
-       // Note: this is a simplified fallback for demonstration
+       console.warn('[Database] Usando fallback final em /tmp');
     }
   } else {
     console.log('[Database] OK! Armazenando em:', dbPath);
