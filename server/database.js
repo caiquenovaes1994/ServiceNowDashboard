@@ -82,6 +82,30 @@ export const initDb = () => {
       key TEXT PRIMARY KEY,
       value TEXT
     )`);
+
+    // Auto-seed if empty
+    db.get("SELECT COUNT(*) as count FROM metrics", (err, row) => {
+      if (!err && row && row.count === 0) {
+        console.log("[Database] Banco vazio detectado. Semeando dados de 2024...");
+        const initialMetrics = [
+          { year: 2024, month: 'Abril', closed_count: 31, evaluated_count: 2, nps: 5.0, nps_general: 0, is_vacation: 0, is_project: 1 },
+          { year: 2024, month: 'Maio', closed_count: 235, evaluated_count: 46, nps: 4.59, nps_general: 0, is_vacation: 0, is_project: 0 },
+          { year: 2024, month: 'Junho', closed_count: 220, evaluated_count: 38, nps: 4.63, nps_general: 0, is_vacation: 0, is_project: 0 },
+          { year: 2024, month: 'Julho', closed_count: 207, evaluated_count: 36, nps: 4.67, nps_general: 0, is_vacation: 0, is_project: 0 },
+          { year: 2024, month: 'Agosto', closed_count: 81, evaluated_count: 18, nps: 4.94, nps_general: 0, is_vacation: 0, is_project: 1 },
+          { year: 2024, month: 'Setembro', closed_count: 173, evaluated_count: 30, nps: 4.67, nps_general: 0, is_vacation: 0, is_project: 0 },
+          { year: 2024, month: 'Outubro', closed_count: 233, evaluated_count: 32, nps: 4.9, nps_general: 0, is_vacation: 0, is_project: 0 },
+          { year: 2024, month: 'Novembro', closed_count: 85, evaluated_count: 13, nps: 4.92, nps_general: 0, is_vacation: 0, is_project: 1 },
+          { year: 2024, month: 'Dezembro', closed_count: 281, evaluated_count: 21, nps: 4.71, nps_general: 0, is_vacation: 0, is_project: 0 }
+        ];
+
+        const stmt = db.prepare(`INSERT INTO metrics (year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
+        for (const m of initialMetrics) {
+          stmt.run([m.year, m.month, m.closed_count, m.evaluated_count, m.nps, m.nps_general, m.is_vacation, m.is_project]);
+        }
+        stmt.finalize();
+      }
+    });
   });
 };
 
