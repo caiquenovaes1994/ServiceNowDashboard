@@ -9,8 +9,23 @@ let backupTimeout = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Ensure the database directory exists
 const dbPath = process.env.DATABASE_PATH || path.resolve(__dirname, 'dashboard.db');
-const db = new (sqlite3.verbose().Database)(dbPath);
+const dbDir = path.dirname(dbPath);
+
+if (!fs.existsSync(dbDir)) {
+  try {
+    fs.mkdirSync(dbDir, { recursive: true });
+  } catch (err) {
+    console.error('[Database] Erro ao criar diretório do banco:', err);
+  }
+}
+
+const db = new (sqlite3.verbose().Database)(dbPath, (err) => {
+  if (err) {
+    console.error('[Database] Erro fatal ao abrir banco de dados:', err.message);
+  }
+});
 
 const backupDatabase = () => {
   const backupPath = dbPath + '.bak';
