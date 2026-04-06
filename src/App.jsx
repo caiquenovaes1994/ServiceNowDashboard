@@ -1,0 +1,391 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  LineChart, Line, Cell, Legend
+} from 'recharts';
+import { 
+  Calendar, BarChart3, Users, Activity
+} from 'lucide-react';
+
+const API_BASE = 'http://localhost:5000/api';
+
+const MONTHS = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+
+const Clock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="clock-section">
+      <div className="clock-date">
+        {time.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+      </div>
+      <div className="clock-time">
+        {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+    </div>
+  );
+};
+
+const RatioTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const closed = payload.find(p => p.dataKey === 'closed_count')?.value || 0;
+    const evalld = payload.find(p => p.dataKey === 'evaluated_count')?.value || 0;
+    const ratio = closed > 0 ? ((evalld / closed) * 100).toFixed(1) : 0;
+    
+    return (
+      <div className="custom-tooltip">
+        <p className="label">{label}</p>
+        <p style={{color: 'var(--primary)'}}>Fechados: {closed}</p>
+        <p style={{color: 'var(--secondary)'}}>Avaliados: {evalld}</p>
+        <p style={{color: 'var(--success)', marginTop: '4px', paddingTop: '4px', borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+          {ratio}%
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const MetricRow = ({ month, data, onSave, readOnly }) => {
+  const [editData, setEditData] = useState({
+    closed_count: 0,
+    evaluated_count: 0,
+    nps: 0,
+    nps_general: 0,
+    is_vacation: 0,
+    is_project: 0
+  });
+
+  useEffect(() => {
+    if (data) {
+      Promise.resolve().then(() => {
+        setEditData({
+          closed_count: data.closed_count || 0,
+          evaluated_count: data.evaluated_count || 0,
+          nps: data.nps || 0,
+          nps_general: data.nps_general || 0,
+          is_vacation: data.is_vacation || 0,
+          is_project: data.is_project || 0
+        });
+      });
+    }
+  }, [data]);
+
+  const handleChange = (field, value) => {
+    if (readOnly) return;
+    let clampedValue = value;
+    if (field === 'closed_count' || field === 'evaluated_count') {
+      clampedValue = Math.min(Math.max(value, 0), 999);
+    } else if (field === 'nps' || field === 'nps_general') {
+      clampedValue = Math.min(Math.max(value, 0), 5.0);
+    }
+    setEditData(prev => ({ ...prev, [field]: clampedValue }));
+  };
+
+  const handleBlur = () => {
+    if (readOnly) return;
+    onSave(month, editData);
+  };
+
+  return (
+    <div className={`metrics-row ${readOnly ? 'readonly' : ''}`}>
+      <span className="row-label">{month}</span>
+      <input 
+        type="number" 
+        className="input-minimal" 
+        value={editData.closed_count} 
+        onChange={(e) => handleChange('closed_count', parseInt(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="Fechados"
+      />
+      <input 
+        type="number" 
+        className="input-minimal" 
+        value={editData.evaluated_count} 
+        onChange={(e) => handleChange('evaluated_count', parseInt(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="Avaliados"
+      />
+      <input 
+        type="number" 
+        step="0.1"
+        className="input-minimal" 
+        value={editData.nps} 
+        onChange={(e) => handleChange('nps', parseFloat(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="Meu NPS"
+      />
+      <input 
+        type="number" 
+        step="0.1"
+        className="input-minimal" 
+        value={editData.nps_general} 
+        onChange={(e) => handleChange('nps_general', parseFloat(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="NPS Geral"
+      />
+      <div 
+        className={`checkbox-container ${readOnly ? 'disabled' : ''}`} 
+        onClick={() => {
+          if (readOnly) return;
+          const newVal = editData.is_vacation ? 0 : 1;
+          handleChange('is_vacation', newVal);
+          onSave(month, { ...editData, is_vacation: newVal });
+        }}
+      >
+        <div className={`checkbox-custom ${editData.is_vacation ? 'checked' : ''}`}>
+          {editData.is_vacation ? '✓' : ''}
+        </div>
+        Férias
+      </div>
+      <div 
+        className={`checkbox-container ${readOnly ? 'disabled' : ''}`} 
+        onClick={() => {
+          if (readOnly) return;
+          const newVal = editData.is_project ? 0 : 1;
+          handleChange('is_project', newVal);
+          onSave(month, { ...editData, is_project: newVal });
+        }}
+      >
+        <div className={`checkbox-custom ${editData.is_project ? 'checked' : ''}`}>
+          {editData.is_project ? '✓' : ''}
+        </div>
+        Projeto
+      </div>
+    </div>
+  );
+};
+
+function App() {
+  const [metrics, setMetrics] = useState([]);
+  const [year, setYear] = useState(2026);
+
+  console.log("Dashboard Render Check - Metrics Count:", metrics?.length);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/metrics?year=${year}`);
+      if (response.data && Array.isArray(response.data.metrics)) {
+        setMetrics(response.data.metrics);
+      }
+    } catch (err) {
+      console.error("Error fetching metrics", err);
+    }
+  }, [year]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchData());
+  }, [fetchData]);
+
+  const handleSaveMonth = async (month, data) => {
+    try {
+      await axios.post(`${API_BASE}/metrics`, { ...data, year, month });
+      fetchData();
+    } catch {
+      alert("Erro ao salvar dados");
+    }
+  };
+
+  // KPI Logic 
+  const safeMetrics = Array.isArray(metrics) ? metrics : [];
+  
+  const totalClosedYear = safeMetrics.reduce((acc, m) => acc + (m.closed_count || 0), 0);
+  const totalEvaluatedYear = safeMetrics.reduce((acc, m) => acc + (m.evaluated_count || 0), 0);
+  
+  const currentMonthIdx = new Date().getMonth();
+  const monthsPassed = currentMonthIdx + 1;
+
+  const avgClosedMonth = (totalClosedYear / monthsPassed).toFixed(1);
+  const avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1); // Based on business days
+  
+  const avgEvalMonth = (totalEvaluatedYear / monthsPassed).toFixed(1);
+  const avgEvalDay = (totalEvaluatedYear / (monthsPassed * 22)).toFixed(1);
+  
+  const evalIndex = totalClosedYear > 0 ? ((totalEvaluatedYear / totalClosedYear) * 100).toFixed(1) : 0;
+
+  const isCurrentYear = year === new Date().getFullYear();
+  const visibleMonths = isCurrentYear
+    ? MONTHS.slice(0, currentMonthIdx + 1).reverse()
+    : [...MONTHS].reverse();
+
+  return (
+    <div className="dashboard-container">
+      <header className="header">
+        <div className="title-section" style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
+          <div>
+            <h1>ServiceNow Dashboard</h1>
+            <p className="welcome-msg">Olá, Caique!</p>
+          </div>
+          
+          <div className="controls" style={{display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <Calendar size={18} color="#64748b"/>
+              <select 
+                className="select-year" 
+                value={year} 
+                onChange={(e) => setYear(parseInt(e.target.value))}
+              >
+                {[2024, 2025, 2026].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <Clock />
+      </header>
+
+      <div className="kpi-grid">
+        <div className="card kpi-card">
+          <span className="label">Total de chamados fechados</span>
+          <span className="value">{totalClosedYear}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Fechados por mês</span>
+          <span className="value">{avgClosedMonth}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Fechados por dia</span>
+          <span className="value">{avgClosedDay}</span>
+        </div>
+        <div className="card kpi-card" style={{visibility: 'hidden'}}></div>
+      </div>
+
+      <div className="kpi-grid">
+        <div className="card kpi-card">
+          <span className="label">Total de chamados avaliados</span>
+          <span className="value">{totalEvaluatedYear}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Avaliações por mês</span>
+          <span className="value">{avgEvalMonth}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Avaliações por dia</span>
+          <span className="value">{avgEvalDay}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Índice de Avaliação</span>
+          <span className="value" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
+        </div>
+      </div>
+
+      <div className="charts-section">
+        <div className="card chart-card">
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <Users size={16}/> Comparação NPS
+          </span>
+          <div style={{width: '100%', height: '300px'}}>
+            <ResponsiveContainer>
+              <LineChart data={safeMetrics}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Legend iconType="circle" />
+                <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                <Line type="monotone" dataKey="nps_general" name="NPS Empresa" stroke="var(--secondary)" strokeWidth={2} strokeDasharray="5 5" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card chart-card">
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <BarChart3 size={16}/> Volume de Chamados
+          </span>
+          <div style={{width: '100%', height: '300px'}}>
+            <ResponsiveContainer>
+              <BarChart data={safeMetrics}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Legend iconType="circle" />
+                <Bar dataKey="closed_count" name="Fechados" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="evaluated_count" name="Avaliados" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card chart-card">
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <Activity size={16}/> Índice de Chamados
+          </span>
+          <div style={{width: '100%', height: '300px'}}>
+            <ResponsiveContainer>
+              <LineChart data={safeMetrics}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <Tooltip content={<RatioTooltip />} />
+                <Legend iconType="circle" />
+                <Line type="monotone" dataKey="closed_count" name="Total Fechados" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                <Line type="monotone" dataKey="evaluated_count" name="Total Avaliados" stroke="var(--secondary)" strokeWidth={2} dot={{r: 4}} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="metrics-table-container">
+        <div className="metrics-grid">
+          <div className="metrics-row" style={{background: 'transparent', border: 'none', paddingBottom: 0}}>
+             <span className="row-label">Mês</span>
+             <span className="row-label">Fechados</span>
+             <span className="row-label">Avaliados</span>
+             <span className="row-label">Meu NPS</span>
+             <span className="row-label">NPS Empresa</span>
+             <span className="row-label">Férias</span>
+             <span className="row-label">Projeto</span>
+          </div>
+          
+          {visibleMonths.map(month => {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonthIdx = today.getMonth();
+            const currentMonthName = MONTHS[currentMonthIdx];
+
+            let prevMonthIdx = currentMonthIdx - 1;
+            let prevYear = currentYear;
+            if (prevMonthIdx < 0) {
+              prevMonthIdx = 11;
+              prevYear = currentYear - 1;
+            }
+            const prevMonthName = MONTHS[prevMonthIdx];
+
+            const isEditable = (year === currentYear && month === currentMonthName) || 
+                               (year === prevYear && month === prevMonthName);
+            
+            return (
+              <MetricRow 
+                key={`${year}-${month}`} 
+                month={month} 
+                data={safeMetrics.find(m => m.month === month)}
+                onSave={handleSaveMonth}
+                readOnly={!isEditable}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
