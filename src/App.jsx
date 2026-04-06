@@ -8,7 +8,7 @@ import {
   Calendar, BarChart3, Users, Activity
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",

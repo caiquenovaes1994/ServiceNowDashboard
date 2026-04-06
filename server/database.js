@@ -8,7 +8,7 @@ let backupTimeout = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.resolve(__dirname, 'dashboard.db');
+const dbPath = process.env.DATABASE_PATH || path.resolve(__dirname, 'dashboard.db');
 const db = new (sqlite3.verbose().Database)(dbPath);
 
 const backupDatabase = () => {
