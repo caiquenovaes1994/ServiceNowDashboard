@@ -216,6 +216,11 @@ function App() {
   
   const evalIndex = totalClosedYear > 0 ? ((totalEvaluatedYear / totalClosedYear) * 100).toFixed(1) : 0;
 
+  const npsValues = safeMetrics.filter(m => (m.nps || 0) > 0).map(m => m.nps);
+  const avgNpsYear = npsValues.length > 0 
+    ? (npsValues.reduce((acc, val) => acc + val, 0) / npsValues.length).toFixed(2)
+    : "0.00";
+
   const isCurrentYear = year === new Date().getFullYear();
   const visibleMonths = isCurrentYear
     ? MONTHS.slice(0, currentMonthIdx + 1).reverse()
@@ -262,7 +267,10 @@ function App() {
           <span className="label">Fechados por dia</span>
           <span className="value">{avgClosedDay}</span>
         </div>
-        <div className="card kpi-card" style={{visibility: 'hidden'}}></div>
+        <div className="card kpi-card">
+          <span className="label">NPS Médio</span>
+          <span className="value" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
+        </div>
       </div>
 
       <div className="kpi-grid">
