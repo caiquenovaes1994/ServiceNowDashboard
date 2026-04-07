@@ -248,27 +248,6 @@ function App() {
     ? MONTHS.slice(0, currentMonthIdx + 1).reverse()
     : [...MONTHS].reverse();
 
-  const handleExportPDF = (mode) => {
-    const element = document.querySelector('.dashboard-container');
-    const opt = {
-      margin: 10,
-      filename: `ServiceNow_Dashboard_${year}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true,
-        backgroundColor: '#0b1120'
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-    };
-
-    element.classList.add('pdf-exporting');
-
-    html2pdf().from(element).set(opt).save().then(() => {
-      element.classList.remove('pdf-exporting');
-    });
-  };
-
   return (
     <div className="dashboard-container">
       <header className="header">
