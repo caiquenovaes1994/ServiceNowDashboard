@@ -5,7 +5,7 @@ import {
   LineChart, Line, Cell, Legend
 } from 'recharts';
 import { 
-  Calendar, BarChart3, Users, Activity
+  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown
 } from 'lucide-react';
 
 const API_BASE = '/api';
@@ -221,10 +221,53 @@ function App() {
     ? (npsValues.reduce((acc, val) => acc + val, 0) / npsValues.length).toFixed(2)
     : "0.00";
 
+  // Filter for months with evaluations (must not be vacation or project)
+  const evaluatedMetrics = safeMetrics.filter(m => 
+    (m.evaluated_count || 0) > 0 && 
+    Number(m.is_vacation || 0) === 0 && 
+    Number(m.is_project || 0) === 0
+  );
+
+  const bestNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps > prev.nps ? current : prev)) : null;
+  const worstNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps < prev.nps ? current : prev)) : null;
+
+  const bestClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count > prev.closed_count ? current : prev)) : null;
+  const worstClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count < prev.closed_count ? current : prev)) : null;
+  const bestEval = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.evaluated_count > prev.evaluated_count ? current : prev)) : null;
+  const worstEval = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.evaluated_count < prev.evaluated_count ? current : prev)) : null;
+
+  const ratioMetrics = evaluatedMetrics.map(m => ({
+    ...m,
+    ratio: ((m.evaluated_count || 0) / (m.closed_count || 1)) * 100
+  }));
+  const bestRatio = ratioMetrics.length > 0 ? ratioMetrics.reduce((prev, current) => (current.ratio > prev.ratio ? current : prev)) : null;
+  const worstRatio = ratioMetrics.length > 0 ? ratioMetrics.reduce((prev, current) => (current.ratio < prev.ratio ? current : prev)) : null;
+
   const isCurrentYear = year === new Date().getFullYear();
   const visibleMonths = isCurrentYear
     ? MONTHS.slice(0, currentMonthIdx + 1).reverse()
     : [...MONTHS].reverse();
+
+  const handleExportPDF = (mode) => {
+    const element = document.querySelector('.dashboard-container');
+    const opt = {
+      margin: 10,
+      filename: `ServiceNow_Dashboard_${year}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: '#0b1120'
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+
+    element.classList.add('pdf-exporting');
+
+    html2pdf().from(element).set(opt).save().then(() => {
+      element.classList.remove('pdf-exporting');
+    });
+  };
 
   return (
     <div className="dashboard-container">
@@ -310,6 +353,19 @@ function App() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          
+          {bestNps && worstNps && (
+            <div className="chart-highlights">
+              <div className="highlight-item best">
+                <ArrowUp size={14} />
+                <span>{bestNps.month} ({bestNps.nps.toFixed(2)})</span>
+              </div>
+              <div className="highlight-item worst">
+                <ArrowDown size={14} />
+                <span>{worstNps.month} ({worstNps.nps.toFixed(2)})</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="card chart-card">
@@ -328,6 +384,19 @@ function App() {
                 <Bar dataKey="evaluated_count" name="Avaliados" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+
+          <div className="chart-highlights multi-row">
+            <div className="highlight-group">
+              <span className="group-label">Fechados:</span>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestClosed?.month} ({bestClosed?.closed_count})</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstClosed?.month} ({worstClosed?.closed_count})</span></div>
+            </div>
+            <div className="highlight-group">
+              <span className="group-label">Avaliados:</span>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestEval?.month} ({bestEval?.evaluated_count})</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstEval?.month} ({worstEval?.evaluated_count})</span></div>
+            </div>
           </div>
         </div>
 
@@ -348,6 +417,13 @@ function App() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+
+          {bestRatio && worstRatio && (
+            <div className="chart-highlights">
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestRatio.month} ({bestRatio.ratio.toFixed(1)}%)</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstRatio.month} ({worstRatio.ratio.toFixed(1)}%)</span></div>
+            </div>
+          )}
         </div>
       </div>
 

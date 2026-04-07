@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Noto+Sans+Meroitic&display=swap');
+
 :root {
-  font-family: 'Outfit', 'Google Sans', system-ui, sans-serif;
+  font-family: 'Noto Sans Meroitic', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -40,6 +42,7 @@ body {
   padding: 2rem;
   max-width: 1600px;
   margin: 0 auto;
+  background: #0b1120;
 }
 
 .header {
@@ -58,6 +61,7 @@ body {
 }
 
 .title-section h1 {
+  font-family: 'Montserrat', sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0;
@@ -78,7 +82,7 @@ body {
 
 .clock-section {
   text-align: right;
-  font-family: 'Outfit', monospace;
+  font-family: 'Montserrat', sans-serif;
   margin-left: auto;
 }
 
@@ -91,7 +95,7 @@ body {
 
 .clock-date {
   font-size: 1.1rem;
-  color: #64748b;
+  color: var(--primary);
   font-weight: 500;
   margin-bottom: 0.25rem;
 }
@@ -155,6 +159,65 @@ body {
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
+
+.chart-highlights {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-highlights.multi-row {
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.highlight-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.group-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  min-width: 80px;
+  text-align: left;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.highlight-item span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.highlight-item.best svg {
+  color: #10b981;
+}
+
+.highlight-item.worst svg {
+  color: #ef4444;
+}
+
 
 .custom-tooltip {
   background: #0f172a;
@@ -294,4 +357,30 @@ body {
 .btn-icon:hover {
   color: var(--accent-pink);
   background: rgba(244, 114, 182, 0.1);
+}
+
+/* Export Controls */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-export:hover {
+  border-color: var(--primary);
+  background: rgba(56, 189, 248, 0.1);
+  transform: translateY(-1px);
+}
+
+.pdf-exporting .export-controls {
+  display: none !important;
 }
