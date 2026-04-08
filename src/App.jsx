@@ -391,8 +391,8 @@ function App() {
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <Tooltip content={<RatioTooltip />} />
                 <Legend iconType="circle" />
-                <Line type="monotone" dataKey="closed_count" name="Total Fechados" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
-                <Line type="monotone" dataKey="evaluated_count" name="Total Avaliados" stroke="var(--secondary)" strokeWidth={2} dot={{r: 4}} />
+                <Line type="monotone" dataKey="closed_count" name="Fechados" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                <Line type="monotone" dataKey="evaluated_count" name="Avaliados" stroke="var(--secondary)" strokeWidth={2} dot={{r: 4}} />
               </LineChart>
             </ResponsiveContainer>
           </div>
