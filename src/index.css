@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Noto+Sans+Meroitic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  font-family: 'Noto Sans Meroitic', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -21,8 +21,13 @@
   --card-bg: rgba(30, 41, 59, 0.7);
   --card-border: rgba(255, 255, 255, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --accent-pink: #f472b6;
+
   --success: #34d399;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
 }
 
 body {
@@ -142,15 +147,6 @@ body {
   display: block;
   margin-bottom: 0.5rem;
   color: #f8fafc;
-}
-
-.kpi-card .sub-value {
-  font-size: 0.8rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
 }
 
 .charts-section {
@@ -343,44 +339,4 @@ body {
 .checkbox-custom.checked {
   background: var(--primary);
   border-color: var(--primary);
-}
-
-.btn-icon {
-  background: transparent;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-}
-
-.btn-icon:hover {
-  color: var(--accent-pink);
-  background: rgba(244, 114, 182, 0.1);
-}
-
-/* Export Controls */
-.btn-export {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.btn-export:hover {
-  border-color: var(--primary);
-  background: rgba(56, 189, 248, 0.1);
-  transform: translateY(-1px);
-}
-
-.pdf-exporting .export-controls {
-  display: none !important;
 }

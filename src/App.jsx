@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, Cell, Legend
+  LineChart, Line, Legend
 } from 'recharts';
 import { 
   Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown
@@ -25,10 +25,10 @@ const Clock = () => {
 
   return (
     <div className="clock-section">
-      <div className="clock-date">
+      <div className="clock-date font-mono">
         {time.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
       </div>
-      <div className="clock-time">
+      <div className="clock-time font-mono">
         {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
       </div>
     </div>
@@ -101,7 +101,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       <span className="row-label">{month}</span>
       <input 
         type="number" 
-        className="input-minimal" 
+        className="input-minimal font-mono" 
         value={editData.closed_count} 
         onChange={(e) => handleChange('closed_count', parseInt(e.target.value) || 0)}
         onBlur={handleBlur}
@@ -110,7 +110,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       />
       <input 
         type="number" 
-        className="input-minimal" 
+        className="input-minimal font-mono" 
         value={editData.evaluated_count} 
         onChange={(e) => handleChange('evaluated_count', parseInt(e.target.value) || 0)}
         onBlur={handleBlur}
@@ -120,7 +120,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       <input 
         type="number" 
         step="0.1"
-        className="input-minimal" 
+        className="input-minimal font-mono" 
         value={editData.nps} 
         onChange={(e) => handleChange('nps', parseFloat(e.target.value) || 0)}
         onBlur={handleBlur}
@@ -130,7 +130,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       <input 
         type="number" 
         step="0.1"
-        className="input-minimal" 
+        className="input-minimal font-mono" 
         value={editData.nps_general} 
         onChange={(e) => handleChange('nps_general', parseFloat(e.target.value) || 0)}
         onBlur={handleBlur}
@@ -228,23 +228,28 @@ function App() {
     Number(m.is_project || 0) === 0
   );
 
-  const bestNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps > prev.nps ? current : prev)) : null;
-  const worstNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps < prev.nps ? current : prev)) : null;
+  const getExtreme = (arr, key, isMax) => 
+    arr.length > 0 ? arr.reduce((p, c) => (isMax ? c[key] > p[key] : c[key] < p[key]) ? c : p) : null;
 
-  const bestNpsGeneral = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps_general > prev.nps_general ? current : prev)) : null;
-  const worstNpsGeneral = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps_general < prev.nps_general ? current : prev)) : null;
+  const bestNps = getExtreme(evaluatedMetrics, 'nps', true);
+  const worstNps = getExtreme(evaluatedMetrics, 'nps', false);
 
-  const bestClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count > prev.closed_count ? current : prev)) : null;
-  const worstClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count < prev.closed_count ? current : prev)) : null;
-  const bestEval = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.evaluated_count > prev.evaluated_count ? current : prev)) : null;
-  const worstEval = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.evaluated_count < prev.evaluated_count ? current : prev)) : null;
+  const bestNpsGeneral = getExtreme(evaluatedMetrics, 'nps_general', true);
+  const worstNpsGeneral = getExtreme(evaluatedMetrics, 'nps_general', false);
+
+  const bestClosed = getExtreme(evaluatedMetrics, 'closed_count', true);
+  const worstClosed = getExtreme(evaluatedMetrics, 'closed_count', false);
+  
+  const bestEval = getExtreme(evaluatedMetrics, 'evaluated_count', true);
+  const worstEval = getExtreme(evaluatedMetrics, 'evaluated_count', false);
 
   const ratioMetrics = evaluatedMetrics.map(m => ({
     ...m,
     ratio: ((m.evaluated_count || 0) / (m.closed_count || 1)) * 100
   }));
-  const bestRatio = ratioMetrics.length > 0 ? ratioMetrics.reduce((prev, current) => (current.ratio > prev.ratio ? current : prev)) : null;
-  const worstRatio = ratioMetrics.length > 0 ? ratioMetrics.reduce((prev, current) => (current.ratio < prev.ratio ? current : prev)) : null;
+  
+  const bestRatio = getExtreme(ratioMetrics, 'ratio', true);
+  const worstRatio = getExtreme(ratioMetrics, 'ratio', false);
 
   const isCurrentYear = year === new Date().getFullYear();
   const visibleMonths = isCurrentYear
@@ -282,38 +287,38 @@ function App() {
       <div className="kpi-grid">
         <div className="card kpi-card">
           <span className="label">Total de chamados fechados</span>
-          <span className="value">{totalClosedYear}</span>
+          <span className="value font-mono">{totalClosedYear}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">Fechados por mês</span>
-          <span className="value">{avgClosedMonth}</span>
+          <span className="value font-mono">{avgClosedMonth}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">Fechados por dia</span>
-          <span className="value">{avgClosedDay}</span>
+          <span className="value font-mono">{avgClosedDay}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">NPS Médio</span>
-          <span className="value" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
+          <span className="value font-mono" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
         </div>
       </div>
 
       <div className="kpi-grid">
         <div className="card kpi-card">
           <span className="label">Total de chamados avaliados</span>
-          <span className="value">{totalEvaluatedYear}</span>
+          <span className="value font-mono">{totalEvaluatedYear}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">Avaliações por mês</span>
-          <span className="value">{avgEvalMonth}</span>
+          <span className="value font-mono">{avgEvalMonth}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">Avaliações por dia</span>
-          <span className="value">{avgEvalDay}</span>
+          <span className="value font-mono">{avgEvalDay}</span>
         </div>
         <div className="card kpi-card">
           <span className="label">Índice de Avaliação</span>
-          <span className="value" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
+          <span className="value font-mono" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
         </div>
       </div>
 
