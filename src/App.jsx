@@ -231,6 +231,9 @@ function App() {
   const bestNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps > prev.nps ? current : prev)) : null;
   const worstNps = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps < prev.nps ? current : prev)) : null;
 
+  const bestNpsGeneral = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps_general > prev.nps_general ? current : prev)) : null;
+  const worstNpsGeneral = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.nps_general < prev.nps_general ? current : prev)) : null;
+
   const bestClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count > prev.closed_count ? current : prev)) : null;
   const worstClosed = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.closed_count < prev.closed_count ? current : prev)) : null;
   const bestEval = evaluatedMetrics.length > 0 ? evaluatedMetrics.reduce((prev, current) => (current.evaluated_count > prev.evaluated_count ? current : prev)) : null;
@@ -328,21 +331,37 @@ function App() {
                 <Tooltip contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
-                <Line type="monotone" dataKey="nps_general" name="NPS Empresa" stroke="var(--secondary)" strokeWidth={2} strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="nps_general" name="NPS Geral" stroke="var(--secondary)" strokeWidth={2} strokeDasharray="5 5" />
               </LineChart>
             </ResponsiveContainer>
           </div>
           
           {bestNps && worstNps && (
-            <div className="chart-highlights">
-              <div className="highlight-item best">
-                <ArrowUp size={14} />
-                <span>{bestNps.month} ({bestNps.nps.toFixed(2)})</span>
+            <div className="chart-highlights multi-row">
+              <div className="highlight-group">
+                <span className="group-label" style={{ color: 'var(--primary)' }}>Meu NPS:</span>
+                <div className="highlight-item best">
+                  <ArrowUp size={14} />
+                  <span>{bestNps.month} ({bestNps.nps.toFixed(2)})</span>
+                </div>
+                <div className="highlight-item worst">
+                  <ArrowDown size={14} />
+                  <span>{worstNps.month} ({worstNps.nps.toFixed(2)})</span>
+                </div>
               </div>
-              <div className="highlight-item worst">
-                <ArrowDown size={14} />
-                <span>{worstNps.month} ({worstNps.nps.toFixed(2)})</span>
-              </div>
+              {bestNpsGeneral && worstNpsGeneral && (
+                <div className="highlight-group">
+                  <span className="group-label" style={{ color: 'var(--secondary)' }}>NPS Geral:</span>
+                  <div className="highlight-item best">
+                    <ArrowUp size={14} />
+                    <span>{bestNpsGeneral.month} ({bestNpsGeneral.nps_general.toFixed(2)})</span>
+                  </div>
+                  <div className="highlight-item worst">
+                    <ArrowDown size={14} />
+                    <span>{worstNpsGeneral.month} ({worstNpsGeneral.nps_general.toFixed(2)})</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -367,12 +386,12 @@ function App() {
 
           <div className="chart-highlights multi-row">
             <div className="highlight-group">
-              <span className="group-label">Fechados:</span>
+              <span className="group-label" style={{ color: 'var(--primary)' }}>Fechados:</span>
               <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestClosed?.month} ({bestClosed?.closed_count})</span></div>
               <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstClosed?.month} ({worstClosed?.closed_count})</span></div>
             </div>
             <div className="highlight-group">
-              <span className="group-label">Avaliados:</span>
+              <span className="group-label" style={{ color: 'var(--secondary)' }}>Avaliados:</span>
               <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestEval?.month} ({bestEval?.evaluated_count})</span></div>
               <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstEval?.month} ({worstEval?.evaluated_count})</span></div>
             </div>
@@ -413,7 +432,7 @@ function App() {
              <span className="row-label">Fechados</span>
              <span className="row-label">Avaliados</span>
              <span className="row-label">Meu NPS</span>
-             <span className="row-label">NPS Empresa</span>
+             <span className="row-label">NPS Geral</span>
              <span className="row-label">Férias</span>
              <span className="row-label">Projeto</span>
           </div>
