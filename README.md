@@ -20,13 +20,17 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 
 | Recurso | Descrição |
 | --- | --- |
-| **KPIs em Tempo Real** | Totais anuais e médias diárias calculadas automaticamente com base no mês corrente |
-| **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa |
-| **Check-ins de Status** | Marcação de meses com Férias, Projetos especiais ou outras categorias |
+| **KPIs Dinâmicos** | Totais anuais e médias calculadas com base nos meses com registros efetivos em cada ano |
+| **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
+| **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
+| **Índice de Chamados** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
+| **Check-ins de Status** | Marcação de meses com Férias ou Projetos especiais, excluídos automaticamente das análises de NPS |
 | **Relógio de Sistema** | Data e hora atualizadas em tempo real no cabeçalho |
-| **Entrada de Dados Ágil** | Tabela editável com auto-sync para inserção rápida de métricas mensais |
-| **Backup Automático** | Persistência de dados com backup `.bak` integrado ao fluxo de salvamento |
-| **Dados Históricos** | Suporte a importação e visualização de dados de anos anteriores |
+| **Edição Controlada** | Tabela editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
+| **Backup Automático** | Persistência com backup `.bak` via debounce, disparado a cada salvamento |
+| **Auto-Seed** | Inicialização automática do banco com dados históricos de 2024–2026 em caso de banco vazio |
+| **Migração de Schema** | Adição automática de colunas novas (`nps_general`, `is_vacation`, `is_project`) em bancos existentes |
+| **Dados Históricos** | Navegação por ano (2024, 2025, 2026) com cálculos independentes por período |
 
 ---
 
@@ -35,8 +39,8 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 ### Frontend
 
 - **React 18** — Componentização e renderização reativa
-- **Vite 5** — Build tool ultrarrápido com HMR
-- **Recharts** — Gráficos responsivos e interativos
+- **Vite 5** — Build tool ultrarrápido com HMR e proxy integrado
+- **Recharts** — Gráficos responsivos e interativos (LineChart, BarChart)
 - **Lucide React** — Ícones modernos e consistentes
 - **Axios** — Comunicação HTTP com o backend
 
@@ -44,7 +48,7 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 
 - **Node.js + Express** — API RESTful leve e performática
 - **SQLite 3** — Banco de dados embarcado, zero configuração
-- **Morgan** — Logging de requisições HTTP
+- **Morgan** — Logging de requisições HTTP em modo desenvolvimento
 - **CORS** — Controle de acesso cross-origin
 
 ---
@@ -60,15 +64,15 @@ ServiceNowDashboard/
 │   └── dashboard.db.bak     # Backup automático
 ├── src/                     # Frontend React
 │   ├── App.jsx              # Componente principal do dashboard
-│   ├── App.css              # Estilos do componente App
 │   ├── index.css            # Design system (tema Deep Blue Premium)
-│   ├── main.jsx             # Ponto de entrada da aplicação React
-│   └── assets/              # Recursos estáticos
-├── dist/                    # Build de produção (gerado pelo Vite)
+│   └── main.jsx             # Ponto de entrada da aplicação React
 ├── public/                  # Arquivos públicos estáticos
-├── start_dashboard.bat      # Script de inicialização (Windows)
+│   ├── favicon.svg          # Ícone da aplicação
+│   └── icons.svg            # Sprites de ícones
+├── dist/                    # Build de produção (gerado pelo Vite)
+├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
 ├── package.json             # Dependências e scripts NPM
-├── vite.config.js           # Configuração do Vite
+├── vite.config.js           # Configuração do Vite (porta, proxy)
 └── eslint.config.js         # Configuração do ESLint
 ```
 
@@ -85,7 +89,7 @@ ServiceNowDashboard/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/ServiceNowDashboard.git
+git clone https://github.com/caiquenovaes1994/ServiceNowDashboard.git
 
 # Acesse o diretório do projeto
 cd ServiceNowDashboard
@@ -102,6 +106,8 @@ npm install
 npm run dev
 ```
 
+> O Vite dev server roda na porta **3002** e faz proxy das chamadas `/api` para o backend na porta **5000**.
+
 #### Modo Produção
 
 ```bash
@@ -112,7 +118,7 @@ npm run build
 npm start
 ```
 
-#### Via Script (Windows — execução contínua)
+#### Via Script (Windows — execução contínua com auto-restart)
 
 ```bash
 start_dashboard.bat
@@ -120,10 +126,34 @@ start_dashboard.bat
 
 ### Acesso
 
-Após iniciar, o dashboard estará disponível em:
+| Ambiente | URL |
+| --- | --- |
+| Desenvolvimento | `http://localhost:3002` |
+| Produção | `http://localhost:5000` |
 
-```text
-http://localhost:3002
+---
+
+## 📡 API REST
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `GET` | `/api/metrics?year=2026` | Retorna métricas do ano especificado |
+| `POST` | `/api/metrics` | Cria ou atualiza métrica mensal (UPSERT) |
+| `POST` | `/api/settings` | Salva configuração chave-valor |
+
+### Exemplo de Payload — `POST /api/metrics`
+
+```json
+{
+  "year": 2026,
+  "month": "Abril",
+  "closed_count": 150,
+  "evaluated_count": 28,
+  "nps": 4.85,
+  "nps_general": 4.72,
+  "is_vacation": 0,
+  "is_project": 0
+}
 ```
 
 ---
@@ -133,11 +163,27 @@ http://localhost:3002
 | Comando | Descrição |
 | --- | --- |
 | `npm run dev` | Inicia frontend e backend em modo desenvolvimento |
-| `npm run server` | Inicia apenas o servidor backend |
-| `npm run client` | Inicia apenas o frontend (Vite dev server) |
+| `npm run server` | Inicia apenas o servidor backend (porta 5000) |
+| `npm run client` | Inicia apenas o frontend Vite (porta 3002) |
 | `npm run build` | Gera build de produção do frontend |
 | `npm start` | Inicia o servidor em modo produção |
 | `npm run lint` | Executa análise estática de código (ESLint) |
+| `npm run preview` | Preview local do build de produção |
+
+---
+
+## 📐 Lógica de Cálculo dos KPIs
+
+| KPI | Fórmula |
+| --- | --- |
+| **Fechados por mês** | `Total Fechados / Meses com registros` |
+| **Fechados por dia** | `Total Fechados / (Meses com registros × 22)` |
+| **Avaliações por mês** | `Total Avaliados / Meses com registros` |
+| **Avaliações por dia** | `Total Avaliados / (Meses com registros × 22)` |
+| **Índice de Avaliação** | `(Total Avaliados / Total Fechados) × 100` |
+| **NPS Médio** | `Soma NPS / Meses com NPS > 0` |
+
+> **Nota**: As médias mensais são calculadas dividindo pelo número de meses que possuem registros efetivos (`closed_count > 0` ou `evaluated_count > 0`) em cada ano, garantindo precisão tanto para anos fechados quanto para o ano corrente.
 
 ---
 

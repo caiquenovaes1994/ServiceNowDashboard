@@ -205,8 +205,9 @@ function App() {
   const totalClosedYear = safeMetrics.reduce((acc, m) => acc + (m.closed_count || 0), 0);
   const totalEvaluatedYear = safeMetrics.reduce((acc, m) => acc + (m.evaluated_count || 0), 0);
   
-  const currentMonthIdx = new Date().getMonth();
-  const monthsPassed = currentMonthIdx + 1;
+  // Count months that have actual records (closed or evaluated > 0)
+  const monthsWithData = safeMetrics.filter(m => (m.closed_count || 0) > 0 || (m.evaluated_count || 0) > 0).length;
+  const monthsPassed = Math.max(monthsWithData, 1); // Avoid division by zero
 
   const avgClosedMonth = (totalClosedYear / monthsPassed).toFixed(1);
   const avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1); // Based on business days
@@ -253,7 +254,7 @@ function App() {
 
   const isCurrentYear = year === new Date().getFullYear();
   const visibleMonths = isCurrentYear
-    ? MONTHS.slice(0, currentMonthIdx + 1).reverse()
+    ? MONTHS.slice(0, new Date().getMonth() + 1).reverse()
     : [...MONTHS].reverse();
 
   return (
