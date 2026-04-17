@@ -119,7 +119,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       />
       <input 
         type="number" 
-        step="0.1"
+        step="0.01"
         className="input-minimal font-mono" 
         value={editData.nps} 
         onChange={(e) => handleChange('nps', parseFloat(e.target.value) || 0)}
@@ -129,7 +129,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       />
       <input 
         type="number" 
-        step="0.1"
+        step="0.01"
         className="input-minimal font-mono" 
         value={editData.nps_general} 
         onChange={(e) => handleChange('nps_general', parseFloat(e.target.value) || 0)}
