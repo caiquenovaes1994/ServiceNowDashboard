@@ -5,7 +5,9 @@ cd /d "%PROJECT_ROOT%"
 
 :loop
 echo [%date% %time%] O Servidor e Dashboard (Modularizado) estao iniciando...
-echo Acesse em http://localhost:3002
+echo Acesse em:
+echo - Local:   http://localhost:3002
+echo - Rede:    http://192.168.60.74:3002
 echo.
 call npm run dev
 echo.

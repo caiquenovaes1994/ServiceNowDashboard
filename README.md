@@ -1,6 +1,6 @@
 # 📊 ServiceNow Dynamic Dashboard
 
-> Painel analítico de alta performance para monitoramento de chamados e NPS
+> Painel analítico de alta performance para monitoramento de chamados, NPS, SLA e Perfect Fix
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -20,7 +20,9 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 
 | Recurso | Descrição |
 | --- | --- |
-| **KPIs Dinâmicos** | Totais anuais e médias calculadas com base nos meses com registros efetivos em cada ano |
+| **KPIs Dinâmicos** | 8 cards organizados em 2 linhas × 4 colunas com totais, médias, SLA% e Perfect Fix |
+| **Monitoramento de SLA** | Calcula a acurácia de SLA (`within_sla_count / closed_count × 100`) com alertas de cor dinâmicos |
+| **Perfect Fix** | Rastreia chamados nunca reabertos (`perfect_fix_count / closed_count × 100`) com escala de cor em 3 faixas |
 | **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
 | **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
 | **Índice de Chamados** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
@@ -29,8 +31,9 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 | **Edição Controlada** | Tabela editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
 | **Backup Automático** | Persistência com backup `.bak` via debounce, disparado a cada salvamento |
 | **Auto-Seed** | Inicialização automática do banco com dados históricos de 2024–2026 em caso de banco vazio |
-| **Migração de Schema** | Adição automática de colunas novas (`nps_general`, `is_vacation`, `is_project`) em bancos existentes |
+| **Migração de Schema** | Adição automática de colunas novas em bancos existentes (sem perda de dados) |
 | **Dados Históricos** | Navegação por ano (2024, 2025, 2026) com cálculos independentes por período |
+| **Acesso em Rede Local** | Vite exposto em `host: true`, permitindo acesso via IP da rede (ex: `192.168.60.74:3002`) |
 
 ---
 
@@ -43,6 +46,7 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 - **Recharts** — Gráficos responsivos e interativos (LineChart, BarChart)
 - **Lucide React** — Ícones modernos e consistentes
 - **Axios** — Comunicação HTTP com o backend
+- **JetBrains Mono** — Tipografia monospace para valores numéricos de KPI
 
 ### Backend
 
@@ -72,7 +76,7 @@ ServiceNowDashboard/
 ├── dist/                    # Build de produção (gerado pelo Vite)
 ├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
 ├── package.json             # Dependências e scripts NPM
-├── vite.config.js           # Configuração do Vite (porta, proxy)
+├── vite.config.js           # Configuração do Vite (porta, proxy, host de rede)
 └── eslint.config.js         # Configuração do ESLint
 ```
 
@@ -128,7 +132,8 @@ start_dashboard.bat
 
 | Ambiente | URL |
 | --- | --- |
-| Desenvolvimento | `http://localhost:3002` |
+| Desenvolvimento (local) | `http://localhost:3002` |
+| Desenvolvimento (rede) | `http://192.168.60.74:3002` |
 | Produção | `http://localhost:5000` |
 
 ---
@@ -152,7 +157,9 @@ start_dashboard.bat
   "nps": 4.85,
   "nps_general": 4.72,
   "is_vacation": 0,
-  "is_project": 0
+  "is_project": 0,
+  "within_sla_count": 142,
+  "perfect_fix_count": 130
 }
 ```
 
@@ -174,16 +181,64 @@ start_dashboard.bat
 
 ## 📐 Lógica de Cálculo dos KPIs
 
+### Linha 1 — Chamados & Qualidade
+
 | KPI | Fórmula |
 | --- | --- |
+| **Total de Chamados Fechados** | Soma de `closed_count` no ano |
 | **Fechados por mês** | `Total Fechados / Meses com registros` |
-| **Fechados por dia** | `Total Fechados / (Meses com registros × 22)` |
-| **Avaliações por mês** | `Total Avaliados / Meses com registros` |
-| **Avaliações por dia** | `Total Avaliados / (Meses com registros × 22)` |
-| **Índice de Avaliação** | `(Total Avaliados / Total Fechados) × 100` |
 | **NPS Médio** | `Soma NPS / Meses com NPS > 0` |
+| **SLA%** | `(Soma within_sla_count / Soma closed_count) × 100` |
+
+### Linha 2 — Avaliações & Eficiência
+
+| KPI | Fórmula |
+| --- | --- |
+| **Total de Chamados Avaliados** | Soma de `evaluated_count` no ano |
+| **Avaliações por mês** | `Total Avaliados / Meses com registros` |
+| **Índice de Avaliação** | `(Total Avaliados / Total Fechados) × 100` |
+| **Perfect Fix** | `(Soma perfect_fix_count / Soma closed_count) × 100` |
 
 > **Nota**: As médias mensais são calculadas dividindo pelo número de meses que possuem registros efetivos (`closed_count > 0` ou `evaluated_count > 0`) em cada ano, garantindo precisão tanto para anos fechados quanto para o ano corrente.
+
+---
+
+## 🎨 Regras de Cores dos KPIs
+
+### SLA%
+
+| Faixa | Cor |
+| --- | --- |
+| ≥ 95% | 🟢 Verde (`--success`) |
+| 71% a 94% | 🟠 Laranja (`--secondary`) |
+| ≤ 70% | 🔴 Vermelho (`--error`) |
+
+### Perfect Fix
+
+| Faixa | Cor |
+| --- | --- |
+| ≥ 80% | 🟢 Verde (`--success`) |
+| 71% a 79% | 🟠 Laranja (`--secondary`) |
+| ≤ 70% | 🔴 Vermelho (`--error`) |
+
+---
+
+## 🗄️ Schema do Banco de Dados
+
+A tabela `metrics` contém as seguintes colunas, com migração automática para bancos existentes:
+
+| Coluna | Tipo | Descrição |
+| --- | --- | --- |
+| `year` | INTEGER | Ano de referência |
+| `month` | TEXT | Mês de referência (em português) |
+| `closed_count` | INTEGER | Chamados fechados no mês |
+| `evaluated_count` | INTEGER | Chamados avaliados no mês |
+| `nps` | REAL | NPS pessoal do mês |
+| `nps_general` | REAL | NPS geral corporativo |
+| `is_vacation` | INTEGER | 1 = mês de férias |
+| `is_project` | INTEGER | 1 = mês em projeto especial |
+| `within_sla_count` | INTEGER | Chamados atendidos dentro do SLA |
+| `perfect_fix_count` | INTEGER | Chamados nunca reabertos (Perfect Fix) |
 
 ---
 
@@ -191,9 +246,16 @@ start_dashboard.bat
 
 O sistema de design está centralizado em `src/index.css`, utilizando variáveis CSS para fácil customização:
 
-- **Paleta de cores** — Tema Deep Blue Premium com gradientes e glassmorphism
-- **Tipografia** — Fontes modernas e responsivas
+```css
+--primary: #38bdf8;       /* Azul principal */
+--secondary: #f97316;     /* Laranja (atenção) */
+--success: #34d399;       /* Verde (meta atingida) */
+--error: #ef4444;         /* Vermelho (alerta crítico) */
+```
+
+- **Tipografia** — JetBrains Mono para valores numéricos, Plus Jakarta Sans para textos
 - **Animações** — Micro-animações e transições suaves
+- **Layout** — Grid responsivo com glassmorphism e tema Deep Blue Premium
 
 ---
 

@@ -62,7 +62,9 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
     nps: 0,
     nps_general: 0,
     is_vacation: 0,
-    is_project: 0
+    is_project: 0,
+    within_sla_count: 0,
+    perfect_fix_count: 0
   });
 
   useEffect(() => {
@@ -74,7 +76,9 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
           nps: data.nps || 0,
           nps_general: data.nps_general || 0,
           is_vacation: data.is_vacation || 0,
-          is_project: data.is_project || 0
+          is_project: data.is_project || 0,
+          within_sla_count: data.within_sla_count || 0,
+          perfect_fix_count: data.perfect_fix_count || 0
         });
       });
     }
@@ -83,7 +87,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
   const handleChange = (field, value) => {
     if (readOnly) return;
     let clampedValue = value;
-    if (field === 'closed_count' || field === 'evaluated_count') {
+    if (field === 'closed_count' || field === 'evaluated_count' || field === 'within_sla_count' || field === 'perfect_fix_count') {
       clampedValue = Math.min(Math.max(value, 0), 999);
     } else if (field === 'nps' || field === 'nps_general') {
       clampedValue = Math.min(Math.max(value, 0), 5.0);
@@ -116,6 +120,24 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
         onBlur={handleBlur}
         disabled={readOnly}
         placeholder="Avaliados"
+      />
+      <input 
+        type="number" 
+        className="input-minimal font-mono" 
+        value={editData.within_sla_count} 
+        onChange={(e) => handleChange('within_sla_count', parseInt(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="SLA"
+      />
+      <input 
+        type="number" 
+        className="input-minimal font-mono" 
+        value={editData.perfect_fix_count} 
+        onChange={(e) => handleChange('perfect_fix_count', parseInt(e.target.value) || 0)}
+        onBlur={handleBlur}
+        disabled={readOnly}
+        placeholder="Perfect Fix"
       />
       <input 
         type="number" 
@@ -204,18 +226,24 @@ function App() {
   
   const totalClosedYear = safeMetrics.reduce((acc, m) => acc + (m.closed_count || 0), 0);
   const totalEvaluatedYear = safeMetrics.reduce((acc, m) => acc + (m.evaluated_count || 0), 0);
+  const totalWithinSlaYear = safeMetrics.reduce((acc, m) => acc + (m.within_sla_count || 0), 0);
   
   // Count months that have actual records (closed or evaluated > 0)
   const monthsWithData = safeMetrics.filter(m => (m.closed_count || 0) > 0 || (m.evaluated_count || 0) > 0).length;
   const monthsPassed = Math.max(monthsWithData, 1); // Avoid division by zero
 
   const avgClosedMonth = (totalClosedYear / monthsPassed).toFixed(1);
-  const avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1); // Based on business days
+  const avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1);
   
   const avgEvalMonth = (totalEvaluatedYear / monthsPassed).toFixed(1);
   const avgEvalDay = (totalEvaluatedYear / (monthsPassed * 22)).toFixed(1);
+
+  const slaAccuracy = totalClosedYear > 0 ? ((totalWithinSlaYear / totalClosedYear) * 100).toFixed(1) : "0";
+
+  const totalPerfectFixYear = safeMetrics.reduce((acc, m) => acc + (m.perfect_fix_count || 0), 0);
+  const perfectFixRate = totalClosedYear > 0 ? ((totalPerfectFixYear / totalClosedYear) * 100).toFixed(1) : "0";
   
-  const evalIndex = totalClosedYear > 0 ? ((totalEvaluatedYear / totalClosedYear) * 100).toFixed(1) : 0;
+  const evalIndex = totalClosedYear > 0 ? ((totalEvaluatedYear / totalClosedYear) * 100).toFixed(1) : "0";
 
   const npsValues = safeMetrics.filter(m => (m.nps || 0) > 0).map(m => m.nps);
   const avgNpsYear = npsValues.length > 0 
@@ -295,12 +323,15 @@ function App() {
           <span className="value font-mono">{avgClosedMonth}</span>
         </div>
         <div className="card kpi-card">
-          <span className="label">Fechados por dia</span>
-          <span className="value font-mono">{avgClosedDay}</span>
-        </div>
-        <div className="card kpi-card">
           <span className="label">NPS Médio</span>
           <span className="value font-mono" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">SLA%</span>
+          <span className="value font-mono" style={{
+            color: Number(slaAccuracy) >= 95 ? 'var(--success)' : 
+                   Number(slaAccuracy) <= 70 ? 'var(--error)' : 'var(--secondary)'
+          }}>{slaAccuracy}%</span>
         </div>
       </div>
 
@@ -314,12 +345,15 @@ function App() {
           <span className="value font-mono">{avgEvalMonth}</span>
         </div>
         <div className="card kpi-card">
-          <span className="label">Avaliações por dia</span>
-          <span className="value font-mono">{avgEvalDay}</span>
-        </div>
-        <div className="card kpi-card">
           <span className="label">Índice de Avaliação</span>
           <span className="value font-mono" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
+        </div>
+        <div className="card kpi-card">
+          <span className="label">Perfect Fix</span>
+          <span className="value font-mono" style={{
+            color: Number(perfectFixRate) >= 80 ? 'var(--success)' : 
+                   Number(perfectFixRate) <= 70 ? 'var(--error)' : 'var(--secondary)'
+          }}>{perfectFixRate}%</span>
         </div>
       </div>
 
@@ -332,8 +366,8 @@ function App() {
             <ResponsiveContainer>
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
@@ -434,14 +468,16 @@ function App() {
       <div className="metrics-table-container">
         <div className="metrics-grid">
           <div className="metrics-row" style={{background: 'transparent', border: 'none', paddingBottom: 0}}>
-             <span className="row-label">Mês</span>
-             <span className="row-label">Fechados</span>
-             <span className="row-label">Avaliados</span>
-             <span className="row-label">Meu NPS</span>
-             <span className="row-label">NPS Geral</span>
-             <span className="row-label">Férias</span>
-             <span className="row-label">Projeto</span>
-          </div>
+              <span className="row-label">Mês</span>
+              <span className="row-label">Fechados</span>
+              <span className="row-label">Avaliados</span>
+              <span className="row-label">Dentro do SLA</span>
+              <span className="row-label">Perfect Fix</span>
+              <span className="row-label">Meu NPS</span>
+              <span className="row-label">NPS Geral</span>
+              <span className="row-label">Férias</span>
+              <span className="row-label">Projeto</span>
+           </div>
           
           {visibleMonths.map(month => {
             const today = new Date();

@@ -33,8 +33,8 @@ app.get('/api/metrics', async (req, res) => {
 
 app.post('/api/metrics', async (req, res) => {
   try {
-    const { year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project } = req.body;
-    await saveMetric({ year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project });
+    const { year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project, within_sla_count, perfect_fix_count } = req.body;
+    await saveMetric({ year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project, within_sla_count, perfect_fix_count });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
