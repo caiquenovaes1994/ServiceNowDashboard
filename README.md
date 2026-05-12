@@ -33,7 +33,6 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 | **Auto-Seed** | Inicialização automática do banco com dados históricos de 2024–2026 em caso de banco vazio |
 | **Migração de Schema** | Adição automática de colunas novas em bancos existentes (sem perda de dados) |
 | **Dados Históricos** | Navegação por ano (2024, 2025, 2026) com cálculos independentes por período |
-| **Acesso em Rede Local** | Vite exposto em `host: true`, permitindo acesso via IP da rede (ex: `192.168.60.74:3002`) |
 
 ---
 
@@ -76,7 +75,7 @@ ServiceNowDashboard/
 ├── dist/                    # Build de produção (gerado pelo Vite)
 ├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
 ├── package.json             # Dependências e scripts NPM
-├── vite.config.js           # Configuração do Vite (porta, proxy, host de rede)
+├── vite.config.js           # Configuração do Vite (porta, proxy)
 └── eslint.config.js         # Configuração do ESLint
 ```
 
@@ -132,8 +131,7 @@ start_dashboard.bat
 
 | Ambiente | URL |
 | --- | --- |
-| Desenvolvimento (local) | `http://localhost:3002` |
-| Desenvolvimento (rede) | `http://192.168.60.74:3002` |
+| Desenvolvimento | `http://localhost:3002` |
 | Produção | `http://localhost:5000` |
 
 ---
