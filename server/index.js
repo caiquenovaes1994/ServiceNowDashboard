@@ -2,7 +2,10 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import { initDb, getMetrics, saveMetric, getSetting, saveSetting } from './database.js';
+import multer from 'multer';
+import csvParser from 'csv-parser';
+import fs from 'fs';
+import { initDb, getMetrics, saveMetric, getSetting, saveSetting, updateSlaMetrics } from './database.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,6 +14,26 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ── Multer: armazena o CSV em uploads/ dentro de server/ ──────────────────────
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const upload = multer({ dest: uploadDir });
+
+// ── Mapeamento numérico de mês → nome PT-BR ───────────────────────────────────
+const MONTH_NAMES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
+// ── SLA por prioridade (em segundos) ─────────────────────────────────────────
+const SLA_LIMITS = {
+  '1': 4  * 3600,   // P1 → 4 h
+  '2': 24 * 3600,   // P2 → 24 h
+  '3': 48 * 3600,   // P3 → 48 h
+  '4': 96 * 3600,   // P4 → 96 h
+};
 
 app.use(cors());
 app.use(express.json());
@@ -50,6 +73,128 @@ app.post('/api/settings', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ── POST /api/upload-metrics ─────────────────────────────────────────────────
+app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+  }
+
+  const filePath = req.file.path;
+
+  // Accumulate per-month totals: { 'YYYY-MM': { within_sla: N, perfect_fix: N } }
+  const monthTotals = {};
+
+  const rows = [];
+
+  fs.createReadStream(filePath)
+    .pipe(csvParser())
+    .on('data', (row) => rows.push(row))
+    .on('end', async () => {
+      // ── Higiene: remove o arquivo temporário ────────────────────────────
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) console.warn('[Upload] Aviso: não foi possível remover arquivo temp:', unlinkErr.message);
+        else console.log('[Upload] Arquivo temporário removido:', filePath);
+      });
+
+      // ── Diagnóstico: mostra as colunas reais do CSV ──────────────────────
+      if (rows.length > 0) {
+        const sampleKeys = Object.keys(rows[0]).map(k => k.trim().replace(/^\uFEFF/, ''));
+        console.log('[Upload] Colunas detectadas:', sampleKeys);
+        console.log('[Upload] Primeira linha (amostra):', JSON.stringify(rows[0], null, 2));
+      }
+
+      // ── Parseia datas de forma robusta (suporta "YYYY-MM-DD HH:mm:ss") ──────
+      const parseDate = (str) => {
+        if (!str || !str.trim()) return null;
+        // Substitui espaço por T para tornar ISO-8601 válido no Node.js
+        const iso = str.trim().replace(' ', 'T');
+        const d = new Date(iso);
+        return isNaN(d) ? null : d;
+      };
+
+      // ── Processar cada linha ────────────────────────────────────────────
+      let skipped = 0;
+      for (const row of rows) {
+        // Normaliza chaves (remove BOM e espaços)
+        const normalizedRow = {};
+        for (const key of Object.keys(row)) {
+          normalizedRow[key.trim().replace(/^\uFEFF/, '')] = (row[key] || '').trim();
+        }
+
+        const createdStr  = normalizedRow['sys_created_on'] || normalizedRow['Created'] || normalizedRow['created'] || normalizedRow['Opened']   || normalizedRow['opened']   || '';
+        const updatedStr  = normalizedRow['sys_updated_on'] || normalizedRow['Updated'] || normalizedRow['updated'] || normalizedRow['Resolved'] || normalizedRow['resolved'] || '';
+        const priorityRaw = normalizedRow['priority']        || normalizedRow['Priority'] || '';
+        const reopenRaw   = normalizedRow['u_reopen_count']  || normalizedRow['Reopen count'] || normalizedRow['reopen_count'] || normalizedRow['reopenCount'] || '0';
+
+        const createdAt = parseDate(createdStr);
+        const updatedAt = parseDate(updatedStr);
+
+        if (!createdAt || !updatedAt) {
+          skipped++;
+          continue;
+        }
+
+        // Duração em segundos
+        const durationSec = (updatedAt - createdAt) / 1000;
+
+        // Extrai dígito da prioridade (ex.: "1 - Critical" → "1", "P2" → "2")
+        const priorityMatch = priorityRaw.match(/(\d)/);
+        const priorityKey   = priorityMatch ? priorityMatch[1] : null;
+        const slaLimit      = priorityKey ? SLA_LIMITS[priorityKey] : null;
+
+        const withinSla   = slaLimit !== null && durationSec <= slaLimit;
+        const reopenCount = parseInt(reopenRaw, 10) || 0;
+        const perfectFix  = withinSla && reopenCount === 0;
+
+        // Agrupa por YYYY-MM usando a coluna Updated
+        const yearKey   = updatedAt.getFullYear();
+        const monthKey  = updatedAt.getMonth(); // 0-indexed
+        const bucketKey = `${yearKey}-${String(monthKey + 1).padStart(2, '0')}`;
+
+        if (!monthTotals[bucketKey]) {
+          monthTotals[bucketKey] = { year: yearKey, month: monthKey, within_sla: 0, perfect_fix: 0 };
+        }
+        if (withinSla)  monthTotals[bucketKey].within_sla++;
+        if (perfectFix) monthTotals[bucketKey].perfect_fix++;
+      }
+
+      if (skipped > 0) {
+        console.warn(`[Upload] ${skipped} linha(s) ignorada(s) por datas inválidas ou ausentes.`);
+      }
+
+      // ── Persistir no banco ──────────────────────────────────────────────
+      try {
+        const updates = Object.values(monthTotals);
+        for (const entry of updates) {
+          const monthName = MONTH_NAMES[entry.month];
+          await updateSlaMetrics(entry.year, monthName, entry.within_sla, entry.perfect_fix);
+        }
+
+        console.log(`[Upload] CSV processado: ${rows.length} linhas, ${skipped} ignoradas, ${updates.length} meses atualizados.`);
+        res.json({
+          success: true,
+          rows_processed: rows.length,
+          rows_skipped: skipped,
+          months_updated: updates.length,
+          summary: Object.fromEntries(
+            Object.entries(monthTotals).map(([k, v]) => [
+              k,
+              { within_sla: v.within_sla, perfect_fix: v.perfect_fix }
+            ])
+          )
+        });
+      } catch (dbErr) {
+        console.error('[Upload] Erro ao atualizar banco:', dbErr.message);
+        res.status(500).json({ error: 'Erro ao salvar métricas no banco.', detail: dbErr.message });
+      }
+    })
+    .on('error', (parseErr) => {
+      console.error('[Upload] Erro ao parsear CSV:', parseErr.message);
+      fs.unlink(filePath, () => {});
+      res.status(400).json({ error: 'Falha ao ler o arquivo CSV.', detail: parseErr.message });
+    });
+});
+
 // Serve static files from Vite's build output (dist)
 app.use(express.static(path.join(__dirname, '../dist')));
 

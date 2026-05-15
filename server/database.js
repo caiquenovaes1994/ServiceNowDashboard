@@ -216,3 +216,27 @@ export const saveSetting = (key, value) => {
     });
   });
 };
+
+// Atualiza APENAS within_sla_count e perfect_fix_count para um mês/ano.
+// Se a linha ainda não existe, insere um registro mínimo (outros campos = 0).
+export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_count) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO metrics (year, month, closed_count, evaluated_count, nps, nps_general,
+                            is_vacation, is_project, within_sla_count, perfect_fix_count)
+       VALUES (?, ?, 0, 0, 0, 0, 0, 0, ?, ?)
+       ON CONFLICT(year, month) DO UPDATE SET
+         within_sla_count = excluded.within_sla_count,
+         perfect_fix_count = excluded.perfect_fix_count`,
+      [year, month, within_sla_count, perfect_fix_count],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          triggerBackup();
+          resolve(this.lastID);
+        }
+      }
+    );
+  });
+};

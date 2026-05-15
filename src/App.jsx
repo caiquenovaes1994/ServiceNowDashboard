@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   LineChart, Line, Legend
 } from 'recharts';
 import { 
-  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown
+  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud
 } from 'lucide-react';
 
 const API_BASE = '/api';
@@ -14,6 +14,80 @@ const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
+
+// ── CSV Upload Button ─────────────────────────────────────────────────────────
+const CsvUploader = ({ onSuccess }) => {
+  const [status, setStatus] = useState('idle'); // idle | uploading | success | error
+  const [message, setMessage] = useState('');
+  const inputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Reset input so the same file can be re-uploaded if needed
+    e.target.value = '';
+
+    setStatus('uploading');
+    setMessage('');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(`${API_BASE}/upload-metrics`, {
+        method: 'POST',
+        body: formData,
+      });
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
+
+      setStatus('success');
+      setMessage(`${json.rows_processed} linhas · ${json.months_updated} meses`);
+      onSuccess();
+
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000);
+    } catch (err) {
+      setStatus('error');
+      setMessage(err.message);
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
+    }
+  };
+
+  const label = {
+    idle:      'Importar CSV',
+    uploading: 'Processando…',
+    success:   'Importado!',
+    error:     'Erro',
+  }[status];
+
+  return (
+    <div className="csv-uploader">
+      <input
+        ref={inputRef}
+        id="csv-file-input"
+        type="file"
+        accept=".csv,text/csv"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <button
+        id="csv-upload-btn"
+        className={`btn-import btn-import--${status}`}
+        onClick={() => status === 'idle' && inputRef.current?.click()}
+        disabled={status === 'uploading'}
+        title="Importar métricas de SLA via CSV do ServiceNow"
+      >
+        <UploadCloud size={15} strokeWidth={2.2} />
+        <span>{label}</span>
+      </button>
+      {message && (
+        <span className={`import-msg import-msg--${status}`}>{message}</span>
+      )}
+    </div>
+  );
+};
 
 const Clock = () => {
   const [time, setTime] = useState(new Date());
@@ -123,21 +197,21 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       />
       <input 
         type="number" 
-        className="input-minimal font-mono" 
+        className="input-minimal font-mono input-csv-only" 
         value={editData.within_sla_count} 
-        onChange={(e) => handleChange('within_sla_count', parseInt(e.target.value) || 0)}
-        onBlur={handleBlur}
-        disabled={readOnly}
-        placeholder="SLA"
+        readOnly
+        disabled
+        title="Populado via importação de CSV"
+        placeholder="—"
       />
       <input 
         type="number" 
-        className="input-minimal font-mono" 
+        className="input-minimal font-mono input-csv-only" 
         value={editData.perfect_fix_count} 
-        onChange={(e) => handleChange('perfect_fix_count', parseInt(e.target.value) || 0)}
-        onBlur={handleBlur}
-        disabled={readOnly}
-        placeholder="Perfect Fix"
+        readOnly
+        disabled
+        title="Populado via importação de CSV"
+        placeholder="—"
       />
       <input 
         type="number" 
@@ -307,6 +381,7 @@ function App() {
                 ))}
               </select>
             </div>
+            <CsvUploader onSuccess={fetchData} />
           </div>
         </div>
         

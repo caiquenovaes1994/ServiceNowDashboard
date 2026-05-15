@@ -14,6 +14,8 @@
 
 O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvida para centralizar e visualizar métricas operacionais de equipes de suporte e atendimento. O sistema oferece uma interface moderna com tema **Deep Blue Premium**, gráficos interativos e sincronização de dados em tempo real, tudo armazenado localmente com SQLite para máxima autonomia e velocidade.
 
+A partir da versão atual, o dashboard suporta **ingestão automática de dados via exportação CSV do ServiceNow**, calculando SLA e Perfect Fix diretamente a partir dos registros brutos.
+
 ---
 
 ## ✨ Funcionalidades
@@ -23,6 +25,7 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 | **KPIs Dinâmicos** | 8 cards organizados em 2 linhas × 4 colunas com totais, médias, SLA% e Perfect Fix |
 | **Monitoramento de SLA** | Calcula a acurácia de SLA (`within_sla_count / closed_count × 100`) com alertas de cor dinâmicos |
 | **Perfect Fix** | Rastreia chamados nunca reabertos (`perfect_fix_count / closed_count × 100`) com escala de cor em 3 faixas |
+| **Importação de CSV** | Upload do export do ServiceNow para cálculo automático de SLA e Perfect Fix por mês |
 | **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
 | **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
 | **Índice de Chamados** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
@@ -51,6 +54,8 @@ O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvid
 
 - **Node.js + Express** — API RESTful leve e performática
 - **SQLite 3** — Banco de dados embarcado, zero configuração
+- **Multer** — Recepção de arquivos via `multipart/form-data`
+- **csv-parser** — Leitura e parsing de arquivos CSV em stream
 - **Morgan** — Logging de requisições HTTP em modo desenvolvimento
 - **CORS** — Controle de acesso cross-origin
 
@@ -63,15 +68,14 @@ ServiceNowDashboard/
 ├── server/                  # Backend da aplicação
 │   ├── index.js             # Servidor Express e rotas da API
 │   ├── database.js          # Camada de acesso ao banco SQLite
+│   ├── uploads/             # Diretório temporário de CSVs (auto-limpo)
 │   ├── dashboard.db         # Banco de dados principal
 │   └── dashboard.db.bak     # Backup automático
 ├── src/                     # Frontend React
-│   ├── App.jsx              # Componente principal do dashboard
+│   ├── App.jsx              # Componente principal + CsvUploader
 │   ├── index.css            # Design system (tema Deep Blue Premium)
 │   └── main.jsx             # Ponto de entrada da aplicação React
 ├── public/                  # Arquivos públicos estáticos
-│   ├── favicon.svg          # Ícone da aplicação
-│   └── icons.svg            # Sprites de ícones
 ├── dist/                    # Build de produção (gerado pelo Vite)
 ├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
 ├── package.json             # Dependências e scripts NPM
@@ -141,8 +145,9 @@ start_dashboard.bat
 | Método | Endpoint | Descrição |
 | --- | --- | --- |
 | `GET` | `/api/metrics?year=2026` | Retorna métricas do ano especificado |
-| `POST` | `/api/metrics` | Cria ou atualiza métrica mensal (UPSERT) |
+| `POST` | `/api/metrics` | Cria ou atualiza métrica mensal (UPSERT completo) |
 | `POST` | `/api/settings` | Salva configuração chave-valor |
+| `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow e atualiza SLA/Perfect Fix |
 
 ### Exemplo de Payload — `POST /api/metrics`
 
@@ -160,6 +165,65 @@ start_dashboard.bat
   "perfect_fix_count": 130
 }
 ```
+
+### `POST /api/upload-metrics`
+
+Recebe um arquivo CSV via `multipart/form-data` (campo `file`).
+
+**Resposta de sucesso:**
+
+```json
+{
+  "success": true,
+  "rows_processed": 57,
+  "rows_skipped": 0,
+  "months_updated": 2,
+  "summary": {
+    "2026-03": { "within_sla": 31, "perfect_fix": 28 },
+    "2026-04": { "within_sla": 24, "perfect_fix": 21 }
+  }
+}
+```
+
+---
+
+## 📥 Importação de CSV do ServiceNow
+
+### Como usar
+
+1. Exporte os chamados diretamente pelo ServiceNow em formato **CSV**
+2. No dashboard, clique em **"Importar CSV"** no cabeçalho
+3. Selecione o arquivo — o processamento ocorre automaticamente
+4. Os KPIs e gráficos atualizam em tempo real após o upload
+
+### Colunas esperadas no CSV
+
+| Coluna no CSV | Uso |
+| --- | --- |
+| `sys_created_on` | Data de criação do chamado |
+| `sys_updated_on` | Data de atualização (usada para agrupar por mês) |
+| `priority` | Prioridade do chamado (ex.: `"4 - Low"`, `"1 - Critical"`) |
+| `u_reopen_count` | Número de vezes que o chamado foi reaberto |
+
+### Lógica de Processamento
+
+| Passo | Descrição |
+| --- | --- |
+| **Duração** | `(sys_updated_on − sys_created_on)` em segundos |
+| **Verificação de SLA** | Compara a duração com o limite por prioridade (tabela abaixo) |
+| **Perfect Fix** | `SLA cumprido == true` **E** `u_reopen_count == 0` |
+| **Agrupamento** | Por mês/ano da coluna `sys_updated_on` |
+| **Persistência** | UPSERT cirúrgico — atualiza apenas `within_sla_count` e `perfect_fix_count`, preservando NPS e demais campos |
+| **Higiene** | Arquivo CSV removido do disco imediatamente após a leitura |
+
+### Limites de SLA por Prioridade
+
+| Prioridade | Limite |
+| --- | --- |
+| P1 — Critical | 4 horas |
+| P2 — High | 24 horas |
+| P3 — Moderate | 48 horas |
+| P4 — Low | 96 horas |
 
 ---
 

@@ -288,6 +288,15 @@ body {
   cursor: not-allowed;
 }
 
+/* Campos gerenciados pela importação CSV */
+.input-csv-only {
+  border-color: rgba(56, 189, 248, 0.12) !important;
+  border-style: dashed !important;
+  color: #38bdf8 !important;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .metrics-row:hover {
   background: rgba(51, 65, 85, 0.5);
 }
@@ -340,4 +349,71 @@ body {
 .checkbox-custom.checked {
   background: var(--primary);
   border-color: var(--primary);
+}
+
+/* ── CSV Uploader ─────────────────────────────────────────────────────────── */
+.csv-uploader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-import {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.08);
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.btn-import:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-import--uploading {
+  border-color: rgba(100, 116, 139, 0.4);
+  color: #64748b;
+  cursor: not-allowed;
+  animation: pulse-import 1.4s ease-in-out infinite;
+}
+
+.btn-import--success {
+  border-color: rgba(52, 211, 153, 0.4);
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--success);
+  cursor: default;
+}
+
+.btn-import--error {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+  cursor: default;
+}
+
+.import-msg {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+.import-msg--success { color: var(--success); }
+.import-msg--error   { color: var(--error); }
+
+@keyframes pulse-import {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
 }
