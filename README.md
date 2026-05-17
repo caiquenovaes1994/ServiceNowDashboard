@@ -2,11 +2,14 @@
 
 > Painel analítico de alta performance para monitoramento de chamados, NPS, SLA e Perfect Fix
 
-![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
+![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
+![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
+![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
+![Vite 5.0.0](https://img.shields.io/badge/Vite-5.0.0-646CFF?style=flat&logo=vite&logoColor=white)
+![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
+
+[![Licença MIT](https://img.shields.io/badge/Licença-MIT-blue?style=flat)](LICENSE)
+[![Código de Conduta](https://img.shields.io/badge/Código_de_Conduta-Contributor_Covenant-ff69b4?style=flat)](CODE_OF_CONDUCT.md)
 
 ---
 
@@ -323,7 +326,7 @@ O sistema de design está centralizado em `src/index.css`, utilizando variáveis
 
 ## 📄 Licença
 
-Este projeto é de uso **privado e proprietário**. Todos os direitos reservados.
+Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
