@@ -31,8 +31,9 @@ A partir da versão atual, o dashboard suporta **ingestão automática de dados 
 | **Importação de CSV** | Upload do export do ServiceNow para cálculo automático de SLA e Perfect Fix por mês |
 | **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
 | **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
-| **Índice de Chamados** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
-| **Check-ins de Status** | Marcação de meses com Férias ou Projetos especiais, excluídos automaticamente das análises de NPS |
+| **Índice de Avaliações** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
+| **SLA & Perfect Fix** | Gráfico de linha comparando os dois indicadores simultaneamente com linha de meta (95%) e extremos |
+| **Check-ins de Status** | Marcação de meses com Férias ou Projetos especiais, excluídos automaticamente dos comparativos extremos |
 | **Relógio de Sistema** | Data e hora atualizadas em tempo real no cabeçalho |
 | **Edição Controlada** | Tabela editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
 | **Backup Automático** | Persistência com backup `.bak` via debounce, disparado a cada salvamento |
@@ -72,8 +73,8 @@ ServiceNowDashboard/
 │   ├── index.js             # Servidor Express e rotas da API
 │   ├── database.js          # Camada de acesso ao banco SQLite
 │   ├── uploads/             # Diretório temporário de CSVs (auto-limpo)
-│   ├── dashboard.db         # Banco de dados principal
-│   └── dashboard.db.bak     # Backup automático
+│   ├── backups/             # Diretório de backups automáticos (.bak) do banco
+│   └── dashboard.db         # Banco de dados principal
 ├── src/                     # Frontend React
 │   ├── App.jsx              # Componente principal + CsvUploader
 │   ├── index.css            # Design system (tema Deep Blue Premium)

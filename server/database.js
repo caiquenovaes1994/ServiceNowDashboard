@@ -34,7 +34,12 @@ const db = new (sqlite3.verbose().Database)(dbPath, (err) => {
 });
 
 const backupDatabase = () => {
-  const backupPath = dbPath + '.bak';
+  const backupDir = path.join(__dirname, 'backups');
+  if (!fs.existsSync(backupDir)) {
+    fs.mkdirSync(backupDir, { recursive: true });
+  }
+  const backupPath = path.join(backupDir, 'dashboard.db.bak');
+  
   fs.copyFile(dbPath, backupPath, (err) => {
     if (err) {
       console.error('[Backup] Erro ao criar backup:', err);
@@ -109,7 +114,7 @@ export const initDb = () => {
           { year: 2024, month: 'Novembro', closed_count: 85, evaluated_count: 13, nps: 4.92, nps_general: 0, is_vacation: 0, is_project: 1, perfect_fix_count: 78 },
           { year: 2024, month: 'Dezembro', closed_count: 281, evaluated_count: 21, nps: 4.71, nps_general: 0, is_vacation: 0, is_project: 0, perfect_fix_count: 248 },
           { year: 2025, month: 'Janeiro', closed_count: 140, evaluated_count: 15, nps: 4.67, nps_general: 0, is_vacation: 0, is_project: 0, perfect_fix_count: 123 },
-          { year: 2025, month: 'Fevereiro', closed_count: 2, evaluated_count: 2, nps: 4.5, nps_general: 0, is_vacation: 1, is_project: 0, perfect_fix_count: 0 },
+          { year: 2025, month: 'Fevereiro', closed_count: 0, evaluated_count: 0, nps: 0, nps_general: 0, is_vacation: 1, is_project: 0, perfect_fix_count: 0 },
           { year: 2025, month: 'Março', closed_count: 39, evaluated_count: 12, nps: 5, nps_general: 0, is_vacation: 0, is_project: 1, perfect_fix_count: 36 },
           { year: 2025, month: 'Abril', closed_count: 115, evaluated_count: 14, nps: 4.79, nps_general: 4.78, is_vacation: 0, is_project: 0, perfect_fix_count: 99 },
           { year: 2025, month: 'Maio', closed_count: 110, evaluated_count: 21, nps: 4.95, nps_general: 4.74, is_vacation: 0, is_project: 0, perfect_fix_count: 102 },
@@ -217,18 +222,19 @@ export const saveSetting = (key, value) => {
   });
 };
 
-// Atualiza APENAS within_sla_count e perfect_fix_count para um mês/ano.
+// Atualiza within_sla_count, perfect_fix_count e closed_count para um mês/ano.
 // Se a linha ainda não existe, insere um registro mínimo (outros campos = 0).
-export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_count) => {
+export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_count, closed_count) => {
   return new Promise((resolve, reject) => {
     db.run(
       `INSERT INTO metrics (year, month, closed_count, evaluated_count, nps, nps_general,
                             is_vacation, is_project, within_sla_count, perfect_fix_count)
-       VALUES (?, ?, 0, 0, 0, 0, 0, 0, ?, ?)
+       VALUES (?, ?, ?, 0, 0, 0, 0, 0, ?, ?)
        ON CONFLICT(year, month) DO UPDATE SET
+         closed_count = excluded.closed_count,
          within_sla_count = excluded.within_sla_count,
          perfect_fix_count = excluded.perfect_fix_count`,
-      [year, month, within_sla_count, perfect_fix_count],
+      [year, month, closed_count, within_sla_count, perfect_fix_count],
       function(err) {
         if (err) {
           reject(err);

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, Legend
+  LineChart, Line, Legend, ReferenceLine
 } from 'recharts';
 import { 
   Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud
@@ -16,7 +16,7 @@ const MONTHS = [
 ];
 
 // ── CSV Upload Button ─────────────────────────────────────────────────────────
-const CsvUploader = ({ onSuccess }) => {
+const CsvUploader = ({ onSuccess, currentYear }) => {
   const [status, setStatus] = useState('idle'); // idle | uploading | success | error
   const [message, setMessage] = useState('');
   const inputRef = useRef(null);
@@ -33,6 +33,9 @@ const CsvUploader = ({ onSuccess }) => {
 
     const formData = new FormData();
     formData.append('file', file);
+    if (currentYear) {
+      formData.append('targetYear', currentYear);
+    }
 
     try {
       const res = await fetch(`${API_BASE}/upload-metrics`, {
@@ -109,8 +112,9 @@ const Clock = () => {
   );
 };
 
-const RatioTooltip = ({ active, payload, label }) => {
+const RatioTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
+    const label = payload[0].payload.month;
     const closed = payload.find(p => p.dataKey === 'closed_count')?.value || 0;
     const evalld = payload.find(p => p.dataKey === 'evaluated_count')?.value || 0;
     const ratio = closed > 0 ? ((evalld / closed) * 100).toFixed(1) : 0;
@@ -296,7 +300,10 @@ function App() {
   };
 
   // KPI Logic 
-  const safeMetrics = Array.isArray(metrics) ? metrics : [];
+  const safeMetrics = Array.isArray(metrics) ? metrics.map(m => ({
+    ...m,
+    shortMonth: m.month ? m.month.substring(0, 3) : ''
+  })) : [];
   
   const totalClosedYear = safeMetrics.reduce((acc, m) => acc + (m.closed_count || 0), 0);
   const totalEvaluatedYear = safeMetrics.reduce((acc, m) => acc + (m.evaluated_count || 0), 0);
@@ -354,6 +361,23 @@ function App() {
   const bestRatio = getExtreme(ratioMetrics, 'ratio', true);
   const worstRatio = getExtreme(ratioMetrics, 'ratio', false);
 
+  const slaChartData = safeMetrics.map(m => ({
+    ...m,
+    sla_rate: m.closed_count > 0 ? ((m.within_sla_count || 0) / m.closed_count) * 100 : 0,
+    perfect_fix_rate: m.closed_count > 0 ? ((m.perfect_fix_count || 0) / m.closed_count) * 100 : 0,
+  }));
+
+  const validSlaMetrics = slaChartData.filter(m => 
+    (m.closed_count || 0) > 0 && 
+    Number(m.is_vacation || 0) === 0 && 
+    Number(m.is_project || 0) === 0
+  );
+  const bestSla = getExtreme(validSlaMetrics, 'sla_rate', true);
+  const worstSla = getExtreme(validSlaMetrics, 'sla_rate', false);
+
+  const bestPerfectFix = getExtreme(validSlaMetrics, 'perfect_fix_rate', true);
+  const worstPerfectFix = getExtreme(validSlaMetrics, 'perfect_fix_rate', false);
+
   const isCurrentYear = year === new Date().getFullYear();
   const visibleMonths = isCurrentYear
     ? MONTHS.slice(0, new Date().getMonth() + 1).reverse()
@@ -381,7 +405,7 @@ function App() {
                 ))}
               </select>
             </div>
-            <CsvUploader onSuccess={fetchData} />
+            <CsvUploader onSuccess={fetchData} currentYear={year} />
           </div>
         </div>
         
@@ -434,16 +458,16 @@ function App() {
 
       <div className="charts-section">
         <div className="card chart-card">
-          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <Users size={16}/> Comparação NPS
           </span>
           <div style={{width: '100%', height: '300px'}}>
             <ResponsiveContainer>
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="shortMonth" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
                 <Line type="monotone" dataKey="nps_general" name="NPS Geral" stroke="var(--secondary)" strokeWidth={2} strokeDasharray="5 5" />
@@ -457,11 +481,11 @@ function App() {
                 <span className="group-label" style={{ color: 'var(--primary)' }}>Meu NPS:</span>
                 <div className="highlight-item best">
                   <ArrowUp size={14} />
-                  <span>{bestNps.month} ({bestNps.nps.toFixed(2)})</span>
+                  <span>{bestNps.shortMonth?.toUpperCase()} ({bestNps.nps.toFixed(2)})</span>
                 </div>
                 <div className="highlight-item worst">
                   <ArrowDown size={14} />
-                  <span>{worstNps.month} ({worstNps.nps.toFixed(2)})</span>
+                  <span>{worstNps.shortMonth?.toUpperCase()} ({worstNps.nps.toFixed(2)})</span>
                 </div>
               </div>
               {bestNpsGeneral && worstNpsGeneral && (
@@ -469,11 +493,11 @@ function App() {
                   <span className="group-label" style={{ color: 'var(--secondary)' }}>NPS Geral:</span>
                   <div className="highlight-item best">
                     <ArrowUp size={14} />
-                    <span>{bestNpsGeneral.month} ({bestNpsGeneral.nps_general.toFixed(2)})</span>
+                    <span>{bestNpsGeneral.shortMonth?.toUpperCase()} ({bestNpsGeneral.nps_general.toFixed(2)})</span>
                   </div>
                   <div className="highlight-item worst">
                     <ArrowDown size={14} />
-                    <span>{worstNpsGeneral.month} ({worstNpsGeneral.nps_general.toFixed(2)})</span>
+                    <span>{worstNpsGeneral.shortMonth?.toUpperCase()} ({worstNpsGeneral.nps_general.toFixed(2)})</span>
                   </div>
                 </div>
               )}
@@ -482,16 +506,16 @@ function App() {
         </div>
 
         <div className="card chart-card">
-          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <BarChart3 size={16}/> Volume de Chamados
           </span>
           <div style={{width: '100%', height: '300px'}}>
             <ResponsiveContainer>
               <BarChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <XAxis dataKey="shortMonth" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
-                <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Bar dataKey="closed_count" name="Fechados" fill="var(--primary)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="evaluated_count" name="Avaliados" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
@@ -502,26 +526,26 @@ function App() {
           <div className="chart-highlights multi-row">
             <div className="highlight-group">
               <span className="group-label" style={{ color: 'var(--primary)' }}>Fechados:</span>
-              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestClosed?.month} ({bestClosed?.closed_count})</span></div>
-              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstClosed?.month} ({worstClosed?.closed_count})</span></div>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestClosed?.shortMonth?.toUpperCase()} ({bestClosed?.closed_count})</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstClosed?.shortMonth?.toUpperCase()} ({worstClosed?.closed_count})</span></div>
             </div>
             <div className="highlight-group">
               <span className="group-label" style={{ color: 'var(--secondary)' }}>Avaliados:</span>
-              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestEval?.month} ({bestEval?.evaluated_count})</span></div>
-              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstEval?.month} ({worstEval?.evaluated_count})</span></div>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestEval?.shortMonth?.toUpperCase()} ({bestEval?.evaluated_count})</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstEval?.shortMonth?.toUpperCase()} ({worstEval?.evaluated_count})</span></div>
             </div>
           </div>
         </div>
 
         <div className="card chart-card">
-          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            <Activity size={16}/> Índice de Chamados
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
+            <Activity size={16}/> Índice de Avaliações
           </span>
           <div style={{width: '100%', height: '300px'}}>
             <ResponsiveContainer>
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <XAxis dataKey="shortMonth" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <Tooltip content={<RatioTooltip />} />
                 <Legend iconType="circle" />
@@ -532,11 +556,44 @@ function App() {
           </div>
 
           {bestRatio && worstRatio && (
-            <div className="chart-highlights">
-              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestRatio.month} ({bestRatio.ratio.toFixed(1)}%)</span></div>
-              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstRatio.month} ({worstRatio.ratio.toFixed(1)}%)</span></div>
+            <div className="chart-highlights multi-row">
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestRatio.shortMonth?.toUpperCase()} ({bestRatio.ratio.toFixed(1)}%)</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstRatio.shortMonth?.toUpperCase()} ({worstRatio.ratio.toFixed(1)}%)</span></div>
             </div>
           )}
+        </div>
+
+        <div className="card chart-card">
+          <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
+            <Activity size={16}/> SLA & Perfect Fix
+          </span>
+          <div style={{width: '100%', height: '300px'}}>
+            <ResponsiveContainer>
+              <LineChart data={slaChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="shortMonth" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} domain={[0, 100]} />
+                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} formatter={(value) => `${Number(value).toFixed(1)}%`} />
+                <Legend iconType="circle" />
+                <ReferenceLine y={95} stroke="#eab308" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta (95%)', fill: '#eab308', fontSize: 12, fontWeight: 'bold' }} />
+                <Line type="monotone" dataKey="sla_rate" name="SLA" stroke="var(--success)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                <Line type="monotone" dataKey="perfect_fix_rate" name="Perfect Fix" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="chart-highlights multi-row">
+            <div className="highlight-group">
+              <span className="group-label" style={{ color: 'var(--success)' }}>SLA:</span>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestSla?.shortMonth?.toUpperCase()} ({bestSla?.sla_rate.toFixed(1)}%)</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstSla?.shortMonth?.toUpperCase()} ({worstSla?.sla_rate.toFixed(1)}%)</span></div>
+            </div>
+            <div className="highlight-group">
+              <span className="group-label" style={{ color: 'var(--primary)' }}>Perfect Fix:</span>
+              <div className="highlight-item best"><ArrowUp size={14} /> <span>{bestPerfectFix?.shortMonth?.toUpperCase()} ({bestPerfectFix?.perfect_fix_rate.toFixed(1)}%)</span></div>
+              <div className="highlight-item worst"><ArrowDown size={14} /> <span>{worstPerfectFix?.shortMonth?.toUpperCase()} ({worstPerfectFix?.perfect_fix_rate.toFixed(1)}%)</span></div>
+            </div>
+          </div>
         </div>
       </div>
 

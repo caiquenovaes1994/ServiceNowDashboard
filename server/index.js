@@ -122,20 +122,27 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
         }
 
         const createdStr  = normalizedRow['sys_created_on'] || normalizedRow['Created'] || normalizedRow['created'] || normalizedRow['Opened']   || normalizedRow['opened']   || '';
+        const resolvedStr = normalizedRow['resolved_at'] || normalizedRow['Resolved at'] || normalizedRow['resolved at'] || normalizedRow['closed_at'] || normalizedRow['Closed'] || normalizedRow['closed'] || '';
         const updatedStr  = normalizedRow['sys_updated_on'] || normalizedRow['Updated'] || normalizedRow['updated'] || normalizedRow['Resolved'] || normalizedRow['resolved'] || '';
         const priorityRaw = normalizedRow['priority']        || normalizedRow['Priority'] || '';
         const reopenRaw   = normalizedRow['u_reopen_count']  || normalizedRow['Reopen count'] || normalizedRow['reopen_count'] || normalizedRow['reopenCount'] || '0';
+        const calendarDurationRaw = normalizedRow['calendar_duration'] || normalizedRow['Calendar duration'] || normalizedRow['calendar duration'] || '';
+
+        // Prioriza a data de resolução final. Se não existir, usa a data de última atualização (fallback).
+        const endStr = resolvedStr || updatedStr;
 
         const createdAt = parseDate(createdStr);
-        const updatedAt = parseDate(updatedStr);
+        const updatedAt = parseDate(endStr);
 
         if (!createdAt || !updatedAt) {
           skipped++;
           continue;
         }
 
-        // Duração em segundos
-        const durationSec = (updatedAt - createdAt) / 1000;
+        // Duração em segundos (prioriza calendar_duration; fallback para diferença de datas)
+        const durationSec = (calendarDurationRaw && !isNaN(calendarDurationRaw))
+          ? parseInt(calendarDurationRaw, 10)
+          : (updatedAt - createdAt) / 1000;
 
         // Extrai dígito da prioridade (ex.: "1 - Critical" → "1", "P2" → "2")
         const priorityMatch = priorityRaw.match(/(\d)/);
@@ -146,14 +153,25 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
         const reopenCount = parseInt(reopenRaw, 10) || 0;
         const perfectFix  = withinSla && reopenCount === 0;
 
+        const targetYear = parseInt(req.body.targetYear, 10);
+        
         // Agrupa por YYYY-MM usando a coluna Updated
         const yearKey   = updatedAt.getFullYear();
+        
+        // Ignora chamados que não pertencem ao ano que o usuário selecionou no dashboard
+        if (!isNaN(targetYear) && yearKey !== targetYear) {
+          skipped++;
+          continue;
+        }
+
         const monthKey  = updatedAt.getMonth(); // 0-indexed
         const bucketKey = `${yearKey}-${String(monthKey + 1).padStart(2, '0')}`;
 
         if (!monthTotals[bucketKey]) {
-          monthTotals[bucketKey] = { year: yearKey, month: monthKey, within_sla: 0, perfect_fix: 0 };
+          monthTotals[bucketKey] = { year: yearKey, month: monthKey, within_sla: 0, perfect_fix: 0, closed_count: 0 };
         }
+        
+        monthTotals[bucketKey].closed_count++;
         if (withinSla)  monthTotals[bucketKey].within_sla++;
         if (perfectFix) monthTotals[bucketKey].perfect_fix++;
       }
@@ -167,7 +185,7 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
         const updates = Object.values(monthTotals);
         for (const entry of updates) {
           const monthName = MONTH_NAMES[entry.month];
-          await updateSlaMetrics(entry.year, monthName, entry.within_sla, entry.perfect_fix);
+          await updateSlaMetrics(entry.year, monthName, entry.within_sla, entry.perfect_fix, entry.closed_count);
         }
 
         console.log(`[Upload] CSV processado: ${rows.length} linhas, ${skipped} ignoradas, ${updates.length} meses atualizados.`);
