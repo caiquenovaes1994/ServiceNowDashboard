@@ -125,10 +125,11 @@ export const initDb = () => {
           { year: 2025, month: 'Outubro', closed_count: 108, evaluated_count: 22, nps: 4.86, nps_general: 4.82, is_vacation: 0, is_project: 0, perfect_fix_count: 97 },
           { year: 2025, month: 'Novembro', closed_count: 141, evaluated_count: 21, nps: 4.9, nps_general: 4.84, is_vacation: 0, is_project: 0, perfect_fix_count: 111 },
           { year: 2025, month: 'Dezembro', closed_count: 47, evaluated_count: 9, nps: 4.89, nps_general: 4.65, is_vacation: 0, is_project: 1, perfect_fix_count: 39 },
-          { year: 2026, month: 'Janeiro', closed_count: 4, evaluated_count: 0, nps: 0, nps_general: 4.71, is_vacation: 1, is_project: 0, within_sla_count: 4, perfect_fix_count: 4 },
+          { year: 2026, month: 'Janeiro', closed_count: 4, evaluated_count: 0, nps: 0, nps_general: 4.88, is_vacation: 1, is_project: 0, within_sla_count: 4, perfect_fix_count: 4 },
           { year: 2026, month: 'Fevereiro', closed_count: 169, evaluated_count: 26, nps: 4.62, nps_general: 4.71, is_vacation: 0, is_project: 0, within_sla_count: 162, perfect_fix_count: 148 },
           { year: 2026, month: 'Março', closed_count: 207, evaluated_count: 51, nps: 4.82, nps_general: 4.74, is_vacation: 0, is_project: 0, within_sla_count: 198, perfect_fix_count: 179 },
-          { year: 2026, month: 'Abril', closed_count: 14, evaluated_count: 1, nps: 5, nps_general: 5, is_vacation: 0, is_project: 0, within_sla_count: 14, perfect_fix_count: 162 }
+          { year: 2026, month: 'Abril', closed_count: 14, evaluated_count: 1, nps: 5, nps_general: 4.85, is_vacation: 0, is_project: 0, within_sla_count: 14, perfect_fix_count: 162 },
+          { year: 2026, month: 'Maio', closed_count: 0, evaluated_count: 0, nps: 0, nps_general: 4.79, is_vacation: 0, is_project: 0, within_sla_count: 0, perfect_fix_count: 0 }
         ];
 
         const stmt = db.prepare(`INSERT INTO metrics (year, month, closed_count, evaluated_count, nps, nps_general, is_vacation, is_project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
