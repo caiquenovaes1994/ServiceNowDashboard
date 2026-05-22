@@ -558,7 +558,8 @@ function App() {
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} domain={[0, 100]} />
                 <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} formatter={(value) => `${Number(value).toFixed(1)}%`} />
                 <Legend iconType="circle" />
-                <ReferenceLine y={95} stroke="#eab308" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta (95%)', fill: '#eab308', fontSize: 12, fontWeight: 'bold' }} />
+                <ReferenceLine y={95} stroke="#eab308" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta SLA (95%)', fill: '#eab308', fontSize: 12, fontWeight: 'bold' }} />
+                <ReferenceLine y={80} stroke="#ffffff" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta PF (80%)', fill: '#ffffff', fontSize: 12, fontWeight: 'bold' }} />
                 <Line type="monotone" dataKey="sla_rate" name="SLA" stroke="var(--success)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
                 <Line type="monotone" dataKey="perfect_fix_rate" name="Perfect Fix" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
               </LineChart>
