@@ -199,24 +199,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
         disabled={readOnly}
         placeholder="Avaliados"
       />
-      <input 
-        type="number" 
-        className="input-minimal font-mono input-csv-only" 
-        value={editData.within_sla_count} 
-        readOnly
-        disabled
-        title="Populado via importação de CSV"
-        placeholder="—"
-      />
-      <input 
-        type="number" 
-        className="input-minimal font-mono input-csv-only" 
-        value={editData.perfect_fix_count} 
-        readOnly
-        disabled
-        title="Populado via importação de CSV"
-        placeholder="—"
-      />
+
       <input 
         type="number" 
         step="0.01"
@@ -603,8 +586,7 @@ function App() {
               <span className="row-label">Mês</span>
               <span className="row-label">Fechados</span>
               <span className="row-label">Avaliados</span>
-              <span className="row-label">Dentro do SLA</span>
-              <span className="row-label">Perfect Fix</span>
+
               <span className="row-label">Meu NPS</span>
               <span className="row-label">NPS Geral</span>
               <span className="row-label">Férias</span>
