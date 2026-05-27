@@ -10,6 +10,7 @@
 
 [![Licença MIT](https://img.shields.io/badge/Licença-MIT-blue?style=flat)](LICENSE)
 [![Código de Conduta](https://img.shields.io/badge/Código_de_Conduta-Contributor_Covenant-ff69b4?style=flat)](CODE_OF_CONDUCT.md)
+[![Segurança](https://img.shields.io/badge/Segurança-Política_de_Divulgação-critical?style=flat)](SECURITY.md)
 
 ---
 
@@ -80,7 +81,11 @@ ServiceNowDashboard/
 │   ├── index.css            # Design system (tema Deep Blue Premium)
 │   └── main.jsx             # Ponto de entrada da aplicação React
 ├── public/                  # Arquivos públicos estáticos
+│   ├── favicon.svg          # Ícone do site
+│   └── icons.svg            # Sprite de ícones SVG
 ├── dist/                    # Build de produção (gerado pelo Vite)
+├── data_dump.json           # Dump de dados para migração/backup manual
+├── dump_data.js             # Script utilitário para exportar dados do banco
 ├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
 ├── package.json             # Dependências e scripts NPM
 ├── vite.config.js           # Configuração do Vite (porta, proxy)
@@ -202,22 +207,29 @@ Recebe um arquivo CSV via `multipart/form-data` (campo `file`).
 
 ### Colunas esperadas no CSV
 
-| Coluna no CSV | Uso |
-| --- | --- |
-| `sys_created_on` | Data de criação do chamado |
-| `sys_updated_on` | Data de atualização (usada para agrupar por mês) |
-| `priority` | Prioridade do chamado (ex.: `"4 - Low"`, `"1 - Critical"`) |
-| `u_reopen_count` | Número de vezes que o chamado foi reaberto |
+O sistema aceita múltiplos nomes de colunas para maior compatibilidade com diferentes exportações do ServiceNow:
+
+| Campo | Colunas aceitas (aliases) | Uso |
+| --- | --- | --- |
+| **Data de criação** | `sys_created_on`, `Created`, `created`, `Opened`, `opened` | Data de abertura do chamado |
+| **Data de resolução** | `resolved_at`, `Resolved at`, `closed_at`, `Closed`, `closed` | Data de encerramento (preferencial para agrupar por mês) |
+| **Data de atualização** | `sys_updated_on`, `Updated`, `updated`, `Resolved`, `resolved` | Fallback caso `resolved_at` não exista |
+| **Prioridade** | `priority`, `Priority` | Prioridade do chamado (ex.: `"4 - Low"`, `"1 - Critical"`) |
+| **Reaberturas** | `u_reopen_count`, `Reopen count`, `reopen_count`, `reopenCount` | Número de vezes que o chamado foi reaberto |
+| **Duração calendário** | `calendar_duration`, `Calendar duration` | Duração em segundos (se presente, substitui o cálculo por datas) |
+
+> **Nota:** O parser normaliza automaticamente chaves com BOM (`\uFEFF`) e espaços extras.
 
 ### Lógica de Processamento
 
 | Passo | Descrição |
 | --- | --- |
-| **Duração** | `(sys_updated_on − sys_created_on)` em segundos |
+| **Duração** | Prioriza `calendar_duration` (se numérico); senão calcula `(resolved_at − sys_created_on)` em segundos |
 | **Verificação de SLA** | Compara a duração com o limite por prioridade (tabela abaixo) |
-| **Perfect Fix** | `SLA cumprido == true` **E** `u_reopen_count == 0` |
-| **Agrupamento** | Por mês/ano da coluna `sys_updated_on` |
-| **Persistência** | UPSERT cirúrgico — atualiza apenas `within_sla_count` e `perfect_fix_count`, preservando NPS e demais campos |
+| **Perfect Fix** | `SLA cumprido == true` **E** `reopen_count == 0` |
+| **Agrupamento** | Por mês/ano da data de resolução (ou atualização como fallback) |
+| **Filtro de ano** | Ignora chamados fora do ano selecionado no dashboard (quando `targetYear` é informado) |
+| **Persistência** | UPSERT — atualiza `closed_count`, `within_sla_count` e `perfect_fix_count`, preservando NPS e demais campos |
 | **Higiene** | Arquivo CSV removido do disco imediatamente após a leitura |
 
 ### Limites de SLA por Prioridade
