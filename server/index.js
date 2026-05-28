@@ -168,12 +168,18 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
           continue;
         }
 
-        // Duração em segundos utilizando horas úteis (Seg-Sex, 09:00 às 18:00)
-        const durationSec = calculateBusinessSeconds(createdAt, updatedAt);
-
         // Extrai dígito da prioridade (ex.: "1 - Critical" → "1", "P2" → "2")
         const priorityMatch = priorityRaw.match(/(\d)/);
         const priorityKey   = priorityMatch ? priorityMatch[1] : null;
+
+        // Duração em segundos: P1 e P2 usam tempo absoluto (24x7); P3 e P4 usam horas úteis
+        let durationSec;
+        if (priorityKey === '1' || priorityKey === '2') {
+          durationSec = (updatedAt - createdAt) / 1000;
+        } else {
+          durationSec = calculateBusinessSeconds(createdAt, updatedAt);
+        }
+
         const slaLimit      = priorityKey ? SLA_LIMITS[priorityKey] : null;
 
         const withinSla   = slaLimit !== null && durationSec <= slaLimit;

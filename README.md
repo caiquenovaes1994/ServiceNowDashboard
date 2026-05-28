@@ -224,7 +224,7 @@ O sistema aceita múltiplos nomes de colunas para maior compatibilidade com dife
 
 | Passo | Descrição |
 | --- | --- |
-| **Duração** | Calcula as **horas úteis** entre a criação e a resolução (segunda a sexta, das 09:00 às 18:00) em segundos |
+| **Duração** | P1 e P2: Tempo absoluto contínuo (24x7). P3 e P4: Horas úteis (Seg-Sex, 09:00 às 18:00). |
 | **Verificação de SLA** | Compara a duração com o limite por prioridade (tabela abaixo) |
 | **Perfect Fix** | `SLA cumprido == true` **E** `reopen_count == 0` |
 | **Agrupamento** | Por mês/ano da data de resolução (ou atualização como fallback) |
