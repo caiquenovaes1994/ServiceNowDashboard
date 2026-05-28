@@ -35,6 +35,35 @@ const SLA_LIMITS = {
   '4': 96 * 3600,   // P4 → 96 h
 };
 
+// ── Cálculo de horas úteis (Segunda a Sexta, 9:00 às 18:00) ──────────────────
+const calculateBusinessSeconds = (start, end) => {
+  if (start >= end) return 0;
+  
+  let current = new Date(start);
+  let totalSeconds = 0;
+
+  while (current < end) {
+    const dayOfWeek = current.getDay();
+    // Segunda(1) a Sexta(5)
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      const workStart = new Date(current.getFullYear(), current.getMonth(), current.getDate(), 9, 0, 0, 0);
+      const workEnd = new Date(current.getFullYear(), current.getMonth(), current.getDate(), 18, 0, 0, 0);
+
+      const effectiveStart = new Date(Math.max(current, workStart));
+      const effectiveEnd = new Date(Math.min(end, workEnd));
+
+      if (effectiveStart < effectiveEnd) {
+        totalSeconds += (effectiveEnd - effectiveStart) / 1000;
+      }
+    }
+
+    // Avança para o dia seguinte à meia-noite
+    current = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1, 0, 0, 0, 0);
+  }
+
+  return totalSeconds;
+};
+
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
@@ -139,10 +168,8 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
           continue;
         }
 
-        // Duração em segundos (prioriza calendar_duration; fallback para diferença de datas)
-        const durationSec = (calendarDurationRaw && !isNaN(calendarDurationRaw))
-          ? parseInt(calendarDurationRaw, 10)
-          : (updatedAt - createdAt) / 1000;
+        // Duração em segundos utilizando horas úteis (Seg-Sex, 09:00 às 18:00)
+        const durationSec = calculateBusinessSeconds(createdAt, updatedAt);
 
         // Extrai dígito da prioridade (ex.: "1 - Critical" → "1", "P2" → "2")
         const priorityMatch = priorityRaw.match(/(\d)/);

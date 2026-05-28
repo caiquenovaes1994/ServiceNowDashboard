@@ -444,7 +444,7 @@ function App() {
           <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <Users size={16}/> Comparação NPS
           </span>
-          <div style={{width: '100%', height: '300px'}}>
+          <div style={{width: '100%', height: '200px'}}>
             <ResponsiveContainer>
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -492,7 +492,7 @@ function App() {
           <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <BarChart3 size={16}/> Volume de Chamados
           </span>
-          <div style={{width: '100%', height: '300px'}}>
+          <div style={{width: '100%', height: '200px'}}>
             <ResponsiveContainer>
               <BarChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -524,7 +524,7 @@ function App() {
           <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <Activity size={16}/> Índice de Avaliações
           </span>
-          <div style={{width: '100%', height: '300px'}}>
+          <div style={{width: '100%', height: '200px'}}>
             <ResponsiveContainer>
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -550,7 +550,7 @@ function App() {
           <span className="label" style={{marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
             <Activity size={16}/> SLA & Perfect Fix
           </span>
-          <div style={{width: '100%', height: '300px'}}>
+          <div style={{width: '100%', height: '200px'}}>
             <ResponsiveContainer>
               <LineChart data={slaChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />

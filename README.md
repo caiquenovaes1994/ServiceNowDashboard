@@ -224,7 +224,7 @@ O sistema aceita múltiplos nomes de colunas para maior compatibilidade com dife
 
 | Passo | Descrição |
 | --- | --- |
-| **Duração** | Prioriza `calendar_duration` (se numérico); senão calcula `(resolved_at − sys_created_on)` em segundos |
+| **Duração** | Calcula as **horas úteis** entre a criação e a resolução (segunda a sexta, das 09:00 às 18:00) em segundos |
 | **Verificação de SLA** | Compara a duração com o limite por prioridade (tabela abaixo) |
 | **Perfect Fix** | `SLA cumprido == true` **E** `reopen_count == 0` |
 | **Agrupamento** | Por mês/ano da data de resolução (ou atualização como fallback) |
