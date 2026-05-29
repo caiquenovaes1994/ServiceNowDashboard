@@ -449,7 +449,7 @@ function App() {
               <LineChart data={safeMetrics}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="shortMonth" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} />
                 <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
