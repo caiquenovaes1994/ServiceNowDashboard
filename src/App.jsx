@@ -414,6 +414,7 @@ function App() {
             color: Number(slaAccuracy) >= 95 ? 'var(--success)' : 
                    Number(slaAccuracy) <= 70 ? 'var(--error)' : 'var(--secondary)'
           }}>{slaAccuracy}%</span>
+          <span className="meta font-mono" style={{ display: 'block', color: '#eab308', fontSize: '0.85rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 95%</span>
         </div>
       </div>
 
@@ -436,6 +437,7 @@ function App() {
             color: Number(perfectFixRate) >= 80 ? 'var(--success)' : 
                    Number(perfectFixRate) <= 70 ? 'var(--error)' : 'var(--secondary)'
           }}>{perfectFixRate}%</span>
+          <span className="meta font-mono" style={{ display: 'block', color: '#ffffff', fontSize: '0.85rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 80%</span>
         </div>
       </div>
 
