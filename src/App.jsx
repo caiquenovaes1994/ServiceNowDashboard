@@ -601,6 +601,7 @@ function App() {
             const currentYear = today.getFullYear();
             const currentMonthIdx = today.getMonth();
             const currentMonthName = MONTHS[currentMonthIdx];
+            const currentDay = today.getDate();
 
             let prevMonthIdx = currentMonthIdx - 1;
             let prevYear = currentYear;
@@ -611,7 +612,7 @@ function App() {
             const prevMonthName = MONTHS[prevMonthIdx];
 
             const isEditable = (year === currentYear && month === currentMonthName) || 
-                               (year === prevYear && month === prevMonthName);
+                               (year === prevYear && month === prevMonthName && currentDay < 10);
             
             return (
               <MetricRow 
