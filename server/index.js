@@ -8,6 +8,20 @@ import fs from 'fs';
 import { initDb, getMetrics, saveMetric, getSetting, saveSetting, updateSlaMetrics, updateNpsGeneralMetrics } from './database.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Holidays from 'date-holidays';
+
+const hd = new Holidays('BR', 'SP');
+
+// Helper para verificar feriados municipais de São Paulo
+const isMunicipalHoliday = (dateObj) => {
+  const month = dateObj.getMonth() + 1;
+  const day = dateObj.getDate();
+  // 25 de Janeiro: Aniversário da Cidade de São Paulo
+  if (month === 1 && day === 25) return true;
+  // 20 de Novembro: Dia da Consciência Negra
+  if (month === 11 && day === 20) return true;
+  return false;
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,8 +58,8 @@ const calculateBusinessSeconds = (start, end) => {
 
   while (current < end) {
     const dayOfWeek = current.getDay();
-    // Segunda(1) a Sexta(5)
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+    // Segunda(1) a Sexta(5) e não é feriado nacional, estadual ou municipal
+    if (dayOfWeek >= 1 && dayOfWeek <= 5 && !hd.isHoliday(current) && !isMunicipalHoliday(current)) {
       const workStart = new Date(current.getFullYear(), current.getMonth(), current.getDate(), 9, 0, 0, 0);
       const workEnd = new Date(current.getFullYear(), current.getMonth(), current.getDate(), 18, 0, 0, 0);
 
