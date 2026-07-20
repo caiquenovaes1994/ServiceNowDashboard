@@ -247,3 +247,26 @@ export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_coun
     );
   });
 };
+
+// Atualiza nps_general para um mês/ano.
+// Se a linha ainda não existe, insere um registro mínimo (outros campos = 0).
+export const updateNpsGeneralMetrics = (year, month, nps_general) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO metrics (year, month, closed_count, evaluated_count, nps, nps_general,
+                            is_vacation, is_project, within_sla_count, perfect_fix_count)
+       VALUES (?, ?, 0, 0, 0, ?, 0, 0, 0, 0)
+       ON CONFLICT(year, month) DO UPDATE SET
+         nps_general = excluded.nps_general`,
+      [year, month, nps_general],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          triggerBackup();
+          resolve(this.lastID);
+        }
+      }
+    );
+  });
+};

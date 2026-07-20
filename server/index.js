@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import multer from 'multer';
 import csvParser from 'csv-parser';
 import fs from 'fs';
-import { initDb, getMetrics, saveMetric, getSetting, saveSetting, updateSlaMetrics } from './database.js';
+import { initDb, getMetrics, saveMetric, getSetting, saveSetting, updateSlaMetrics, updateNpsGeneralMetrics } from './database.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -244,6 +244,89 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
       fs.unlink(filePath, () => {});
       res.status(400).json({ error: 'Falha ao ler o arquivo CSV.', detail: parseErr.message });
     });
+});
+
+// ── POST /api/upload-json ───────────────────────────────────────────────────
+app.post('/api/upload-json', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+  }
+
+  const filePath = req.file.path;
+  fs.readFile(filePath, 'utf8', async (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao ler arquivo.' });
+    }
+
+    try {
+      const json = JSON.parse(data);
+      const records = json.records || [];
+      const targetYear = parseInt(req.body.targetYear, 10);
+
+      const monthTotals = {};
+      let skipped = 0;
+
+      for (const record of records) {
+        const actualValueStr = record.actual_value;
+        const updatedOnStr = record.sys_updated_on;
+
+        if (!actualValueStr || !updatedOnStr) {
+          skipped++;
+          continue;
+        }
+
+        const val = parseFloat(actualValueStr);
+        if (isNaN(val)) {
+          skipped++;
+          continue;
+        }
+
+        const dateStr = updatedOnStr.replace(' ', 'T');
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          skipped++;
+          continue;
+        }
+
+        const yearKey = date.getFullYear();
+        if (!isNaN(targetYear) && yearKey !== targetYear) {
+          skipped++;
+          continue;
+        }
+
+        const monthKey = date.getMonth(); // 0-11
+        const bucketKey = `${yearKey}-${String(monthKey + 1).padStart(2, '0')}`;
+
+        if (!monthTotals[bucketKey]) {
+          monthTotals[bucketKey] = { year: yearKey, month: monthKey, sum: 0, count: 0 };
+        }
+
+        monthTotals[bucketKey].sum += val;
+        monthTotals[bucketKey].count++;
+      }
+
+      fs.unlink(filePath, () => {});
+
+      const updates = Object.values(monthTotals);
+      for (const entry of updates) {
+        const monthName = MONTH_NAMES[entry.month];
+        const npsGeneral = Number((entry.sum / entry.count).toFixed(2));
+        await updateNpsGeneralMetrics(entry.year, monthName, npsGeneral);
+      }
+      
+      console.log(`[Upload JSON] ${records.length} registros, ${skipped} ignorados, ${updates.length} meses atualizados.`);
+      res.json({
+        success: true,
+        rows_processed: records.length,
+        rows_skipped: skipped,
+        months_updated: updates.length
+      });
+    } catch (parseErr) {
+      console.error('[Upload JSON] Erro ao parsear JSON:', parseErr.message);
+      fs.unlink(filePath, () => {});
+      res.status(400).json({ error: 'Falha ao processar o arquivo JSON.', detail: parseErr.message });
+    }
+  });
 });
 
 // Serve static files from Vite's build output (dist)

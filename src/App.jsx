@@ -15,6 +15,79 @@ const MONTHS = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
+// ── JSON Upload Button ─────────────────────────────────────────────────────────
+const JsonUploader = ({ onSuccess, currentYear }) => {
+  const [status, setStatus] = useState('idle');
+  const [message, setMessage] = useState('');
+  const inputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    e.target.value = '';
+    setStatus('uploading');
+    setMessage('');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (currentYear) {
+      formData.append('targetYear', currentYear);
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/upload-json`, {
+        method: 'POST',
+        body: formData,
+      });
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
+
+      setStatus('success');
+      setMessage(`${json.rows_processed} registros · ${json.months_updated} meses`);
+      onSuccess();
+
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000);
+    } catch (err) {
+      setStatus('error');
+      setMessage(err.message);
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
+    }
+  };
+
+  const label = {
+    idle:      'Importar JSON',
+    uploading: 'Processando…',
+    success:   'Importado!',
+    error:     'Erro',
+  }[status];
+
+  return (
+    <div className="csv-uploader">
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <button
+        className={`btn-import btn-import--${status}`}
+        onClick={() => status === 'idle' && inputRef.current?.click()}
+        disabled={status === 'uploading'}
+        title="Importar métricas de NPS Geral via JSON"
+      >
+        <UploadCloud size={15} strokeWidth={2.2} />
+        <span>{label}</span>
+      </button>
+      {message && (
+        <span className={`import-msg import-msg--${status}`}>{message}</span>
+      )}
+    </div>
+  );
+};
+
 // ── CSV Upload Button ─────────────────────────────────────────────────────────
 const CsvUploader = ({ onSuccess, currentYear }) => {
   const [status, setStatus] = useState('idle'); // idle | uploading | success | error
@@ -388,7 +461,10 @@ function App() {
                 ))}
               </select>
             </div>
-            <CsvUploader onSuccess={fetchData} currentYear={year} />
+            <div style={{display: 'flex', gap: '0.5rem'}}>
+              <CsvUploader onSuccess={fetchData} currentYear={year} />
+              <JsonUploader onSuccess={fetchData} currentYear={year} />
+            </div>
           </div>
         </div>
         

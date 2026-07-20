@@ -18,7 +18,7 @@
 
 O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvida para centralizar e visualizar métricas operacionais de equipes de suporte e atendimento. O sistema oferece uma interface moderna com tema **Deep Blue Premium**, gráficos interativos e sincronização de dados em tempo real, tudo armazenado localmente com SQLite para máxima autonomia e velocidade.
 
-A partir da versão atual, o dashboard suporta **ingestão automática de dados via exportação CSV do ServiceNow**, calculando SLA e Perfect Fix diretamente a partir dos registros brutos.
+A partir da versão atual, o dashboard suporta **ingestão automática de dados via exportação CSV do ServiceNow**, calculando SLA e Perfect Fix diretamente a partir dos registros brutos, bem como **importação via JSON** para cálculo do NPS Geral Corporativo.
 
 ---
 
@@ -30,6 +30,7 @@ A partir da versão atual, o dashboard suporta **ingestão automática de dados 
 | **Monitoramento de SLA** | Calcula a acurácia de SLA (`within_sla_count / closed_count × 100`) com alertas de cor dinâmicos |
 | **Perfect Fix** | Rastreia chamados nunca reabertos (`perfect_fix_count / closed_count × 100`) com escala de cor em 3 faixas |
 | **Importação de CSV** | Upload do export do ServiceNow para cálculo automático de SLA e Perfect Fix por mês |
+| **Importação de JSON** | Upload de avaliações (`asmt_metric_result.json`) para cálculo automático do NPS Geral corporativo |
 | **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
 | **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
 | **Índice de Avaliações** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
@@ -157,6 +158,7 @@ start_dashboard.bat
 | `POST` | `/api/metrics` | Cria ou atualiza métrica mensal (UPSERT completo) |
 | `POST` | `/api/settings` | Salva configuração chave-valor |
 | `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow e atualiza SLA/Perfect Fix |
+| `POST` | `/api/upload-json` | Processa JSON de avaliações e atualiza o NPS Geral corporativo |
 
 ### Exemplo de Payload — `POST /api/metrics`
 
