@@ -27,3 +27,6 @@ dist-ssr
 *.db
 *.db.bak
 *.bak
+
+# Documentos
+PLANO_DE_ESCALACAO.md
