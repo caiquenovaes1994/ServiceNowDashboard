@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'ServiceNow Dynamic Dashboard',
+        name: 'ServiceNow Dashboard',
         short_name: 'SNDashboard',
         description: 'Painel de Gestão e Controle de Chamados',
         theme_color: '#002b49',

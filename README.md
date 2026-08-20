@@ -1,22 +1,27 @@
-# 📊 ServiceNow Dynamic Dashboard
+<div align="center">
+
+# 📊 ServiceNow Dashboard
 
 > Painel analítico de alta performance para monitoramento de chamados, NPS, SLA e Perfect Fix
 
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
 ![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
-![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
 ![Vite 5.0.0](https://img.shields.io/badge/Vite-5.0.0-646CFF?style=flat&logo=vite&logoColor=white)
 ![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
+![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
+![Recharts 2.12.7](https://img.shields.io/badge/Recharts-2.12.7-22B5BF?style=flat&logo=recharts&logoColor=white)
 
 [![Licença MIT](https://img.shields.io/badge/Licença-MIT-blue?style=flat)](LICENSE)
 [![Código de Conduta](https://img.shields.io/badge/Código_de_Conduta-Contributor_Covenant-ff69b4?style=flat)](CODE_OF_CONDUCT.md)
 [![Segurança](https://img.shields.io/badge/Segurança-Política_de_Divulgação-critical?style=flat)](SECURITY.md)
 
+</div>
+
 ---
 
 ## 📋 Sobre o Projeto
 
-O **ServiceNow Dynamic Dashboard** é uma aplicação web full-stack desenvolvida para centralizar e visualizar métricas operacionais de equipes de suporte e atendimento. O sistema oferece uma interface moderna com tema **Deep Blue Premium**, gráficos interativos e sincronização de dados em tempo real, tudo armazenado localmente com SQLite para máxima autonomia e velocidade.
+O **ServiceNow Dashboard** é uma aplicação web full-stack desenvolvida para centralizar e visualizar métricas operacionais de equipes de suporte e atendimento. O sistema oferece uma interface moderna com tema **Deep Blue Premium**, gráficos interativos e sincronização de dados em tempo real, tudo armazenado localmente com SQLite para máxima autonomia e velocidade.
 
 A partir da versão atual, o dashboard suporta **ingestão automática de dados via exportação CSV do ServiceNow**, calculando SLA e Perfect Fix diretamente a partir dos registros brutos, bem como **importação via JSON** para cálculo do NPS Geral Corporativo.
 
@@ -345,11 +350,17 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ---
 
+<div align="center">
+
 ## 👨‍💻 Desenvolvido por
 
 **Caique Novaes** — Analista de Suporte & Desenvolvedor
 
 [![GitHub](https://img.shields.io/badge/GitHub-caiquenovaes1994-181717?style=flat&logo=github&logoColor=white)](https://github.com/caiquenovaes1994)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:caiquenovaes1994@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-caiquenovaes-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/caiquenovaes)
+[![Telegram](https://img.shields.io/badge/Telegram-caiquenovaes1994-26A5E4?style=flat&logo=telegram&logoColor=white)](https://t.me/caiquenovaes1994)
 
 Feito com ❤️ e ☕ — *2024–2026*
+
+</div>
