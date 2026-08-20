@@ -15,152 +15,96 @@ const MONTHS = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-// ── JSON Upload Button ─────────────────────────────────────────────────────────
-const JsonUploader = ({ onSuccess, currentYear }) => {
+// ── Unified Dropzone Uploader ──────────────────────────────────────────────────
+const UnifiedUploader = ({ onSuccess, currentYear }) => {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const inputRef = useRef(null);
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    e.target.value = '';
+  const handleFiles = async (files) => {
+    if (!files || files.length === 0) return;
+    const filesArray = Array.from(files);
     setStatus('uploading');
     setMessage('');
+    let totalProcessed = 0;
+    let errors = [];
 
-    const formData = new FormData();
-    formData.append('file', file);
-    if (currentYear) {
-      formData.append('targetYear', currentYear);
+    for (let i = 0; i < filesArray.length; i++) {
+      const file = filesArray[i];
+      const ext = file.name.split('.').pop().toLowerCase();
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      if (currentYear) formData.append('targetYear', currentYear);
+
+      let endpoint = '';
+      if (ext === 'csv') endpoint = `${API_BASE}/upload-metrics`;
+      else if (ext === 'json') endpoint = `${API_BASE}/upload-json`;
+      else {
+        errors.push(`Ignorado: ${file.name}`);
+        continue;
+      }
+
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: formData });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Erro');
+        totalProcessed++;
+      } catch (err) {
+        errors.push(`Erro (${ext}): ${err.message}`);
+      }
     }
 
-    try {
-      const res = await fetch(`${API_BASE}/upload-json`, {
-        method: 'POST',
-        body: formData,
-      });
-      const json = await res.json();
-
-      if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
-
-      setStatus('success');
-      setMessage(`${json.rows_processed} registros · ${json.months_updated} meses`);
-      onSuccess();
-
-      setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000);
-    } catch (err) {
+    if (errors.length > 0) {
       setStatus('error');
-      setMessage(err.message);
-      setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
+      setMessage(errors.join(' | '));
+    } else if (totalProcessed > 0) {
+      setStatus('success');
+      setMessage(`${totalProcessed} arquivo(s) importado(s)!`);
+      onSuccess();
+    } else {
+      setStatus('idle');
     }
+    setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
+  };
+
+  const handleDragOver = (e) => { e.preventDefault(); e.stopPropagation(); };
+  const handleDrop = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (status !== 'uploading') handleFiles(e.dataTransfer.files);
   };
 
   const label = {
-    idle:      'Importar JSON',
+    idle: 'CSV / JSON',
     uploading: 'Processando…',
-    success:   'Importado!',
-    error:     'Erro',
+    success: 'Importação Concluída!',
+    error: 'Aviso/Erro'
   }[status];
 
   return (
-    <div className="csv-uploader">
+    <div 
+      className={`unified-dropzone dropzone--${status}`}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onClick={() => status === 'idle' && inputRef.current?.click()}
+      title="Importar métricas via CSV (SLA) ou JSON (NPS)"
+    >
       <input
         ref={inputRef}
         type="file"
-        accept=".json,application/json"
+        accept=".csv,text/csv,.json,application/json"
+        multiple
         style={{ display: 'none' }}
-        onChange={handleFileChange}
+        onChange={(e) => {
+          handleFiles(e.target.files);
+          e.target.value = '';
+        }}
       />
-      <button
-        className={`btn-import btn-import--${status}`}
-        onClick={() => status === 'idle' && inputRef.current?.click()}
-        disabled={status === 'uploading'}
-        title="Importar métricas de NPS Geral via JSON"
-      >
-        <UploadCloud size={15} strokeWidth={2.2} />
+      <div className="dropzone-content">
+        <UploadCloud size={20} strokeWidth={2.2} />
         <span>{label}</span>
-      </button>
-      {message && (
-        <span className={`import-msg import-msg--${status}`}>{message}</span>
-      )}
-    </div>
-  );
-};
-
-// ── CSV Upload Button ─────────────────────────────────────────────────────────
-const CsvUploader = ({ onSuccess, currentYear }) => {
-  const [status, setStatus] = useState('idle'); // idle | uploading | success | error
-  const [message, setMessage] = useState('');
-  const inputRef = useRef(null);
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Reset input so the same file can be re-uploaded if needed
-    e.target.value = '';
-
-    setStatus('uploading');
-    setMessage('');
-
-    const formData = new FormData();
-    formData.append('file', file);
-    if (currentYear) {
-      formData.append('targetYear', currentYear);
-    }
-
-    try {
-      const res = await fetch(`${API_BASE}/upload-metrics`, {
-        method: 'POST',
-        body: formData,
-      });
-      const json = await res.json();
-
-      if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
-
-      setStatus('success');
-      setMessage(`${json.rows_processed} linhas · ${json.months_updated} meses`);
-      onSuccess();
-
-      setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000);
-    } catch (err) {
-      setStatus('error');
-      setMessage(err.message);
-      setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
-    }
-  };
-
-  const label = {
-    idle:      'Importar CSV',
-    uploading: 'Processando…',
-    success:   'Importado!',
-    error:     'Erro',
-  }[status];
-
-  return (
-    <div className="csv-uploader">
-      <input
-        ref={inputRef}
-        id="csv-file-input"
-        type="file"
-        accept=".csv,text/csv"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-      <button
-        id="csv-upload-btn"
-        className={`btn-import btn-import--${status}`}
-        onClick={() => status === 'idle' && inputRef.current?.click()}
-        disabled={status === 'uploading'}
-        title="Importar métricas de SLA via CSV do ServiceNow"
-      >
-        <UploadCloud size={15} strokeWidth={2.2} />
-        <span>{label}</span>
-      </button>
-      {message && (
-        <span className={`import-msg import-msg--${status}`}>{message}</span>
-      )}
+      </div>
+      {message && <span className="dropzone-msg">{message}</span>}
     </div>
   );
 };
@@ -462,8 +406,7 @@ function App() {
               </select>
             </div>
             <div style={{display: 'flex', gap: '0.5rem'}}>
-              <CsvUploader onSuccess={fetchData} currentYear={year} />
-              <JsonUploader onSuccess={fetchData} currentYear={year} />
+              <UnifiedUploader onSuccess={fetchData} currentYear={year} />
             </div>
           </div>
         </div>
@@ -472,48 +415,56 @@ function App() {
       </header>
 
       <div className="kpi-grid">
-        <div className="card kpi-card">
-          <span className="label">Total de chamados fechados</span>
-          <span className="value font-mono">{totalClosedYear}</span>
+        <div className="card kpi-card split-kpi-card">
+          <div className="split-kpi-section">
+            <span className="label">Total Fechados</span>
+            <span className="value font-mono">{totalClosedYear}</span>
+          </div>
+          <div className="split-kpi-section">
+            <span className="label">Fechados/Mês</span>
+            <span className="value font-mono">{avgClosedMonth}</span>
+          </div>
         </div>
-        <div className="card kpi-card">
-          <span className="label">Fechados por mês</span>
-          <span className="value font-mono">{avgClosedMonth}</span>
-        </div>
-        <div className="card kpi-card">
-          <span className="label">NPS Médio</span>
-          <span className="value font-mono" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
-        </div>
-        <div className="card kpi-card">
-          <span className="label">SLA%</span>
-          <span className="value font-mono" style={{
-            color: Number(slaAccuracy) >= 95 ? 'var(--success)' : 
-                   Number(slaAccuracy) <= 70 ? 'var(--error)' : 'var(--secondary)'
-          }}>{slaAccuracy}%</span>
-          <span className="meta font-mono" style={{ display: 'block', color: '#eab308', fontSize: '0.85rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 95%</span>
-        </div>
-      </div>
 
-      <div className="kpi-grid">
-        <div className="card kpi-card">
-          <span className="label">Total de chamados avaliados</span>
-          <span className="value font-mono">{totalEvaluatedYear}</span>
+        <div className="card kpi-card split-kpi-card">
+          <div className="split-kpi-section">
+            <span className="label">NPS Médio</span>
+            <span className="value font-mono" style={{color: 'var(--primary)'}}>{avgNpsYear}</span>
+          </div>
+          <div className="split-kpi-section">
+            <span className="label">Índice Avaliações</span>
+            <span className="value font-mono" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
+          </div>
         </div>
-        <div className="card kpi-card">
-          <span className="label">Avaliações por mês</span>
-          <span className="value font-mono">{avgEvalMonth}</span>
+
+        <div className="card kpi-card split-kpi-card">
+          <div className="split-kpi-section">
+            <span className="label">Total Avaliados</span>
+            <span className="value font-mono">{totalEvaluatedYear}</span>
+          </div>
+          <div className="split-kpi-section">
+            <span className="label">Avaliações/Mês</span>
+            <span className="value font-mono">{avgEvalMonth}</span>
+          </div>
         </div>
-        <div className="card kpi-card">
-          <span className="label">Índice de Avaliação</span>
-          <span className="value font-mono" style={{color: 'var(--primary)'}}>{evalIndex}%</span>
-        </div>
-        <div className="card kpi-card">
-          <span className="label">Perfect Fix</span>
-          <span className="value font-mono" style={{
-            color: Number(perfectFixRate) >= 80 ? 'var(--success)' : 
-                   Number(perfectFixRate) <= 70 ? 'var(--error)' : 'var(--secondary)'
-          }}>{perfectFixRate}%</span>
-          <span className="meta font-mono" style={{ display: 'block', color: '#ffffff', fontSize: '0.85rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 80%</span>
+
+        <div className="card kpi-card split-kpi-card">
+          <div className="split-kpi-section">
+            <span className="label">SLA</span>
+            <span className="value font-mono" style={{
+              color: Number(slaAccuracy) >= 95 ? 'var(--success)' : 
+                     Number(slaAccuracy) <= 70 ? 'var(--error)' : 'var(--secondary)'
+            }}>{slaAccuracy}%</span>
+            <span className="meta font-mono" style={{ display: 'block', color: '#eab308', fontSize: '0.65rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 95%</span>
+          </div>
+          <div className="split-kpi-section">
+            <span className="label">Perfect Fix</span>
+            <span className="value font-mono" style={{
+              color: Number(perfectFixRate) >= 80 ? 'var(--success)' : 
+                     Number(perfectFixRate) <= 70 ? 'var(--error)' : 'var(--secondary)'
+            }}>{perfectFixRate}%</span>
+            <span className="meta font-mono" style={{ display: 'block', color: '#ffffff', fontSize: '0.65rem', marginTop: '-0.25rem', fontWeight: 600 }}>Meta: 80%</span>
+          </div>
         </div>
       </div>
 

@@ -150,6 +150,36 @@ body {
   color: #f8fafc;
 }
 
+.split-kpi-card {
+  display: flex;
+  padding: 0;
+}
+
+.split-kpi-section {
+  flex: 1;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.split-kpi-section:first-child {
+  border-right: 1px solid var(--card-border);
+}
+
+.split-kpi-section .label {
+  font-size: 0.65rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.split-kpi-section .value {
+  font-size: 1.5rem;
+  margin-bottom: 0;
+}
+
 .charts-section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -356,69 +386,86 @@ body {
   border-color: var(--primary);
 }
 
-/* ── CSV Uploader ─────────────────────────────────────────────────────────── */
-.csv-uploader {
+/* ── Unified Dropzone ─────────────────────────────────────────────────────── */
+.unified-dropzone {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-}
-
-.btn-import {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 1rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 8px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(56, 189, 248, 0.08);
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.05);
   color: var(--primary);
-  font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-  white-space: nowrap;
+  transition: all 0.2s;
+  position: relative;
 }
 
-.btn-import:hover:not(:disabled) {
-  background: rgba(56, 189, 248, 0.18);
+.unified-dropzone:hover {
+  background: rgba(56, 189, 248, 0.12);
   border-color: var(--primary);
   transform: translateY(-1px);
 }
 
-.btn-import--uploading {
+.dropzone-content {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.dropzone--uploading {
   border-color: rgba(100, 116, 139, 0.4);
   color: #64748b;
   cursor: not-allowed;
   animation: pulse-import 1.4s ease-in-out infinite;
 }
 
-.btn-import--success {
+.dropzone--success {
   border-color: rgba(52, 211, 153, 0.4);
   background: rgba(52, 211, 153, 0.1);
   color: var(--success);
-  cursor: default;
 }
 
-.btn-import--error {
-  border-color: rgba(239, 68, 68, 0.4);
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
-  cursor: default;
+.dropzone--error {
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--danger);
 }
 
-.import-msg {
-  font-size: 0.72rem;
-  font-weight: 600;
+.dropzone-msg {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  font-size: 0.7rem;
   font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.02em;
+  white-space: nowrap;
+  animation: fade-in 0.3s forwards;
 }
 
-.import-msg--success { color: var(--success); }
-.import-msg--error   { color: var(--error); }
+.dropzone-msg.import-msg--success { color: var(--success); }
+.dropzone-msg.import-msg--error   { color: var(--error); }
 
 @keyframes pulse-import {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.45; }
+}
+
+/* ── Responsividade / Mobile PWA ──────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-section { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+  .title-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .title-section h1 { font-size: 2rem; }
+  .controls { flex-direction: column; align-items: stretch; width: 100%; }
+  .clock-section { display: none; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .charts-section { grid-template-columns: 1fr; }
+  .unified-dropzone { justify-content: center; }
 }
