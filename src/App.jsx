@@ -129,9 +129,33 @@ const Clock = () => {
   );
 };
 
+const formatMonthTooltip = (item, fallbackLabel = '', allMetrics = []) => {
+  let target = item;
+  if (!target && fallbackLabel && allMetrics?.length) {
+    target = allMetrics.find(m => m.shortMonth === fallbackLabel || m.month === fallbackLabel);
+  }
+  if (!target) return fallbackLabel;
+
+  const monthName = target.month || fallbackLabel || '';
+  const isVacation = target.is_vacation === 1 || target.is_vacation === '1' || target.is_vacation === true;
+  const isProject = target.is_project === 1 || target.is_project === '1' || target.is_project === true;
+
+  if (isVacation && isProject) {
+    return `${monthName} (Férias / Projeto)`;
+  }
+  if (isVacation) {
+    return `${monthName} (Férias)`;
+  }
+  if (isProject) {
+    return `${monthName} (Projeto)`;
+  }
+  return monthName;
+};
+
 const RatioTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
-    const label = payload[0].payload.month;
+    const item = payload[0].payload;
+    const label = formatMonthTooltip(item, item?.month);
     const closed = payload.find(p => p.dataKey === 'closed_count')?.value || 0;
     const evalld = payload.find(p => p.dataKey === 'evaluated_count')?.value || 0;
     const ratio = closed > 0 ? ((evalld / closed) * 100).toFixed(1) : 0;
@@ -314,10 +338,10 @@ function App() {
   const monthsPassed = Math.max(monthsWithData, 1); // Avoid division by zero
 
   const avgClosedMonth = (totalClosedYear / monthsPassed).toFixed(1);
-  const avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1);
+  const _avgClosedDay = (totalClosedYear / (monthsPassed * 22)).toFixed(1);
   
   const avgEvalMonth = (totalEvaluatedYear / monthsPassed).toFixed(1);
-  const avgEvalDay = (totalEvaluatedYear / (monthsPassed * 22)).toFixed(1);
+  const _avgEvalDay = (totalEvaluatedYear / (monthsPassed * 22)).toFixed(1);
 
   const slaAccuracy = totalClosedYear > 0 ? ((totalWithinSlaYear / totalClosedYear) * 100).toFixed(1) : "0";
 
@@ -479,7 +503,7 @@ function App() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="shortMonth" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} />
-                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Tooltip labelFormatter={(label, payload) => formatMonthTooltip(payload?.[0]?.payload, label, safeMetrics)} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Line type="monotone" dataKey="nps" name="Meu NPS" stroke="var(--primary)" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
                 <Line type="monotone" dataKey="nps_general" name="NPS Geral" stroke="var(--secondary)" strokeWidth={2} strokeDasharray="5 5" />
@@ -527,7 +551,7 @@ function App() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="shortMonth" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
-                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
+                <Tooltip labelFormatter={(label, payload) => formatMonthTooltip(payload?.[0]?.payload, label, safeMetrics)} cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} />
                 <Legend iconType="circle" />
                 <Bar dataKey="closed_count" name="Fechados" fill="var(--primary)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="evaluated_count" name="Avaliados" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
@@ -585,7 +609,7 @@ function App() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="shortMonth" stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} axisLine={false} tickLine={false} domain={[0, 100]} />
-                <Tooltip labelFormatter={(label, payload) => payload?.[0]?.payload?.month || label} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} formatter={(value) => `${Number(value).toFixed(1)}%`} />
+                <Tooltip labelFormatter={(label, payload) => formatMonthTooltip(payload?.[0]?.payload, label, slaChartData)} contentStyle={{background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px'}} formatter={(value) => `${Number(value).toFixed(1)}%`} />
                 <Legend iconType="circle" />
                 <ReferenceLine y={95} stroke="#eab308" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta SLA (95%)', fill: '#eab308', fontSize: 12, fontWeight: 'bold' }} />
                 <ReferenceLine y={80} stroke="#ffffff" strokeDasharray="3 3" strokeWidth={2} label={{ position: 'top', value: 'Meta PF (80%)', fill: '#ffffff', fontSize: 12, fontWeight: 'bold' }} />

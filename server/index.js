@@ -169,7 +169,6 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
         const updatedStr  = normalizedRow['sys_updated_on'] || normalizedRow['Updated'] || normalizedRow['updated'] || normalizedRow['Resolved'] || normalizedRow['resolved'] || '';
         const priorityRaw = normalizedRow['priority']        || normalizedRow['Priority'] || '';
         const reopenRaw   = normalizedRow['u_reopen_count']  || normalizedRow['Reopen count'] || normalizedRow['reopen_count'] || normalizedRow['reopenCount'] || '0';
-        const calendarDurationRaw = normalizedRow['calendar_duration'] || normalizedRow['Calendar duration'] || normalizedRow['calendar duration'] || '';
 
         // Prioriza a data de resolução final. Se não existir, usa a data de última atualização (fallback).
         const endStr = resolvedStr || updatedStr;
