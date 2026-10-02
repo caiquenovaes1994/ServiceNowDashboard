@@ -5,7 +5,7 @@ import {
   LineChart, Line, Legend, ReferenceLine
 } from 'recharts';
 import { 
-  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud
+  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud, ChevronDown, Check
 } from 'lucide-react';
 
 const API_BASE = '/api';
@@ -105,6 +105,76 @@ const UnifiedUploader = ({ onSuccess, currentYear }) => {
         <span>{label}</span>
       </div>
       {message && <span className="dropzone-msg">{message}</span>}
+    </div>
+  );
+};
+
+// ── Custom Styled Year Dropdown ────────────────────────────────────────────────
+const YearDropdown = ({ value, onChange, options = [2024, 2025, 2026] }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className="year-dropdown-container" ref={containerRef}>
+      <button 
+        type="button"
+        className={`year-filter-btn ${isOpen ? 'is-open' : ''}`}
+        onClick={() => setIsOpen(prev => !prev)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        title="Filtrar por ano"
+      >
+        <Calendar size={18} strokeWidth={2.2} />
+        <span>{value}</span>
+        <ChevronDown 
+          size={14} 
+          strokeWidth={2.2} 
+          className={`year-chevron ${isOpen ? 'rotate' : ''}`} 
+        />
+      </button>
+
+      {isOpen && (
+        <div className="year-dropdown-menu" role="listbox">
+          {options.map((y) => {
+            const isSelected = y === value;
+            return (
+              <div
+                key={y}
+                role="option"
+                aria-selected={isSelected}
+                className={`year-dropdown-item ${isSelected ? 'selected' : ''}`}
+                onClick={() => {
+                  onChange(y);
+                  setIsOpen(false);
+                }}
+              >
+                <span>{y}</span>
+                {isSelected && <Check size={14} strokeWidth={2.5} className="item-check" />}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -410,28 +480,19 @@ function App() {
   return (
     <div className="dashboard-container">
       <header className="header">
-        <div className="title-section" style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
+        <div className="title-section">
           <div>
             <h1>ServiceNow Dashboard</h1>
             <p className="welcome-msg">Olá, Caique!</p>
           </div>
           
-          <div className="controls" style={{display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-              <Calendar size={18} color="#64748b"/>
-              <select 
-                className="select-year" 
-                value={year} 
-                onChange={(e) => setYear(parseInt(e.target.value))}
-              >
-                {[2024, 2025, 2026].map(y => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
-            </div>
-            <div style={{display: 'flex', gap: '0.5rem'}}>
-              <UnifiedUploader onSuccess={fetchData} currentYear={year} />
-            </div>
+          <div className="controls">
+            <YearDropdown 
+              value={year} 
+              onChange={setYear} 
+              options={[2024, 2025, 2026]} 
+            />
+            <UnifiedUploader onSuccess={fetchData} currentYear={year} />
           </div>
         </div>
         
