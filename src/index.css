@@ -275,19 +275,110 @@ body {
   font-weight: 500;
 }
 
-.metrics-table-container {
+/* ── Unified Collapsible Details Container ───────────────────────────────────── */
+.details-section-container {
   margin-top: 2rem;
-  padding: 0;
-  background: transparent;
-  border-radius: 0;
-  border: none;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.metrics-table-header {
+.details-section-container:hover {
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.details-section-container.is-expanded {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.15);
+}
+
+.details-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.details-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 1.25rem;
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  user-select: none;
+}
+
+.details-toggle-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+}
+
+.details-toggle-btn.is-active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+}
+
+.details-arrow-icon {
+  color: var(--primary);
+  transition: transform 0.53s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.details-arrow-icon.rotate {
+  transform: rotate(180deg);
+}
+
+/* Smooth expansion using CSS Grid with fade effect */
+.details-collapse-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.details-collapse-wrapper.expanded {
+  grid-template-rows: 1fr;
+}
+
+.details-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.details-collapse-inner .metrics-grid {
+  padding-top: 1.25rem;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.38s ease-out, transform 0.38s ease-out;
+  will-change: opacity, transform;
+}
+
+.details-collapse-wrapper.expanded .details-collapse-inner .metrics-grid {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, 
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
 }
 
 .metrics-grid {

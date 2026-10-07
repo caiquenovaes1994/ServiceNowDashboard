@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD033 MD041 -->
+
 <div align="center">
 
 # 📊 ServiceNow Dashboard
@@ -10,10 +12,6 @@
 ![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
 ![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
 ![Recharts 2.12.7](https://img.shields.io/badge/Recharts-2.12.7-22B5BF?style=flat&logo=recharts&logoColor=white)
-
-[![Licença MIT](https://img.shields.io/badge/Licença-MIT-blue?style=flat)](LICENSE)
-[![Código de Conduta](https://img.shields.io/badge/Código_de_Conduta-Contributor_Covenant-ff69b4?style=flat)](CODE_OF_CONDUCT.md)
-[![Segurança](https://img.shields.io/badge/Segurança-Política_de_Divulgação-critical?style=flat)](SECURITY.md)
 
 </div>
 
@@ -42,7 +40,8 @@ A partir da versão atual, o dashboard suporta **ingestão automática de dados 
 | **SLA & Perfect Fix** | Gráfico de linha comparando os dois indicadores simultaneamente com linha de meta (95%) e extremos |
 | **Check-ins de Status** | Marcação de meses com Férias ou Projetos especiais, excluídos automaticamente dos comparativos extremos |
 | **Relógio de Sistema** | Data e hora atualizadas em tempo real no cabeçalho |
-| **Edição Controlada** | Tabela editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
+| **Detalhamento Mensal Expansível** | Visualização sob demanda da tabela de métricas através de container retrátil com animação suave via CSS Grid, mantendo a visão inicial focada nos cards e gráficos |
+| **Edição Controlada** | Tabela analítica editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
 | **Backup Automático** | Persistência com backup `.bak` via debounce, disparado a cada salvamento |
 | **Auto-Seed** | Inicialização automática do banco com dados históricos de 2024–2026 em caso de banco vazio |
 | **Migração de Schema** | Adição automática de colunas novas em bancos existentes (sem perda de dados) |
@@ -339,8 +338,8 @@ O sistema de design está centralizado em `src/index.css`, utilizando variáveis
 ```
 
 - **Tipografia** — JetBrains Mono para valores numéricos, Plus Jakarta Sans para textos
-- **Animações** — Micro-animações e transições suaves
-- **Layout** — Grid responsivo com glassmorphism e tema Deep Blue Premium
+- **Animações** — Micro-animações, transições suaves de colapso/expansão via CSS Grid (`grid-template-rows`)
+- **Layout** — Grid responsivo com glassmorphism, tema Deep Blue Premium e visão sob demanda de detalhamento
 
 ---
 

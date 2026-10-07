@@ -366,6 +366,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
 function App() {
   const [metrics, setMetrics] = useState([]);
   const [year, setYear] = useState(2026);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   console.log("Dashboard Render Check - Metrics Count:", metrics?.length);
 
@@ -695,47 +696,68 @@ function App() {
         </div>
       </div>
 
-      <div className="metrics-table-container">
-        <div className="metrics-grid">
-          <div className="metrics-row" style={{background: 'transparent', border: 'none', paddingBottom: 0}}>
-              <span className="row-label">Mês</span>
-              <span className="row-label">Fechados</span>
-              <span className="row-label">Avaliados</span>
+      <div className={`details-section-container ${isDetailsOpen ? 'is-expanded' : ''}`}>
+        <div className="details-header">
+          <button 
+            type="button"
+            className={`details-toggle-btn ${isDetailsOpen ? 'is-active' : ''}`}
+            onClick={() => setIsDetailsOpen(prev => !prev)}
+            aria-expanded={isDetailsOpen}
+            title={isDetailsOpen ? "Recolher Detalhamento Mensal" : "Expandir Detalhamento Mensal"}
+          >
+            <span>Detalhamento Mensal</span>
+            <ArrowDown 
+              size={18} 
+              strokeWidth={2.2} 
+              className={`details-arrow-icon ${isDetailsOpen ? 'rotate' : ''}`} 
+            />
+          </button>
+        </div>
 
-              <span className="row-label">Meu NPS</span>
-              <span className="row-label">NPS Geral</span>
-              <span className="row-label">Férias</span>
-              <span className="row-label">Projeto</span>
-           </div>
-          
-          {visibleMonths.map(month => {
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonthIdx = today.getMonth();
-            const currentMonthName = MONTHS[currentMonthIdx];
-            const currentDay = today.getDate();
+        <div className={`details-collapse-wrapper ${isDetailsOpen ? 'expanded' : ''}`}>
+          <div className="details-collapse-inner">
+            <div className="metrics-grid">
+              <div className="metrics-row" style={{background: 'transparent', border: 'none', paddingBottom: 0}}>
+                <span className="row-label">Mês</span>
+                <span className="row-label">Fechados</span>
+                <span className="row-label">Avaliados</span>
 
-            let prevMonthIdx = currentMonthIdx - 1;
-            let prevYear = currentYear;
-            if (prevMonthIdx < 0) {
-              prevMonthIdx = 11;
-              prevYear = currentYear - 1;
-            }
-            const prevMonthName = MONTHS[prevMonthIdx];
+                <span className="row-label">Meu NPS</span>
+                <span className="row-label">NPS Geral</span>
+                <span className="row-label">Férias</span>
+                <span className="row-label">Projeto</span>
+              </div>
+              
+              {visibleMonths.map(month => {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const currentMonthIdx = today.getMonth();
+                const currentMonthName = MONTHS[currentMonthIdx];
+                const currentDay = today.getDate();
 
-            const isEditable = (year === currentYear && month === currentMonthName) || 
-                               (year === prevYear && month === prevMonthName && currentDay < 10);
-            
-            return (
-              <MetricRow 
-                key={`${year}-${month}`} 
-                month={month} 
-                data={safeMetrics.find(m => m.month === month)}
-                onSave={handleSaveMonth}
-                readOnly={!isEditable}
-              />
-            );
-          })}
+                let prevMonthIdx = currentMonthIdx - 1;
+                let prevYear = currentYear;
+                if (prevMonthIdx < 0) {
+                  prevMonthIdx = 11;
+                  prevYear = currentYear - 1;
+                }
+                const prevMonthName = MONTHS[prevMonthIdx];
+
+                const isEditable = (year === currentYear && month === currentMonthName) || 
+                                   (year === prevYear && month === prevMonthName && currentDay < 10);
+                
+                return (
+                  <MetricRow 
+                    key={`${year}-${month}`} 
+                    month={month} 
+                    data={safeMetrics.find(m => m.month === month)}
+                    onSave={handleSaveMonth}
+                    readOnly={!isEditable}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
