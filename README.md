@@ -12,8 +12,6 @@
 ![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
 ![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
 ![ExcelJS 4.4.0](https://img.shields.io/badge/ExcelJS-4.4.0-217346?style=flat&logo=microsoft-excel&logoColor=white)
-![PWA Ready](https://img.shields.io/badge/PWA-Enabled-5A0FC8?style=flat&logo=pwa&logoColor=white)
-![Vanilla CSS](https://img.shields.io/badge/CSS-Vanilla%20Pure-1572B6?style=flat&logo=css3&logoColor=white)
 
 </div>
 
@@ -254,10 +252,10 @@ Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquiv
 
 **Caique Novaes** — Analista de Suporte & Desenvolvedor
 
-[![GitHub](https://img.shields.io/badge/GitHub-caiquenovaes1994-181717?style=flat&logo=github&logoColor=white)](https://github.com/caiquenovaes1994)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/caiquenovaes1994)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:caiquenovaes1994@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-caiquenovaes-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/caiquenovaes)
-[![Telegram](https://img.shields.io/badge/Telegram-caiquenovaes1994-26A5E4?style=flat&logo=telegram&logoColor=white)](https://t.me/caiquenovaes1994)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/caiquenovaes)
+[![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=flat&logo=telegram&logoColor=white)](https://t.me/caiquenovaes1994)
 
 Feito com ❤️ e ☕ — *2024–2026*
 
