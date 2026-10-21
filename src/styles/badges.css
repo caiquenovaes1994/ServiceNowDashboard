@@ -1,0 +1,219 @@
+/* ── Status Pills (Incidentes) ───────────────────────────────────────────── */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.status-pill.aberto {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.status-pill.resolvido {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.status-pill.pendente {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.status-pill.andamento {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+/* ── Badges de Major Incident ────────────────────────────────────────────── */
+.badge-major {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: var(--radius-pill);
+  color: var(--error);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: pulse-danger 2.5s infinite;
+}
+
+/* ── Badges de RID / Hotel ───────────────────────────────────────────────── */
+.badge-rid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.42rem;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 4px;
+  color: var(--primary);
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ── Badges de Ativo / Inativo (Cadastros) ────────────────────────────────── */
+.badge-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-inactive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--text-faint);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ── Tags de Filtro Ativo na Toolbar ─────────────────────────────────────── */
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-pill);
+  color: var(--primary);
+  font-size: 0.8rem;
+}
+
+.filter-tag strong {
+  color: #fff;
+}
+
+.filter-tag-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem;
+  transition: color var(--transition-fast);
+}
+
+.filter-tag-clear:hover {
+  color: var(--error);
+}
+
+/* ── Sino de Notificações e Dropdown ─────────────────────────────────────── */
+.notif-bell-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.notif-bell-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.notif-bell-btn:hover {
+  color: var(--text-white);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notif-badge-count {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  background: var(--error);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  min-width: 17px;
+  height: 17px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 2px solid #0b1120;
+}
+
+.notif-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-height: 380px;
+  overflow-y: auto;
+  background: #0f172a;
+  border: 1px solid var(--card-border-focus);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.notif-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.notif-item:hover {
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.notif-item.stale {
+  border-left: 3px solid var(--warning);
+}

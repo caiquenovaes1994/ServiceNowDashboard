@@ -55,7 +55,8 @@ const triggerBackup = () => {
 };
 
 export const initDb = () => {
-  db.serialize(() => {
+  return new Promise((resolve) => {
+    db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS metrics (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       year INTEGER NOT NULL,
@@ -95,6 +96,85 @@ export const initDb = () => {
       key TEXT PRIMARY KEY,
       value TEXT
     )`);
+
+    // ── Tabelas do Incident Manager (migradas do SNOW_INC) ──────────────────
+    db.run(`CREATE TABLE IF NOT EXISTS hoteis (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      rid TEXT UNIQUE,
+      nome TEXT NOT NULL,
+      ativo BOOLEAN DEFAULT 1
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS responsaveis (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL UNIQUE,
+      equipe TEXT,
+      ativo BOOLEAN DEFAULT 1
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS incidentes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      caso TEXT,
+      incidente TEXT,
+      id_hotel INTEGER,
+      problema TEXT,
+      id_responsavel INTEGER,
+      ticket TEXT,
+      situacao TEXT,
+      ultima_atualizacao TEXT,
+      status TEXT DEFAULT 'Aberto',
+      ordem INTEGER,
+      link TEXT,
+      pendencia TEXT,
+      is_major BOOLEAN DEFAULT 0,
+      FOREIGN KEY (id_hotel) REFERENCES hoteis(id),
+      FOREIGN KEY (id_responsavel) REFERENCES responsaveis(id)
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS chamados_filhos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id_incidente INTEGER,
+      id_hotel INTEGER,
+      ticket TEXT,
+      hotel_texto TEXT,
+      FOREIGN KEY (id_incidente) REFERENCES incidentes(id) ON DELETE CASCADE,
+      FOREIGN KEY (id_hotel) REFERENCES hoteis(id)
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS historico_situacao (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id_incidente INTEGER,
+      situacao TEXT,
+      timestamp TEXT,
+      FOREIGN KEY (id_incidente) REFERENCES incidentes(id) ON DELETE CASCADE
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS incidentes_maiores (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      numero TEXT UNIQUE NOT NULL,
+      descricao TEXT,
+      hotel TEXT,
+      ocorrencias INTEGER DEFAULT 1,
+      ultima_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+      minha_responsabilidade BOOLEAN DEFAULT 0
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS logs_auditoria (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      id_registro INTEGER,
+      entidade TEXT,
+      tipo_acao TEXT,
+      valor_anterior TEXT,
+      valor_novo TEXT
+    )`);
+
+    // Índices de otimização
+    db.run(`CREATE INDEX IF NOT EXISTS idx_incidentes_status ON incidentes(status)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_incidentes_id_hotel ON incidentes(id_hotel)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_incidentes_id_responsavel ON incidentes(id_responsavel)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_historico_id_incidente ON historico_situacao(id_incidente)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_chamados_id_incidente ON chamados_filhos(id_incidente)`);
 
     // Auto-seed if empty
     db.get("SELECT COUNT(*) as count FROM metrics", (err, row) => {
@@ -138,7 +218,9 @@ export const initDb = () => {
         }
         stmt.finalize();
       }
+      resolve();
     });
+  });
   });
 };
 
@@ -270,3 +352,43 @@ export const updateNpsGeneralMetrics = (year, month, nps_general) => {
     );
   });
 };
+
+// ── Generic Async DB Helpers ───────────────────────────────────────────────
+export const dbAll = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+};
+
+export const dbGet = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) reject(err);
+      else resolve(row || null);
+    });
+  });
+};
+
+export const dbRun = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) {
+      if (err) reject(err);
+      else resolve({ lastID: this.lastID, changes: this.changes });
+    });
+  });
+};
+
+export const dbExec = (sql) => {
+  return new Promise((resolve, reject) => {
+    db.exec(sql, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+};
+
+export { db, triggerBackup };
+

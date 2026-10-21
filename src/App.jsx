@@ -8,6 +8,12 @@ import {
   Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud, ChevronDown, Check
 } from 'lucide-react';
 
+import NavigationTabs, { TABS } from './components/common/NavigationTabs.jsx';
+import IncidentList from './components/incidents/IncidentList.jsx';
+import HotelManagement from './components/settings/HotelManagement.jsx';
+import ResponsibleManagement from './components/settings/ResponsibleManagement.jsx';
+import SettingsDropdown from './components/common/SettingsDropdown.jsx';
+
 const API_BASE = '/api';
 
 const MONTHS = [
@@ -368,7 +374,14 @@ function App() {
   const [year, setYear] = useState(2026);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  console.log("Dashboard Render Check - Metrics Count:", metrics?.length);
+  // Estados de Navegação e Módulos Operacionais
+  const [activeMainTab, setActiveMainTab] = useState(TABS.METRICS);
+  const [activeIncidentSubTab, setActiveIncidentSubTab] = useState('Aberto');
+
+  const [incidents, setIncidents] = useState([]);
+  const [majorRecords, setMajorRecords] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [responsibles, setResponsibles] = useState([]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -381,9 +394,52 @@ function App() {
     }
   }, [year]);
 
+  // Carregamento de dados operacionais
+  const fetchIncidents = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/incidentes?status=Todos`);
+      if (Array.isArray(res.data)) setIncidents(res.data);
+    } catch (err) {
+      console.error("Error fetching incidentes", err);
+    }
+  }, []);
+
+  const fetchMajorRecords = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/incidentes-maiores`);
+      if (Array.isArray(res.data)) setMajorRecords(res.data);
+    } catch (err) {
+      console.error("Error fetching major records", err);
+    }
+  }, []);
+
+  const fetchHotels = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/hoteis`);
+      if (Array.isArray(res.data)) setHotels(res.data);
+    } catch (err) {
+      console.error("Error fetching hoteis", err);
+    }
+  }, []);
+
+  const fetchResponsibles = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/responsaveis`);
+      if (Array.isArray(res.data)) setResponsibles(res.data);
+    } catch (err) {
+      console.error("Error fetching responsaveis", err);
+    }
+  }, []);
+
   useEffect(() => {
-    Promise.resolve().then(() => fetchData());
-  }, [fetchData]);
+    Promise.resolve().then(() => {
+      fetchData();
+      fetchIncidents();
+      fetchMajorRecords();
+      fetchHotels();
+      fetchResponsibles();
+    });
+  }, [fetchData, fetchIncidents, fetchMajorRecords, fetchHotels, fetchResponsibles]);
 
   const handleSaveMonth = async (month, data) => {
     try {
@@ -391,6 +447,151 @@ function App() {
       fetchData();
     } catch {
       alert("Erro ao salvar dados");
+    }
+  };
+
+  // ── Handlers de Incidentes ────────────────────────────────────────────────
+  const handleCreateIncident = async (data) => {
+    try {
+      await axios.post(`${API_BASE}/incidentes`, data);
+      await fetchIncidents();
+      await fetchMajorRecords();
+    } catch (err) {
+      alert("Erro ao criar incidente: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleUpdateIncident = async (id, data) => {
+    try {
+      await axios.put(`${API_BASE}/incidentes/${id}`, data);
+      await fetchIncidents();
+      await fetchMajorRecords();
+    } catch (err) {
+      alert("Erro ao atualizar incidente: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleDeleteIncident = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/incidentes/${id}`);
+      await fetchIncidents();
+      await fetchMajorRecords();
+    } catch (err) {
+      alert("Erro ao excluir incidente: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleReorderIncidents = async (ids) => {
+    try {
+      await axios.put(`${API_BASE}/incidentes/reordenar`, { ids });
+      await fetchIncidents();
+    } catch (err) {
+      console.error("Erro ao reordenar incidentes:", err);
+    }
+  };
+
+  const handleToggleMajorResponsibility = async (numero, val) => {
+    try {
+      await axios.post(`${API_BASE}/incidentes-maiores/${numero}/toggle`, { minha_responsabilidade: val });
+      await fetchMajorRecords();
+    } catch (err) {
+      console.error("Erro ao alternar responsabilidade:", err);
+    }
+  };
+
+  const handleFetchHistory = async (id) => {
+    try {
+      const res = await axios.get(`${API_BASE}/incidentes/${id}/historico`);
+      return res.data;
+    } catch (err) {
+      console.error("Erro ao buscar histórico:", err);
+      return [];
+    }
+  };
+
+  const handleFetchChamados = async (id) => {
+    try {
+      const res = await axios.get(`${API_BASE}/incidentes/${id}/chamados`);
+      return res.data;
+    } catch (err) {
+      console.error("Erro ao buscar chamados vinculados:", err);
+      return [];
+    }
+  };
+
+  const handleAddChamado = async (idIncidente, ticketData) => {
+    try {
+      await axios.post(`${API_BASE}/incidentes/${idIncidente}/chamados`, ticketData);
+      await fetchIncidents();
+      await fetchMajorRecords();
+    } catch (err) {
+      alert("Erro ao vincular chamado: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleRemoveChamado = async (idChamado) => {
+    try {
+      await axios.delete(`${API_BASE}/incidentes/chamados/${idChamado}`);
+      await fetchIncidents();
+      await fetchMajorRecords();
+    } catch (err) {
+      alert("Erro ao remover chamado: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // ── Handlers de Hotéis ───────────────────────────────────────────────────
+  const handleCreateHotel = async (data) => {
+    try {
+      await axios.post(`${API_BASE}/hoteis`, data);
+      await fetchHotels();
+    } catch (err) {
+      alert("Erro ao cadastrar hotel: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleUpdateHotel = async (id, data) => {
+    try {
+      await axios.put(`${API_BASE}/hoteis/${id}`, data);
+      await fetchHotels();
+    } catch (err) {
+      alert("Erro ao atualizar hotel: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleDeleteHotel = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/hoteis/${id}`);
+      await fetchHotels();
+    } catch (err) {
+      alert("Erro ao inativar/excluir hotel: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // ── Handlers de Responsáveis ─────────────────────────────────────────────
+  const handleCreateResponsible = async (data) => {
+    try {
+      await axios.post(`${API_BASE}/responsaveis`, data);
+      await fetchResponsibles();
+    } catch (err) {
+      alert("Erro ao cadastrar responsável: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleUpdateResponsible = async (id, data) => {
+    try {
+      await axios.put(`${API_BASE}/responsaveis/${id}`, data);
+      await fetchResponsibles();
+    } catch (err) {
+      alert("Erro ao atualizar responsável: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleDeleteResponsible = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/responsaveis/${id}`);
+      await fetchResponsibles();
+    } catch (err) {
+      alert("Erro ao inativar/excluir responsável: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -484,23 +685,41 @@ function App() {
         <div className="title-section">
           <div>
             <h1>ServiceNow Dashboard</h1>
-            <p className="welcome-msg">Olá, Caique!</p>
+            <p className="welcome-msg">Painel Integrado de Gestão de Incidentes e<br></br> Análise de Desempenho</p>
           </div>
           
-          <div className="controls">
-            <YearDropdown 
-              value={year} 
-              onChange={setYear} 
-              options={[2024, 2025, 2026]} 
-            />
-            <UnifiedUploader onSuccess={fetchData} currentYear={year} />
-          </div>
+          {activeMainTab === TABS.METRICS && (
+            <div className="controls">
+              <YearDropdown 
+                value={year} 
+                onChange={setYear} 
+                options={[2024, 2025, 2026]} 
+              />
+              <UnifiedUploader onSuccess={fetchData} currentYear={year} />
+            </div>
+          )}
         </div>
         
-        <Clock />
+        <div className="header-right-group">
+          <Clock />
+          <SettingsDropdown 
+            activeTab={activeMainTab}
+            onSelectTab={setActiveMainTab}
+          />
+        </div>
       </header>
 
-      <div className="kpi-grid">
+      {/* Navegação por Abas Principais */}
+      <NavigationTabs
+        activeTab={activeMainTab}
+        onTabChange={setActiveMainTab}
+        openIncidentsCount={incidents.filter(i => i.status !== 'Resolvido').length}
+      />
+
+      {/* Módulo 1: Métricas & KPIs Analíticos */}
+      {activeMainTab === TABS.METRICS && (
+        <>
+          <div className="kpi-grid">
         <div className="card kpi-card split-kpi-card">
           <div className="split-kpi-section">
             <span className="label">Total Fechados</span>
@@ -760,6 +979,49 @@ function App() {
           </div>
         </div>
       </div>
+      </>
+      )}
+
+      {/* Módulo 2: Gestão Operacional de Incidentes */}
+      {activeMainTab === TABS.INCIDENTS && (
+        <IncidentList
+          incidents={incidents}
+          majorRecords={majorRecords}
+          hotels={hotels}
+          responsibles={responsibles}
+          activeSubTab={activeIncidentSubTab}
+          onSubTabChange={setActiveIncidentSubTab}
+          onCreateIncident={handleCreateIncident}
+          onUpdateIncident={handleUpdateIncident}
+          onDeleteIncident={handleDeleteIncident}
+          onReorderIncidents={handleReorderIncidents}
+          onToggleMajorResponsibility={handleToggleMajorResponsibility}
+          onFetchHistory={handleFetchHistory}
+          onFetchChamados={handleFetchChamados}
+          onAddChamado={handleAddChamado}
+          onRemoveChamado={handleRemoveChamado}
+        />
+      )}
+
+      {/* Módulo 3: Gestão de Hotéis & Localidades */}
+      {activeMainTab === TABS.HOTELS && (
+        <HotelManagement
+          hotels={hotels}
+          onCreateHotel={handleCreateHotel}
+          onUpdateHotel={handleUpdateHotel}
+          onDeleteHotel={handleDeleteHotel}
+        />
+      )}
+
+      {/* Módulo 4: Gestão de Responsáveis & Equipes */}
+      {activeMainTab === TABS.RESPONSIBLES && (
+        <ResponsibleManagement
+          responsibles={responsibles}
+          onCreateResponsible={handleCreateResponsible}
+          onUpdateResponsible={handleUpdateResponsible}
+          onDeleteResponsible={handleDeleteResponsible}
+        />
+      )}
     </div>
   );
 }

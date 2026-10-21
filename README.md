@@ -2,16 +2,18 @@
 
 <div align="center">
 
-# 📊 ServiceNow Dashboard
+# 📊 ServiceNow Dashboard & Incident Suite
 
-> Painel analítico de alta performance para monitoramento de chamados, NPS, SLA e Perfect Fix
+> Plataforma Integrada de Gestão Operacional de Incidentes, Monitoramento de Chamados, Análise de NPS, SLA e Perfect Fix
 
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
 ![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
-![Vite 5.0.0](https://img.shields.io/badge/Vite-5.0.0-646CFF?style=flat&logo=vite&logoColor=white)
+![Vite 5.4+](https://img.shields.io/badge/Vite-5.4%2B-646CFF?style=flat&logo=vite&logoColor=white)
 ![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
 ![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
-![Recharts 2.12.7](https://img.shields.io/badge/Recharts-2.12.7-22B5BF?style=flat&logo=recharts&logoColor=white)
+![ExcelJS 4.4.0](https://img.shields.io/badge/ExcelJS-4.4.0-217346?style=flat&logo=microsoft-excel&logoColor=white)
+![PWA Ready](https://img.shields.io/badge/PWA-Enabled-5A0FC8?style=flat&logo=pwa&logoColor=white)
+![Vanilla CSS](https://img.shields.io/badge/CSS-Vanilla%20Pure-1572B6?style=flat&logo=css3&logoColor=white)
 
 </div>
 
@@ -19,82 +21,113 @@
 
 ## 📋 Sobre o Projeto
 
-O **ServiceNow Dashboard** é uma aplicação web full-stack desenvolvida para centralizar e visualizar métricas operacionais de equipes de suporte e atendimento. O sistema oferece uma interface moderna com tema **Deep Blue Premium**, gráficos interativos e sincronização de dados em tempo real, tudo armazenado localmente com SQLite para máxima autonomia e velocidade.
+O **ServiceNow Dashboard & Incident Suite** é uma solução corporativa unificada desenvolvida para centralizar tanto a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix, volume) quanto a **gestão operacional de incidentes em tempo real**.
 
-A partir da versão atual, o dashboard suporta **ingestão automática de dados via exportação CSV do ServiceNow**, calculando SLA e Perfect Fix diretamente a partir dos registros brutos, bem como **importação via JSON** para cálculo do NPS Geral Corporativo.
+Construído com base em uma arquitetura moderna e modular (React 18 + Vite no frontend, Express nativo em ESM com SQLite no backend e um Design System em **Vanilla CSS puro**), o sistema opera de forma autônoma, leve e com persistência local de dados.
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Módulos da Aplicação
 
-| Recurso | Descrição |
-| --- | --- |
-| **KPIs Dinâmicos** | 8 cards organizados em 2 linhas × 4 colunas com totais, médias, SLA% e Perfect Fix |
-| **Monitoramento de SLA** | Calcula a acurácia de SLA (`within_sla_count / closed_count × 100`) com alertas de cor dinâmicos |
-| **Perfect Fix** | Rastreia chamados nunca reabertos (`perfect_fix_count / closed_count × 100`) com escala de cor em 3 faixas |
-| **Importação de CSV** | Upload do export do ServiceNow para cálculo automático de SLA e Perfect Fix por mês |
-| **Importação de JSON** | Upload de avaliações (`asmt_metric_result.json`) para cálculo automático do NPS Geral corporativo |
-| **Comparativo de NPS** | Gráfico de linha comparando NPS pessoal com a média corporativa, com destaques de melhor/pior mês |
-| **Volume de Chamados** | Gráfico de barras com sobreposição de fechados vs. avaliados e indicadores de extremos |
-| **Índice de Avaliações** | Gráfico de linha com tooltip detalhado exibindo percentual de avaliação por mês |
-| **SLA & Perfect Fix** | Gráfico de linha comparando os dois indicadores simultaneamente com linha de meta (95%) e extremos |
-| **Check-ins de Status** | Marcação de meses com Férias ou Projetos especiais, excluídos automaticamente dos comparativos extremos |
-| **Relógio de Sistema** | Data e hora atualizadas em tempo real no cabeçalho |
-| **Detalhamento Mensal Expansível** | Visualização sob demanda da tabela de métricas através de container retrátil com animação suave via CSS Grid, mantendo a visão inicial focada nos cards e gráficos |
-| **Edição Controlada** | Tabela analítica editável restrita ao mês atual e ao mês anterior, protegendo dados históricos |
-| **Backup Automático** | Persistência com backup `.bak` via debounce, disparado a cada salvamento |
-| **Auto-Seed** | Inicialização automática do banco com dados históricos de 2024–2026 em caso de banco vazio |
-| **Migração de Schema** | Adição automática de colunas novas em bancos existentes (sem perda de dados) |
-| **Dados Históricos** | Navegação por ano (2024, 2025, 2026) com cálculos independentes por período |
+### 1. 📈 Módulo Analítico (Métricas & KPIs)
+
+- **8 Cards Dinâmicos de KPI**: Visão rápida de fechados no ano, fechados por mês, NPS pessoal, NPS geral corporativo, SLA%, avaliados no ano, avaliações por mês e taxa de Perfect Fix.
+- **Gráficos Comparativos Recharts**:
+  - Comparativo de NPS (Pessoal vs. Média Geral da Empresa) com destaques dinâmicos de melhor/pior mês.
+  - Volume de chamados fechados vs. chamados avaliados.
+  - Acurácia de SLA e taxa de Perfect Fix com linha de meta (95%).
+- **Detalhamento Mensal Retrátil**: Tabela analítica expansível com animação CSS Grid para edição controlada do mês corrente e anterior.
+- **Upload Unificado de Dados**:
+  - Ingestão de export CSV do ServiceNow com cálculo automático de SLA útil (considerando horário comercial e feriados nacionais, estaduais-SP e municipais de SP) e Perfect Fix.
+  - Ingestão de JSON corporativo (`asmt_metric_result.json`) para cálculo do NPS Geral.
+
+### 2. 🚨 Módulo Operacional de Incidentes
+
+- **Visualização por Sub-abas**: Alternância instantânea entre incidentes **Abertos** e **Resolvidos**.
+- **Ordenação Inteligente**:
+  - Aba *Abertos*: Ordenação customizada com **Drag & Drop nativo (HTML5)** direto na linha através de alça visual (`GripVertical`), com persistência instantânea no banco de dados.
+  - Aba *Resolvidos*: Ordenação cronológica automática reversa por data/hora de resolução (mais recente no topo).
+- **Major Incidents & Chamados Filhos**:
+  - Banner dinâmico no topo destacando ocorrências massivas ativas (5+ chamados).
+  - Controle de atribuição *"Minha Responsabilidade"* com contadores sincronizados.
+  - Modal de gestão e vinculação de chamados filhos associados ao Major Incident com exportação individual.
+- **Destaque Visual para Incidentes Pendentes (+3 dias)**:
+  - Alerta visual marcante em linhas de incidentes sem atualização há 3 ou mais dias (fundo suave em tom âmbar, barra lateral luminosa de alerta e pill animado pulsante `+3d`).
+- **Atualização Rápida de Timestamp**:
+  - Botão de ação rápida (`RotateCw`) na coluna de data/hora para atualizar instantaneamente a data da última atualização para o momento presente, gravando entrada no histórico sem necessidade de abrir modais de edição.
+- **Estatísticas Interativas de Rodapé**:
+  - Painéis dinâmicos de *"Incidentes por Hotel"* e *"Incidentes por Responsável"* com barras de preenchimento proporcional e filtragem rápida por clique (toggle).
+- **Busca Rápida Animada**:
+  - Campo de busca neon expansível e colapsável com botão de limpeza rápida.
+- **Exportação XLSX Avançada**:
+  - Geração de planilhas Excel formatadas profissionalmente via **ExcelJS** com cabeçalho executivo escuro (`#1F2937`), zebrado de linhas (`#FFFFFF` e `#D9D9D9`) e criação automática de abas filhas dedicadas `(!) [Incidente]` para cada Major Incident.
+  - Code-splitting dinâmico com carregamento assíncrono do módulo de exportação apenas sob demanda.
+
+### 3. ⚙️ Módulo de Cadastros Base (Hotéis e Responsáveis)
+
+- Centralizado no dropdown de **Configurações** (ícone de engrenagem) no cabeçalho.
+- CRUD completo de Hotéis (RID, Nome, status Ativo/Inativo) e Responsáveis (Nome, status Ativo/Inativo).
+- Busca textual em tempo real e filtros de status (*Ativos*, *Inativos*, *Todos*).
+- **Paginação Completa**: 20 itens por página com controles numéricos inteligentes e elipses.
+- Diálogos de confirmação padronizados para exclusões seguras.
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-### Frontend
-
-- **React 18** — Componentização e renderização reativa
-- **Vite 5** — Build tool ultrarrápido com HMR e proxy integrado
-- **Recharts** — Gráficos responsivos e interativos (LineChart, BarChart)
-- **Lucide React** — Ícones modernos e consistentes
-- **Axios** — Comunicação HTTP com o backend
-- **JetBrains Mono** — Tipografia monospace para valores numéricos de KPI
-
-### Backend
-
-- **Node.js + Express** — API RESTful leve e performática
-- **SQLite 3** — Banco de dados embarcado, zero configuração
-- **Multer** — Recepção de arquivos via `multipart/form-data`
-- **csv-parser** — Leitura e parsing de arquivos CSV em stream
-- **Morgan** — Logging de requisições HTTP em modo desenvolvimento
-- **CORS** — Controle de acesso cross-origin
+| Camada | Tecnologia | Propósito |
+| :--- | :--- | :--- |
+| **Frontend** | React 18 + Vite 5 | Renderização reativa, HMR ultrarrápido e modularização |
+| **Design System** | Vanilla CSS Puro | Design executivo *Deep Blue Premium* modularizado em 8 arquivos CSS |
+| **PWA** | vite-plugin-pwa | Suporte a Service Worker, cache offline e manifesto instalável |
+| **Gráficos** | Recharts 2.12 | Visualização interativa e responsiva de métricas e indicadores |
+| **Ícones** | Lucide React | Biblioteca de ícones SVG limpos e padronizados (sem CDNs externas) |
+| **Exportação** | ExcelJS 4.4 | Geração client-side de planilhas `.xlsx` formatadas e zebradas |
+| **Backend** | Node.js + Express (ESM) | API RESTful nativa em módulos ECMAScript |
+| **Banco de Dados** | SQLite 3 | Banco de dados relacional embarcado em arquivo único local (`server/dashboard.db`) |
+| **Auditoria & Logs** | Winston | Registro cronológico em arquivo (`audit.log`) e tabela SQLite com poda automática |
+| **Segurança** | Helmet + CORS | Headers de segurança HTTP e controle de acesso |
+| **Agendador** | Scheduler customizado | Backups automáticos do SQLite com rotação de até 30 arquivos |
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura de Diretórios
 
 ```text
 ServiceNowDashboard/
-├── server/                  # Backend da aplicação
-│   ├── index.js             # Servidor Express e rotas da API
-│   ├── database.js          # Camada de acesso ao banco SQLite
-│   ├── uploads/             # Diretório temporário de CSVs (auto-limpo)
-│   ├── backups/             # Diretório de backups automáticos (.bak) do banco
-│   └── dashboard.db         # Banco de dados principal
-├── src/                     # Frontend React
-│   ├── App.jsx              # Componente principal + CsvUploader
-│   ├── index.css            # Design system (tema Deep Blue Premium)
-│   └── main.jsx             # Ponto de entrada da aplicação React
-├── public/                  # Arquivos públicos estáticos
-│   ├── favicon.svg          # Ícone do site
-│   └── icons.svg            # Sprite de ícones SVG
-├── dist/                    # Build de produção (gerado pelo Vite)
-├── data_dump.json           # Dump de dados para migração/backup manual
-├── dump_data.js             # Script utilitário para exportar dados do banco
-├── start_dashboard.bat      # Script de inicialização com auto-restart (Windows)
-├── package.json             # Dependências e scripts NPM
-├── vite.config.js           # Configuração do Vite (porta, proxy)
-└── eslint.config.js         # Configuração do ESLint
+├── server/                        # Backend da aplicação (ESM nativo)
+│   ├── controllers/               # Controladores de negócio (Incident, Hotel, Responsible, Major)
+│   ├── routes/                    # Rotas da API RESTful (/api/...)
+│   ├── services/                  # Regras de banco, auditoria e scheduler de backups
+│   ├── uploads/                   # Diretório de arquivos temporários de upload (ignorado no git)
+│   ├── backups/                   # Backups rotativos automáticos do SQLite (ignorado no git)
+│   ├── database.js                # Inicialização do banco, schema e helpers assíncronos
+│   ├── dashboard.db               # Banco de dados principal SQLite (ignorado no git)
+│   └── index.js                   # Ponto de entrada do servidor Express
+├── src/                           # Frontend React
+│   ├── components/
+│   │   ├── common/                # Componentes compartilhados (Header, NavTabs, Pagination, Modals)
+│   │   ├── incidents/             # Tabela de incidentes, modais de histórico, chamados e major cards
+│   │   └── settings/              # Módulos de gestão de Hotéis e Responsáveis
+│   ├── styles/                    # Design System Vanilla CSS Refatorado
+│   │   ├── tokens.css             # Cores, fontes, sombras e transições (Deep Blue)
+│   │   ├── base.css               # Reset, tipografia global e scrollbars
+│   │   ├── layout.css             # Grid do dashboard, toolbar, relógio e rodapé
+│   │   ├── cards.css              # Cards com glassmorphism e badges de status
+│   │   ├── tables.css             # Tabelas com linhas zebradas, drag & drop e alertas (+3d)
+│   │   ├── forms.css              # Inputs, autocomplete, botões e campo de busca neon
+│   │   ├── modals.css             # Janelas modais flutuantes com backdrop blur
+│   │   ├── badges.css             # Badges de RID, tags de status e pills pulsantes
+│   │   └── index.css              # Ponto de unificação de todos os estilos
+│   ├── utils/
+│   │   └── excelExport.js         # Utilitário assíncrono para exportação XLSX com ExcelJS
+│   ├── App.jsx                    # Componente raiz com navegação e gerenciamento de estado
+│   └── main.jsx                   # Ponto de entrada React com registro PWA
+├── public/                        # Assets estáticos, favicon e manifest
+├── start_dashboard.bat            # Inicializador para Windows com auto-restart em falhas
+├── package.json                   # Dependências e scripts npm
+├── vite.config.js                 # Configuração de build, proxy e PWA
+└── eslint.config.js               # Regras de linting do projeto
 ```
 
 ---
@@ -103,249 +136,115 @@ ServiceNowDashboard/
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) v18 ou superior
-- npm (incluído com o Node.js)
+- [Node.js](https://nodejs.org/) v18 ou superior instalado.
+- npm (incluído no instalador do Node.js).
 
-### Instalação
+### 1. Instalação das Dependências
 
 ```bash
-# Clone o repositório
-git clone https://github.com/caiquenovaes1994/ServiceNowDashboard.git
-
-# Acesse o diretório do projeto
-cd ServiceNowDashboard
-
-# Instale as dependências
 npm install
 ```
 
-### Execução
-
-#### Modo Desenvolvimento (Frontend + Backend simultâneos)
+### 2. Execução em Desenvolvimento (Frontend + Backend)
 
 ```bash
 npm run dev
 ```
 
-> O Vite dev server roda na porta **3002** e faz proxy das chamadas `/api` para o backend na porta **5000**.
+- **Frontend (Vite)**: `http://localhost:3002`
+- **Backend (Express API)**: `http://localhost:5000` (com proxy automático configurado no Vite)
 
-#### Modo Produção
+### 3. Execução em Produção
 
 ```bash
-# Build do frontend
+# Gera os arquivos minificados do frontend na pasta dist/
 npm run build
 
-# Inicia o servidor (serve o frontend compilado + API)
+# Inicia o servidor Node.js servindo a API e os arquivos estáticos de dist/
 npm start
 ```
 
-#### Via Script (Windows — execução contínua com auto-restart)
+### 4. Inicialização Rápida no Windows (Script com Auto-Restart)
 
-```bash
+Dê um duplo clique no arquivo:
+
+```text
 start_dashboard.bat
 ```
 
-### Acesso
-
-| Ambiente | URL |
-| --- | --- |
-| Desenvolvimento | `http://localhost:3002` |
-| Produção | `http://localhost:5000` |
+Ou execute via prompt de comando. O script monitora o processo e reinicia automaticamente os serviços caso ocorra alguma interrupção inesperada.
 
 ---
 
-## 📡 API REST
+## 📡 Endpoints da API REST
+
+### Métricas & Análises
 
 | Método | Endpoint | Descrição |
-| --- | --- | --- |
-| `GET` | `/api/metrics?year=2026` | Retorna métricas do ano especificado |
-| `POST` | `/api/metrics` | Cria ou atualiza métrica mensal (UPSERT completo) |
-| `POST` | `/api/settings` | Salva configuração chave-valor |
-| `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow e atualiza SLA/Perfect Fix |
-| `POST` | `/api/upload-json` | Processa JSON de avaliações e atualiza o NPS Geral corporativo |
+| :--- | :--- | :--- |
+| `GET` | `/api/metrics?year=2026` | Retorna métricas analíticas mensais do ano especificado |
+| `POST` | `/api/metrics` | Cria ou atualiza manualmente métrica mensal (UPSERT) |
+| `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow para cálculo de SLA e Perfect Fix |
+| `POST` | `/api/upload-json` | Processa JSON de avaliações para cálculo do NPS Geral corporativo |
 
-### Exemplo de Payload — `POST /api/metrics`
+### Gestão de Incidentes
 
-```json
-{
-  "year": 2026,
-  "month": "Abril",
-  "closed_count": 150,
-  "evaluated_count": 28,
-  "nps": 4.85,
-  "nps_general": 4.72,
-  "is_vacation": 0,
-  "is_project": 0,
-  "within_sla_count": 142,
-  "perfect_fix_count": 130
-}
-```
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/incidentes?status=Aberto` | Lista incidentes filtrados por status (*Aberto* ou *Resolvido*) |
+| `GET` | `/api/incidentes/:id` | Retorna os detalhes de um incidente específico |
+| `POST` | `/api/incidentes` | Cria um novo incidente (e vincula chamados caso seja Major) |
+| `PUT` | `/api/incidentes/:id` | Atualiza dados do incidente (ou apenas data de atualização com `forcar_historico`) |
+| `DELETE` | `/api/incidentes/:id` | Exclui permanentemente o incidente, chamados filhos e histórico |
+| `PUT` | `/api/incidentes/reordenar` | Persiste a nova ordem das linhas (Drag & Drop) via array de IDs |
+| `GET` | `/api/incidentes/:id/historico` | Retorna o histórico cronológico de situações do incidente |
+| `GET` | `/api/incidentes/:id/chamados` | Retorna todos os chamados filhos vinculados ao incidente |
+| `POST` | `/api/incidentes/:id/chamados` | Adiciona chamado filho a um incidente massivo (*Major*) |
+| `DELETE` | `/api/chamados/:id` | Remove um chamado filho vinculado |
+| `GET` | `/api/incidentes-maiores` | Retorna dados agregados de incidentes massivos ativos |
+| `POST` | `/api/incidentes-maiores/:num/toggle` | Alterna a flag de responsabilidade do analista sobre o Major Incident |
 
-### `POST /api/upload-metrics`
+### Cadastros Base
 
-Recebe um arquivo CSV via `multipart/form-data` (campo `file`).
-
-**Resposta de sucesso:**
-
-```json
-{
-  "success": true,
-  "rows_processed": 57,
-  "rows_skipped": 0,
-  "months_updated": 2,
-  "summary": {
-    "2026-03": { "within_sla": 31, "perfect_fix": 28 },
-    "2026-04": { "within_sla": 24, "perfect_fix": 21 }
-  }
-}
-```
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/hoteis` | Lista hotéis cadastrados |
+| `POST` | `/api/hoteis` | Cadastra novo hotel (RID único e Nome) |
+| `PUT` | `/api/hoteis/:id` | Atualiza dados do hotel ou status ativo/inativo |
+| `DELETE` | `/api/hoteis/:id` | Exclui hotel do catálogo |
+| `GET` | `/api/responsaveis` | Lista responsáveis cadastrados |
+| `POST` | `/api/responsaveis` | Cadastra novo responsável |
+| `PUT` | `/api/responsaveis/:id` | Atualiza nome ou status do responsável |
+| `DELETE` | `/api/responsaveis/:id` | Exclui responsável do catálogo |
 
 ---
 
-## 📥 Importação de CSV do ServiceNow
-
-### Como usar
-
-1. Exporte os chamados diretamente pelo ServiceNow em formato **CSV**
-2. No dashboard, clique em **"Importar CSV"** no cabeçalho
-3. Selecione o arquivo — o processamento ocorre automaticamente
-4. Os KPIs e gráficos atualizam em tempo real após o upload
-
-### Colunas esperadas no CSV
-
-O sistema aceita múltiplos nomes de colunas para maior compatibilidade com diferentes exportações do ServiceNow:
-
-| Campo | Colunas aceitas (aliases) | Uso |
-| --- | --- | --- |
-| **Data de criação** | `sys_created_on`, `Created`, `created`, `Opened`, `opened` | Data de abertura do chamado |
-| **Data de resolução** | `resolved_at`, `Resolved at`, `closed_at`, `Closed`, `closed` | Data de encerramento (preferencial para agrupar por mês) |
-| **Data de atualização** | `sys_updated_on`, `Updated`, `updated`, `Resolved`, `resolved` | Fallback caso `resolved_at` não exista |
-| **Prioridade** | `priority`, `Priority` | Prioridade do chamado (ex.: `"4 - Low"`, `"1 - Critical"`) |
-| **Reaberturas** | `u_reopen_count`, `Reopen count`, `reopen_count`, `reopenCount` | Número de vezes que o chamado foi reaberto |
-| **Duração calendário** | `calendar_duration`, `Calendar duration` | Duração em segundos (se presente, substitui o cálculo por datas) |
-
-> **Nota:** O parser normaliza automaticamente chaves com BOM (`\uFEFF`) e espaços extras.
-
-### Lógica de Processamento
-
-| Passo | Descrição |
-| --- | --- |
-| **Duração** | P1 e P2: Tempo absoluto contínuo (24x7). P3 e P4: Horas úteis (Seg-Sex, 09:00 às 18:00, **excluindo feriados nacionais, estaduais-SP e municipais de São Paulo**). |
-| **Verificação de SLA** | Compara a duração com o limite por prioridade (tabela abaixo) |
-| **Perfect Fix** | `SLA cumprido == true` **E** `reopen_count == 0` |
-| **Agrupamento** | Por mês/ano da data de resolução (ou atualização como fallback) |
-| **Filtro de ano** | Ignora chamados fora do ano selecionado no dashboard (quando `targetYear` é informado) |
-| **Persistência** | UPSERT — atualiza `closed_count`, `within_sla_count` e `perfect_fix_count`, preservando NPS e demais campos |
-| **Higiene** | Arquivo CSV removido do disco imediatamente após a leitura |
-
-### Limites de SLA por Prioridade
-
-| Prioridade | Limite |
-| --- | --- |
-| P1 — Critical | 4 horas |
-| P2 — High | 24 horas |
-| P3 — Moderate | 48 horas |
-| P4 — Low | 96 horas |
-
----
-
-## ⚙️ Scripts Disponíveis
+## ⚙️ Comandos Úteis
 
 | Comando | Descrição |
-| --- | --- |
-| `npm run dev` | Inicia frontend e backend em modo desenvolvimento |
-| `npm run server` | Inicia apenas o servidor backend (porta 5000) |
-| `npm run client` | Inicia apenas o frontend Vite (porta 3002) |
-| `npm run build` | Gera build de produção do frontend |
-| `npm start` | Inicia o servidor em modo produção |
-| `npm run lint` | Executa análise estática de código (ESLint) |
-| `npm run preview` | Preview local do build de produção |
+| :--- | :--- |
+| `npm run dev` | Inicia simultaneamente o servidor backend e o cliente Vite em modo desenvolvimento |
+| `npm run server` | Inicia apenas o backend Express (`server/index.js`) na porta 5000 |
+| `npm run client` | Inicia apenas o cliente Vite (`localhost:3002`) |
+| `npm run build` | Compila o bundle minificado de produção em `dist/` |
+| `npm run lint` | Executa o linter ESLint em todo o código-fonte |
+| `npm run preview` | Executa visualização prévia local da pasta `dist/` |
 
 ---
 
-## 📐 Lógica de Cálculo dos KPIs
+## 🎨 Tipografia e Tokens Visuais
 
-### Linha 1 — Chamados & Qualidade
+O projeto adota uma hierarquia tipográfica precisa, documentada em detalhes no artifact [font_families_inventory.md](file:///C:/Users/caiqu/.gemini/antigravity-ide/brain/d1841552-cd8c-4025-9fc8-77014c0058a1/font_families_inventory.md):
 
-| KPI | Fórmula |
-| --- | --- |
-| **Total de Chamados Fechados** | Soma de `closed_count` no ano |
-| **Fechados por mês** | `Total Fechados / Meses com registros` |
-| **NPS Médio** | `Soma NPS / Meses com NPS > 0` |
-| **SLA%** | `(Soma within_sla_count / Soma closed_count) × 100` |
-
-### Linha 2 — Avaliações & Eficiência
-
-| KPI | Fórmula |
-| --- | --- |
-| **Total de Chamados Avaliados** | Soma de `evaluated_count` no ano |
-| **Avaliações por mês** | `Total Avaliados / Meses com registros` |
-| **Índice de Avaliação** | `(Total Avaliados / Total Fechados) × 100` |
-| **Perfect Fix** | `(Soma perfect_fix_count / Soma closed_count) × 100` |
-
-> **Nota**: As médias mensais são calculadas dividindo pelo número de meses que possuem registros efetivos (`closed_count > 0` ou `evaluated_count > 0`) em cada ano, garantindo precisão tanto para anos fechados quanto para o ano corrente.
-
----
-
-## 🎨 Regras de Cores dos KPIs
-
-### SLA%
-
-| Faixa | Cor |
-| --- | --- |
-| ≥ 95% | 🟢 Verde (`--success`) |
-| 71% a 94% | 🟠 Laranja (`--secondary`) |
-| ≤ 70% | 🔴 Vermelho (`--error`) |
-
-### Perfect Fix
-
-| Faixa | Cor |
-| --- | --- |
-| ≥ 80% | 🟢 Verde (`--success`) |
-| 71% a 79% | 🟠 Laranja (`--secondary`) |
-| ≤ 70% | 🔴 Vermelho (`--error`) |
-
----
-
-## 🗄️ Schema do Banco de Dados
-
-A tabela `metrics` contém as seguintes colunas, com migração automática para bancos existentes:
-
-| Coluna | Tipo | Descrição |
-| --- | --- | --- |
-| `year` | INTEGER | Ano de referência |
-| `month` | TEXT | Mês de referência (em português) |
-| `closed_count` | INTEGER | Chamados fechados no mês |
-| `evaluated_count` | INTEGER | Chamados avaliados no mês |
-| `nps` | REAL | NPS pessoal do mês |
-| `nps_general` | REAL | NPS geral corporativo |
-| `is_vacation` | INTEGER | 1 = mês de férias |
-| `is_project` | INTEGER | 1 = mês em projeto especial |
-| `within_sla_count` | INTEGER | Chamados atendidos dentro do SLA |
-| `perfect_fix_count` | INTEGER | Chamados nunca reabertos (Perfect Fix) |
-
----
-
-## 🎨 Personalização
-
-O sistema de design está centralizado em `src/index.css`, utilizando variáveis CSS para fácil customização:
-
-```css
---primary: #38bdf8;       /* Azul principal */
---secondary: #f97316;     /* Laranja (atenção) */
---success: #34d399;       /* Verde (meta atingida) */
---error: #ef4444;         /* Vermelho (alerta crítico) */
-```
-
-- **Tipografia** — JetBrains Mono para valores numéricos, Plus Jakarta Sans para textos
-- **Animações** — Micro-animações, transições suaves de colapso/expansão via CSS Grid (`grid-template-rows`)
-- **Layout** — Grid responsivo com glassmorphism, tema Deep Blue Premium e visão sob demanda de detalhamento
+- **`--font-main` (`Plus Jakarta Sans`)**: Interface principal, textos e tabelas operacionais.
+- **`--font-title` (`Montserrat`)**: Títulos de grande impacto visual e modais.
+- **`--font-mono` (`JetBrains Mono`)**: Tickets, dados tabulares, valores numéricos de KPI e relógio.
 
 ---
 
 ## 📄 Licença
 
-Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 

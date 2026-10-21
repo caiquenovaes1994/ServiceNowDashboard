@@ -1,0 +1,9 @@
+/* ── ServiceNow Suite Design System (Vanilla CSS Modular) ─────────────────── */
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './cards.css';
+@import './tables.css';
+@import './forms.css';
+@import './modals.css';
+@import './badges.css';

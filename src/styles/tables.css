@@ -1,0 +1,310 @@
+/* ── Wrapper de Tabelas Operacionais e Cadastros ─────────────────────────── */
+.table-wrapper {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  overflow: auto;
+  box-shadow: var(--shadow-md);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  backdrop-filter: var(--backdrop-blur);
+  position: relative;
+  width: 100%;
+}
+
+/* ── Estrutura de Tabela Padrão ──────────────────────────────────────────── */
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-family: var(--font-main);
+  font-size: 0.8125rem;
+  color: var(--text-main);
+}
+
+.app-table thead th {
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--card-border);
+  text-align: center;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-table tbody td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  text-align: center;
+  vertical-align: middle;
+  transition: background var(--transition-fast);
+}
+
+.app-table tbody tr:hover td {
+  background: rgba(56, 189, 248, 0.04);
+}
+
+.app-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Linhas Especiais: Drag & Drop, Major Incident e Pendências ───────────── */
+.draggable-row {
+  cursor: grab;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.draggable-row:active {
+  cursor: grabbing;
+}
+
+.draggable-row.dragging-row {
+  opacity: 0.35;
+  background: rgba(56, 189, 248, 0.08) !important;
+}
+
+.draggable-row.dragover-row td {
+  border-top: 2px solid var(--primary) !important;
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.drag-handle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: grab;
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  cursor: grab;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+
+.draggable-row:hover .drag-handle {
+  opacity: 1;
+  color: var(--primary);
+  transform: scale(1.15);
+}
+
+.sortable-ghost {
+  opacity: 0.35;
+  background: rgba(56, 189, 248, 0.2) !important;
+  border: 2px dashed var(--primary);
+}
+
+/* Linha com Major Incident */
+.major-row td {
+  background: rgba(239, 68, 68, 0.04);
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.major-row:hover td {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.major-row td:first-child {
+  border-left: 4px solid var(--error) !important;
+}
+
+/* Linha com mais de 3 dias sem atualização (Stale) */
+.stale-row td {
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.stale-row td:first-child {
+  border-left: 4px solid #f59e0b !important;
+  box-shadow: inset 4px 0 8px -2px rgba(245, 158, 11, 0.4);
+}
+
+.stale-row:hover td {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+/* Linha simultaneamente Major e Stale */
+.major-row.stale-row td:first-child {
+  border-left: 4px solid var(--error) !important;
+  box-shadow: inset 4px 0 8px -2px rgba(239, 68, 68, 0.5);
+}
+
+.badge-stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  animation: pulse-stale 2s infinite ease-in-out;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-stale {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(0.96); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-refresh-ts {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.btn-refresh-ts:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--primary);
+}
+
+.btn-refresh-ts:active {
+  transform: rotate(180deg);
+}
+
+/* ── Células e Links em Tabelas ──────────────────────────────────────────── */
+.ticket-link {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.ticket-link:hover {
+  color: #7dd3fc;
+  text-decoration: underline;
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.cell-ellipsis {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Ações em Linhas de Tabela ───────────────────────────────────────────── */
+.table-actions-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.btn-table-action {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-table-action:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-table-action.action-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.btn-table-action.action-success:hover {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ── Tabela Analítica Retrátil de Métricas Mensais ────────────────────────── */
+.metrics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metrics-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 0.8fr 0.8fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  transition: all var(--transition-fast);
+}
+
+.metrics-row.readonly {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
+.metrics-row:hover {
+  background: rgba(51, 65, 85, 0.5);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.row-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.row-label:first-child {
+  text-align: left;
+}
+
+/* ── Responsividade de Tabelas ───────────────────────────────────────────── */
+@media (max-width: 992px) {
+  .app-table { font-size: 0.82rem; }
+  .app-table th, .app-table td { padding: 0.6rem 0.5rem; }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+}

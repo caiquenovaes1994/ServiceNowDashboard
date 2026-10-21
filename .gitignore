@@ -23,10 +23,18 @@ dist-ssr
 *.sln
 *.sw?
 
-# Database
+# Database & Backups
 *.db
 *.db.bak
 *.bak
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+server/backups/
+backups/
 
-# Documentos
-PLANO_DE_ESCALACAO.md
+# Uploads Temporários
+server/uploads/
+uploads/
