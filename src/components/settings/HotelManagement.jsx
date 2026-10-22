@@ -142,7 +142,7 @@ const HotelManagement = ({
             <thead>
               <tr>
                 <th style={{ width: '120px' }}>RID</th>
-                <th style={{ textAlign: 'left', paddingLeft: '1.5rem' }}>Nome da Localidade / Hotel</th>
+                <th style={{ textAlign: 'left', paddingLeft: '1.5rem' }}>Nome do Hotel</th>
                 <th style={{ width: '130px' }}>Status</th>
                 <th style={{ width: '110px' }}>Ações</th>
               </tr>

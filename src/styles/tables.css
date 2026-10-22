@@ -261,6 +261,38 @@
   color: var(--success);
 }
 
+/* ── Botão / Badge de Chamados Vinculados no Major Incident (Coluna Hotel) ── */
+.btn-linked-cases-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-pill);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-linked-cases-badge:hover {
+  background: rgba(56, 189, 248, 0.24);
+  border-color: rgba(56, 189, 248, 0.65);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.btn-linked-cases-badge:active {
+  transform: translateY(0);
+}
+
 /* ── Tabela Analítica Retrátil de Métricas Mensais ────────────────────────── */
 .metrics-grid {
   display: flex;

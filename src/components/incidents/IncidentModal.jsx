@@ -74,7 +74,15 @@ const IncidentModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.incidente.trim()) return;
+    if (
+      !formData.incidente.trim() ||
+      !formData.responsavel_nome?.trim() ||
+      !formData.situacao?.trim() ||
+      !formData.problema?.trim()
+    ) {
+      alert('Por favor, preencha todos os campos obrigatórios (*).');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -148,7 +156,7 @@ const IncidentModal = ({
                   {formData.is_major && '✓'}
                 </div>
                 <span style={{ fontWeight: 700, color: formData.is_major ? 'var(--error)' : 'var(--text-main)' }}>
-                  Registrar como Major Incident (Incidente Massivo)
+                  Major Incident
                 </span>
               </label>
             </div>
@@ -156,22 +164,24 @@ const IncidentModal = ({
             {/* Linha 1: Caso & Incidente */}
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Caso (Opcional)</label>
+                <label className="form-label">Caso</label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Ex: CS05663642"
+                  placeholder="Ex: CS12345678"
                   value={formData.caso}
                   onChange={(e) => setFormData(prev => ({ ...prev, caso: e.target.value }))}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Incidente (Obrigatório)</label>
+                <label className="form-label">
+                  Incidente <span className="required-star" title="campo obrigatório">*</span>
+                </label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Ex: INC03756657"
+                  placeholder="Ex: INC12345678"
                   value={formData.incidente}
                   onChange={(e) => setFormData(prev => ({ ...prev, incidente: e.target.value }))}
                   required
@@ -182,13 +192,16 @@ const IncidentModal = ({
             {/* Linha 2: Responsável & Status */}
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Responsável</label>
+                <label className="form-label">
+                  Responsável <span className="required-star" title="campo obrigatório">*</span>
+                </label>
                 <AutocompleteInput
                   options={responsibles}
                   value={formData.responsavel_nome}
                   onChange={(val) => setFormData(prev => ({ ...prev, responsavel_nome: val, id_responsavel: null }))}
                   onSelect={(r) => setFormData(prev => ({ ...prev, responsavel_nome: r.nome, id_responsavel: r.id }))}
                   placeholder="Selecione o responsável..."
+                  required
                 />
               </div>
 
@@ -209,25 +222,31 @@ const IncidentModal = ({
 
             {/* Linha 3: Situação Atual */}
             <div className="form-group">
-              <label className="form-label">Situação Atual</label>
+              <label className="form-label">
+                Situação Atual <span className="required-star" title="campo obrigatório">*</span>
+              </label>
               <input
                 type="text"
                 className="form-input"
                 placeholder="Ex: Investigação com equipe de redes, aguardando fornecedor..."
                 value={formData.situacao}
                 onChange={(e) => setFormData(prev => ({ ...prev, situacao: e.target.value }))}
+                required
               />
             </div>
 
             {/* Linha 4: Descrição do Problema */}
             <div className="form-group">
-              <label className="form-label">Problema / Descrição</label>
+              <label className="form-label">
+                Problema / Descrição <span className="required-star" title="campo obrigatório">*</span>
+              </label>
               <textarea
                 className="form-textarea"
                 rows={2}
                 placeholder="Breve descrição do problema ou falha..."
                 value={formData.problema}
                 onChange={(e) => setFormData(prev => ({ ...prev, problema: e.target.value }))}
+                required
               />
             </div>
 
@@ -237,7 +256,7 @@ const IncidentModal = ({
             {!formData.is_major && (
               <div>
                 <div className="form-group">
-                  <label className="form-label">Hotel / Localidade</label>
+                  <label className="form-label">Hotel</label>
                   <AutocompleteInput
                     options={hotels}
                     value={formData.hotel_nome}

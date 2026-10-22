@@ -45,7 +45,7 @@ const SettingsDropdown = ({ activeTab, onSelectTab }) => {
             onClick={() => handleSelect(TABS.HOTELS)}
           >
             <Building2 size={16} />
-            <span>Hotéis & Localidades</span>
+            <span>Hotéis</span>
           </button>
 
           <button
@@ -54,7 +54,7 @@ const SettingsDropdown = ({ activeTab, onSelectTab }) => {
             onClick={() => handleSelect(TABS.RESPONSIBLES)}
           >
             <Users size={16} />
-            <span>Responsáveis & Equipes</span>
+            <span>Responsáveis</span>
           </button>
         </div>
       )}

@@ -26,6 +26,13 @@
   letter-spacing: 0.05em;
 }
 
+.form-label .required-star {
+  color: var(--error, #ef4444);
+  margin-left: 0.25rem;
+  font-weight: 700;
+  cursor: help;
+}
+
 /* ── Inputs, Textareas e Selects ─────────────────────────────────────────── */
 .form-input,
 .form-select,

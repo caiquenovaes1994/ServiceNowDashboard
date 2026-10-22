@@ -9,7 +9,12 @@ export const TABS = {
   RESPONSIBLES: 'responsibles'
 };
 
-const NavigationTabs = ({ activeTab, onTabChange, openIncidentsCount = 0 }) => {
+const NavigationTabs = ({ 
+  activeTab, 
+  onTabChange, 
+  openIncidentsCount = 0,
+  hasStaleIncidents = false 
+}) => {
   return (
     <div className="nav-tabs-center-container">
       <nav className="nav-tabs-wrapper" aria-label="Navegação Principal">
@@ -28,9 +33,11 @@ const NavigationTabs = ({ activeTab, onTabChange, openIncidentsCount = 0 }) => {
           onClick={() => onTabChange(TABS.INCIDENTS)}
         >
           <AlertOctagon size={18} />
-          <span>Incidentes</span>
+          <span className={hasStaleIncidents ? 'tab-text-stale-pulse' : ''}>
+            Incidentes
+          </span>
           {openIncidentsCount > 0 && (
-            <span className="nav-tab-badge badge-alert">
+            <span className={`nav-tab-badge badge-alert ${hasStaleIncidents ? 'badge-stale-pulse' : ''}`}>
               {openIncidentsCount}
             </span>
           )}

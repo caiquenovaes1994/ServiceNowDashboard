@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Search, Plus, FileSpreadsheet, History, Edit2, Trash2, 
   Layers, GripVertical, Flame, X,
-  Building2, Users, ChevronLeft, ChevronRight, RotateCw, AlertTriangle
+  Building2, Users, ChevronLeft, ChevronRight, RotateCw
 } from 'lucide-react';
 import MajorIncidentBanner from './MajorIncidentBanner.jsx';
 import IncidentModal from './IncidentModal.jsx';
@@ -10,43 +10,7 @@ import SituationHistoryModal from './SituationHistoryModal.jsx';
 import LinkedTicketsModal from './LinkedTicketsModal.jsx';
 import ConfirmDialog from '../common/ConfirmDialog.jsx';
 import Pagination from '../common/Pagination.jsx';
-
-// Parser auxiliar para converter 'DD/MM/YYYY HH:mm' em timestamp numérico
-const parseDateToTimestamp = (dateStr) => {
-  if (!dateStr || typeof dateStr !== 'string') return 0;
-  const parts = dateStr.trim().split(' ');
-  const dateParts = parts[0].split('/');
-  if (dateParts.length === 3) {
-    const day = parseInt(dateParts[0], 10);
-    const month = parseInt(dateParts[1], 10) - 1;
-    const year = parseInt(dateParts[2], 10);
-    let hours = 0;
-    let minutes = 0;
-    if (parts[1]) {
-      const timeParts = parts[1].split(':');
-      hours = parseInt(timeParts[0], 10) || 0;
-      minutes = parseInt(timeParts[1], 10) || 0;
-    }
-    const d = new Date(year, month, day, hours, minutes);
-    return isNaN(d.getTime()) ? 0 : d.getTime();
-  }
-  const parsed = Date.parse(dateStr);
-  return isNaN(parsed) ? 0 : parsed;
-};
-
-// Verifica se o incidente está há 3 ou mais dias sem atualização
-const isIncidentStale = (dateStr) => {
-  if (!dateStr || typeof dateStr !== 'string' || dateStr.trim() === '-') return false;
-  const parts = dateStr.trim().split(' ')[0].split('/');
-  if (parts.length !== 3) return false;
-  const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1;
-  const year = parseInt(parts[2], 10);
-  const dataInc = new Date(year, month, day);
-  if (isNaN(dataInc.getTime())) return false;
-  const diffDays = (new Date() - dataInc) / (1000 * 60 * 60 * 24);
-  return diffDays >= 3;
-};
+import { parseDateToTimestamp, isIncidentStale } from '../../utils/incidentUtils.js';
 
 const IncidentList = ({
   incidents = [],
@@ -428,7 +392,7 @@ const IncidentList = ({
                 <th style={{ width: '40px' }}></th>
                 <th style={{ width: '100px' }}>Caso</th>
                 <th style={{ width: '140px' }}>Incidente</th>
-                <th style={{ minWidth: '220px' }}>Hotel / Localidade</th>
+                <th style={{ minWidth: '220px' }}>Hotel</th>
                 <th style={{ minWidth: '220px' }}>Problema</th>
                 <th style={{ minWidth: '150px' }}>Responsável</th>
                 <th style={{ width: '120px' }}>Ticket</th>
@@ -476,10 +440,32 @@ const IncidentList = ({
 
                     {/* Hotel */}
                     <td style={{ textAlign: 'left' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-                        {item.hotel_rid && <span className="badge-rid">{item.hotel_rid}</span>}
-                        <span>{item.hotel_nome || 'Não definido'}</span>
-                      </div>
+                      {isMajor ? (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          {item.hotel_nome && item.hotel_nome !== 'Não definido' && (
+                            <span>{item.hotel_nome}</span>
+                          )}
+                          <button
+                            type="button"
+                            className="btn-linked-cases-badge"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenLinkedTickets(item);
+                            }}
+                            title="Clique para visualizar e gerenciar chamados vinculados"
+                          >
+                            <Layers size={13} />
+                            <span>
+                              {item.total_chamados || 0} {(item.total_chamados || 0) === 1 ? 'caso vinculado' : 'casos'}
+                            </span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
+                          {item.hotel_rid && <span className="badge-rid">{item.hotel_rid}</span>}
+                          <span>{item.hotel_nome || 'Não definido'}</span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Problema */}
@@ -526,11 +512,6 @@ const IncidentList = ({
                     <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', width: '100%' }}>
                         <span>{item.ultima_atualizacao || '-'}</span>
-                        {isStale && (
-                          <span className="badge-stale" title="Sem atualização há 3 ou mais dias">
-                            <AlertTriangle size={11} /> +3d
-                          </span>
-                        )}
                         <button
                           type="button"
                           className="btn-refresh-ts"
@@ -556,17 +537,6 @@ const IncidentList = ({
                           <History size={15} />
                         </button>
 
-                        {/* Chamados Vinculados (Major) */}
-                        {isMajor && (
-                          <button
-                            type="button"
-                            className="btn-table-action action-success"
-                            onClick={() => handleOpenLinkedTickets(item)}
-                            title="Gerenciar chamados vinculados"
-                          >
-                            <Layers size={15} />
-                          </button>
-                        )}
 
                         {/* Editar */}
                         <button

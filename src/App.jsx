@@ -10,6 +10,7 @@ import {
 
 import NavigationTabs, { TABS } from './components/common/NavigationTabs.jsx';
 import IncidentList from './components/incidents/IncidentList.jsx';
+import { isIncidentStale } from './utils/incidentUtils.js';
 import HotelManagement from './components/settings/HotelManagement.jsx';
 import ResponsibleManagement from './components/settings/ResponsibleManagement.jsx';
 import SettingsDropdown from './components/common/SettingsDropdown.jsx';
@@ -679,6 +680,10 @@ function App() {
     ? MONTHS.slice(0, new Date().getMonth() + 1).reverse()
     : [...MONTHS].reverse();
 
+  const hasStaleIncidents = incidents.some(
+    (inc) => inc.status !== 'Resolvido' && isIncidentStale(inc.ultima_atualizacao)
+  );
+
   return (
     <div className="dashboard-container">
       <header className="header">
@@ -714,6 +719,7 @@ function App() {
         activeTab={activeMainTab}
         onTabChange={setActiveMainTab}
         openIncidentsCount={incidents.filter(i => i.status !== 'Resolvido').length}
+        hasStaleIncidents={hasStaleIncidents}
       />
 
       {/* Módulo 1: Métricas & KPIs Analíticos */}
@@ -1003,7 +1009,7 @@ function App() {
         />
       )}
 
-      {/* Módulo 3: Gestão de Hotéis & Localidades */}
+      {/* Módulo 3: Gestão de Hotéis */}
       {activeMainTab === TABS.HOTELS && (
         <HotelManagement
           hotels={hotels}
@@ -1013,7 +1019,7 @@ function App() {
         />
       )}
 
-      {/* Módulo 4: Gestão de Responsáveis & Equipes */}
+      {/* Módulo 4: Gestão de Responsáveis */}
       {activeMainTab === TABS.RESPONSIBLES && (
         <ResponsibleManagement
           responsibles={responsibles}

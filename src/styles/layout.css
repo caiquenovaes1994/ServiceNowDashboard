@@ -240,6 +240,42 @@
   color: var(--error);
 }
 
+/* ── Alerta pulsante suave para a aba Incidentes quando houver chamados há 3+ dias sem atualização ── */
+.tab-text-stale-pulse {
+  animation: softPulseText 2.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.badge-stale-pulse {
+  animation: softPulseBadge 2.4s ease-in-out infinite;
+}
+
+@keyframes softPulseText {
+  0%, 100% {
+    opacity: 1;
+    color: #f87171;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    opacity: 0.35;
+    color: inherit;
+    text-shadow: none;
+  }
+}
+
+@keyframes softPulseBadge {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.65);
+    background: rgba(239, 68, 68, 0.35);
+  }
+  50% {
+    opacity: 0.35;
+    box-shadow: 0 0 2px rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.15);
+  }
+}
+
 /* ── Sub-abas (Ex: Incidentes Abertos vs Resolvidos) ─────────────────────── */
 .subtabs-container {
   display: flex;

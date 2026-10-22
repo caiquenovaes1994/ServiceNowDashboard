@@ -85,7 +85,7 @@ const LinkedTicketsModal = ({
           {/* Formulário de Inclusão Rápida */}
           <form onSubmit={handleAdd} className="form-row" style={{ alignItems: 'flex-end', marginBottom: '1.25rem' }}>
             <div className="form-group" style={{ flex: 2, margin: 0 }}>
-              <label className="form-label">Hotel / Localidade</label>
+              <label className="form-label">Hotel</label>
               <AutocompleteInput
                 options={hotels}
                 value={hotelQuery}
@@ -135,7 +135,7 @@ const LinkedTicketsModal = ({
                 <thead>
                   <tr>
                     <th style={{ width: '15%' }}>RID</th>
-                    <th style={{ width: '45%' }}>Hotel / Localidade</th>
+                    <th style={{ width: '45%' }}>Hotel</th>
                     <th style={{ width: '25%' }}>Chamado / Ticket</th>
                     <th style={{ width: '15%' }}>Ações</th>
                   </tr>
