@@ -37,8 +37,6 @@ const SettingsDropdown = ({ activeTab, onSelectTab }) => {
 
       {isOpen && (
         <div className="settings-menu-dropdown">
-          <div className="settings-menu-header">Cadastros Base</div>
-          
           <button
             type="button"
             className={`settings-menu-item ${activeTab === TABS.HOTELS ? 'selected' : ''}`}
