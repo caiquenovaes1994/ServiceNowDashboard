@@ -42,6 +42,14 @@ const IncidentList = ({
   // Estados de Drag & Drop para reorganização
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [dragHandleRowId, setDragHandleRowId] = useState(null);
+
+  // Garante que o estado de arrasto seja resetado ao soltar o mouse
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setDragHandleRowId(null);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, []);
 
   // Modais
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -285,6 +293,7 @@ const IncidentList = ({
 
   const handleDrop = async (e, targetIndex) => {
     e.preventDefault();
+    setDragHandleRowId(null);
     if (draggedIndex === null || draggedIndex === targetIndex) {
       setDraggedIndex(null);
       setDragOverIndex(null);
@@ -309,6 +318,7 @@ const IncidentList = ({
   const handleDragEnd = () => {
     setDraggedIndex(null);
     setDragOverIndex(null);
+    setDragHandleRowId(null);
   };
 
   return (
@@ -445,7 +455,7 @@ const IncidentList = ({
                 return (
                   <tr
                     key={item.id}
-                    draggable={activeSubTab === 'Aberto'}
+                    draggable={activeSubTab === 'Aberto' && dragHandleRowId === item.id}
                     onDragStart={(e) => handleDragStart(e, idx)}
                     onDragOver={(e) => handleDragOver(e, idx)}
                     onDrop={(e) => handleDrop(e, idx)}
@@ -454,21 +464,32 @@ const IncidentList = ({
                   >
                     {/* Alça de Arrastar (Drag Handle) */}
                     <td>
-                      <div className="drag-handle-container" title={activeSubTab === 'Aberto' ? 'Arrastar para reorganizar' : ''}>
+                      <div
+                        className="drag-handle-container"
+                        title={activeSubTab === 'Aberto' ? 'Arrastar para reorganizar' : ''}
+                        onMouseDown={() => {
+                          if (activeSubTab === 'Aberto') setDragHandleRowId(item.id);
+                        }}
+                        onMouseUp={() => setDragHandleRowId(null)}
+                      >
                         <GripVertical size={15} className="drag-handle" />
                       </div>
                     </td>
 
                     {/* Caso (Fonte padrão do sistema) */}
-                    <td style={{ fontSize: '0.8125rem' }}>
-                      {item.caso || '-'}
+                    <td className="cell-selectable" style={{ fontSize: '0.8125rem' }}>
+                      {item.caso ? (
+                        <span className="selectable-code">{item.caso}</span>
+                      ) : (
+                        '-'
+                      )}
                     </td>
 
                     {/* Incidente */}
-                    <td>
+                    <td className="cell-selectable">
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                         {isMajor && <Flame size={15} color="var(--error)" />}
-                        <strong style={{ color: isMajor ? 'var(--error)' : 'var(--text-white)' }}>
+                        <strong className="selectable-code" style={{ color: isMajor ? 'var(--error)' : 'var(--text-white)' }}>
                           {item.incidente}
                         </strong>
                       </div>
@@ -538,8 +559,8 @@ const IncidentList = ({
                     </td>
 
                     {/* Situação */}
-                    <td style={{ textAlign: 'left' }}>
-                      <div className="cell-ellipsis" title={item.situacao}>
+                    <td style={{ textAlign: 'center' }}>
+                      <div className="cell-wrap-center" title={item.situacao}>
                         {item.situacao || '-'}
                       </div>
                     </td>

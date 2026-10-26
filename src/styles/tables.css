@@ -55,17 +55,13 @@
 
 /* ── Linhas Especiais: Drag & Drop, Major Incident e Pendências ───────────── */
 .draggable-row {
-  cursor: grab;
   transition: background-color var(--transition-fast), opacity var(--transition-fast);
-}
-
-.draggable-row:active {
-  cursor: grabbing;
 }
 
 .draggable-row.dragging-row {
   opacity: 0.35;
   background: rgba(56, 189, 248, 0.08) !important;
+  cursor: grabbing;
 }
 
 .draggable-row.dragover-row td {
@@ -81,6 +77,10 @@
   cursor: grab;
 }
 
+.drag-handle-container:active {
+  cursor: grabbing;
+}
+
 .drag-handle {
   display: inline-flex;
   align-items: center;
@@ -91,10 +91,43 @@
   transition: all var(--transition-fast);
 }
 
+.drag-handle:active {
+  cursor: grabbing;
+}
+
 .draggable-row:hover .drag-handle {
   opacity: 1;
   color: var(--primary);
   transform: scale(1.15);
+}
+
+/* ── Células e Textos Selecionáveis ───────────────────────────────────────── */
+.cell-selectable {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text;
+}
+
+.selectable-code {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text;
+  display: inline-block;
+  padding: 1px 3px;
+  border-radius: var(--radius-xs, 3px);
+  transition: background var(--transition-fast);
+}
+
+.cell-selectable::selection,
+.selectable-code::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
+}
+
+.cell-selectable::-moz-selection,
+.selectable-code::-moz-selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
 }
 
 .sortable-ghost {
@@ -218,6 +251,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.cell-wrap-center {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  line-height: 1.45;
+  margin: 0 auto;
 }
 
 /* ── Ações em Linhas de Tabela ───────────────────────────────────────────── */
