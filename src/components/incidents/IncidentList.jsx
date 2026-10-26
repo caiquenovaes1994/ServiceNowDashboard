@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Search, Plus, FileSpreadsheet, History, Edit2, Trash2, 
   Layers, GripVertical, Flame, X,
-  Building2, Users, ChevronLeft, ChevronRight, RotateCw
+  Building2, Users, ChevronLeft, ChevronRight, RotateCw,
+  CheckCircle2, RotateCcw
 } from 'lucide-react';
 import MajorIncidentBanner from './MajorIncidentBanner.jsx';
 import IncidentModal from './IncidentModal.jsx';
@@ -54,7 +55,42 @@ const IncidentList = ({
 
   const [deletingIncidentId, setDeletingIncidentId] = useState(null);
   const [updatingTimestampId, setUpdatingTimestampId] = useState(null);
+  const [statusChangingId, setStatusChangingId] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
+
+  // Marcar chamado como Resolvido
+  const handleResolveIncident = async (e, item) => {
+    e.stopPropagation();
+    if (!onUpdateIncident) return;
+    try {
+      setStatusChangingId(item.id);
+      await onUpdateIncident(item.id, {
+        ...item,
+        status: 'Resolvido'
+      });
+    } catch (err) {
+      console.error('Erro ao marcar incidente como resolvido:', err);
+    } finally {
+      setStatusChangingId(null);
+    }
+  };
+
+  // Reabrir chamado (retornar para Aberto)
+  const handleReopenIncident = async (e, item) => {
+    e.stopPropagation();
+    if (!onUpdateIncident) return;
+    try {
+      setStatusChangingId(item.id);
+      await onUpdateIncident(item.id, {
+        ...item,
+        status: 'Aberto'
+      });
+    } catch (err) {
+      console.error('Erro ao reabrir incidente:', err);
+    } finally {
+      setStatusChangingId(null);
+    }
+  };
 
   // Exportação para Excel (.xlsx) da listagem atual
   const handleExportExcel = async () => {
@@ -398,7 +434,7 @@ const IncidentList = ({
                 <th style={{ width: '120px' }}>Ticket</th>
                 <th style={{ minWidth: '240px' }}>Situação</th>
                 <th style={{ width: '160px' }}>Atualizado</th>
-                <th style={{ width: '130px' }}>Ações</th>
+                <th style={{ width: '90px' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -524,41 +560,83 @@ const IncidentList = ({
                       </div>
                     </td>
 
-                    {/* Ações */}
+                    {/* Ações (Grid 2x2) */}
                     <td>
-                      <div className="table-actions-cell">
-                        {/* Ver Histórico */}
+                      <div className="table-actions-grid">
+                        {/* Linha 1, Coluna 1: Botão de Status (Resolver ou Reabrir) */}
+                        {item.status === 'Resolvido' ? (
+                          <button
+                            type="button"
+                            className="btn-table-action action-reopen"
+                            onClick={(e) => handleReopenIncident(e, item)}
+                            disabled={statusChangingId === item.id}
+                            title="Reabrir chamado"
+                            aria-label="Reabrir chamado"
+                          >
+                            {statusChangingId === item.id ? (
+                              <RotateCw size={13} className="spin" />
+                            ) : (
+                              <RotateCcw size={14} />
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn-table-action action-resolve"
+                            onClick={(e) => handleResolveIncident(e, item)}
+                            disabled={statusChangingId === item.id}
+                            title="Marcar como Resolvido"
+                            aria-label="Marcar como Resolvido"
+                          >
+                            {statusChangingId === item.id ? (
+                              <RotateCw size={13} className="spin" />
+                            ) : (
+                              <CheckCircle2 size={14} />
+                            )}
+                          </button>
+                        )}
+
+                        {/* Linha 1, Coluna 2: Excluir */}
                         <button
                           type="button"
-                          className="btn-table-action"
-                          onClick={() => handleOpenHistory(item)}
-                          title="Ver histórico de situações"
+                          className="btn-table-action action-delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingIncidentId(item.id);
+                          }}
+                          title="Excluir incidente"
+                          aria-label="Excluir incidente"
                         >
-                          <History size={15} />
+                          <Trash2 size={14} />
                         </button>
 
-
-                        {/* Editar */}
+                        {/* Linha 2, Coluna 1: Editar */}
                         <button
                           type="button"
                           className="btn-table-action"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingIncident(item);
                             setIsFormModalOpen(true);
                           }}
                           title="Editar incidente"
+                          aria-label="Editar incidente"
                         >
-                          <Edit2 size={15} />
+                          <Edit2 size={14} />
                         </button>
 
-                        {/* Excluir */}
+                        {/* Linha 2, Coluna 2: Ver Histórico */}
                         <button
                           type="button"
-                          className="btn-table-action action-delete"
-                          onClick={() => setDeletingIncidentId(item.id)}
-                          title="Excluir incidente"
+                          className="btn-table-action"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenHistory(item);
+                          }}
+                          title="Ver histórico de situações"
+                          aria-label="Ver histórico de situações"
                         >
-                          <Trash2 size={15} />
+                          <History size={14} />
                         </button>
                       </div>
                     </td>

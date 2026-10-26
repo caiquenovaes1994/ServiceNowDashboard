@@ -255,10 +255,45 @@
   color: var(--error);
 }
 
-.btn-table-action.action-success:hover {
-  background: rgba(52, 211, 153, 0.15);
+.btn-table-action.action-success:hover,
+.btn-table-action.action-resolve:hover {
+  background: rgba(52, 211, 153, 0.2);
   border-color: var(--success);
+  color: #6ee7b7;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.35);
+  transform: scale(1.05);
+}
+
+.btn-table-action.action-resolve {
   color: var(--success);
+}
+
+.btn-table-action.action-reopen {
+  color: var(--warning);
+}
+
+.btn-table-action.action-reopen:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: #fcd34d;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+  transform: scale(1.05);
+}
+
+/* ── Grid 2x2 para Ações de Incidentes ────────────────────────────────────── */
+.table-actions-grid {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 28px);
+  grid-template-rows: repeat(2, 28px);
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.table-actions-grid .btn-table-action {
+  width: 28px;
+  height: 28px;
 }
 
 /* ── Botão / Badge de Chamados Vinculados no Major Incident (Coluna Hotel) ── */

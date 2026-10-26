@@ -10,10 +10,9 @@ const SituationHistoryModal = ({
   if (!isOpen || !incident) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop">
       <div
         className="modal-container"
-        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >

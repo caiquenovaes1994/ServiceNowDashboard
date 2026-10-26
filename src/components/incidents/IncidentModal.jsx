@@ -122,10 +122,9 @@ const IncidentModal = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop">
       <div
         className="modal-container modal-lg"
-        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
@@ -189,7 +188,7 @@ const IncidentModal = ({
               </div>
             </div>
 
-            {/* Linha 2: Responsável & Status */}
+            {/* Linha 2: Responsável & Situação Atual */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">
@@ -206,33 +205,18 @@ const IncidentModal = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Status</label>
-                <select
-                  className="form-select"
-                  value={formData.status}
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                >
-                  <option value="Aberto">Aberto</option>
-                  <option value="Em Análise">Em Análise</option>
-                  <option value="Pendente">Pendente</option>
-                  <option value="Resolvido">Resolvido</option>
-                </select>
+                <label className="form-label">
+                  Situação Atual <span className="required-star" title="campo obrigatório">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: Investigação com equipe de redes, aguardando fornecedor..."
+                  value={formData.situacao}
+                  onChange={(e) => setFormData(prev => ({ ...prev, situacao: e.target.value }))}
+                  required
+                />
               </div>
-            </div>
-
-            {/* Linha 3: Situação Atual */}
-            <div className="form-group">
-              <label className="form-label">
-                Situação Atual <span className="required-star" title="campo obrigatório">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Ex: Investigação com equipe de redes, aguardando fornecedor..."
-                value={formData.situacao}
-                onChange={(e) => setFormData(prev => ({ ...prev, situacao: e.target.value }))}
-                required
-              />
             </div>
 
             {/* Linha 4: Descrição do Problema */}

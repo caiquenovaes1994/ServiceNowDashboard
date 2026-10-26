@@ -207,10 +207,9 @@ const HotelManagement = ({
 
       {/* Modal de Criação / Edição de Hotel */}
       {isModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
+        <div className="modal-backdrop">
           <div
             className="modal-container modal-sm"
-            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
           >

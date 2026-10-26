@@ -39,10 +39,9 @@ const LinkedTicketsModal = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop">
       <div
         className="modal-container modal-lg"
-        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
