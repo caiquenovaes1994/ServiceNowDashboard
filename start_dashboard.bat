@@ -2,6 +2,7 @@
 title ServiceNow Dashboard - Active (System)
 set PROJECT_ROOT=%~dp0
 cd /d "%PROJECT_ROOT%"
+set NODE_OPTIONS=--no-deprecation
 
 :loop
 echo [%date% %time%] O Servidor e Dashboard (Modularizado) estao iniciando...
