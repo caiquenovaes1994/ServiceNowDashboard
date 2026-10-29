@@ -11,7 +11,7 @@ import SituationHistoryModal from './SituationHistoryModal.jsx';
 import LinkedTicketsModal from './LinkedTicketsModal.jsx';
 import ConfirmDialog from '../common/ConfirmDialog.jsx';
 import Pagination from '../common/Pagination.jsx';
-import { parseDateToTimestamp, isIncidentStale } from '../../utils/incidentUtils.js';
+import { parseDateToTimestamp, isIncidentStale, compareAlphanumeric } from '../../utils/incidentUtils.js';
 
 const IncidentList = ({
   incidents = [],
@@ -224,7 +224,12 @@ const IncidentList = ({
       }
       map[key].count += 1;
     });
-    return Object.values(map).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    return Object.values(map).sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      const labelA = a.rid ? `${a.rid} ${a.name}` : a.name;
+      const labelB = b.rid ? `${b.rid} ${b.name}` : b.name;
+      return compareAlphanumeric(labelA, labelB);
+    });
   }, [currentSubTabIncidents]);
 
   // Estatísticas: Incidentes por Responsável
@@ -236,7 +241,7 @@ const IncidentList = ({
     });
     return Object.entries(map)
       .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+      .sort((a, b) => b.count - a.count || compareAlphanumeric(a.name, b.name));
   }, [currentSubTabIncidents]);
 
   // Alterna filtro ao clicar nas estatísticas

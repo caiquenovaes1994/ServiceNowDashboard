@@ -38,3 +38,24 @@ export const isIncidentStale = (dateStr) => {
   const diffDays = (new Date() - dataInc) / (1000 * 60 * 60 * 24);
   return diffDays >= 3;
 };
+
+export const INVENTTI_TICKET_URL_PREFIX = 'https://inventti.movidesk.com/Ticket/Edit/';
+
+// Verifica se o responsável informado é a Inventti
+export const isInventtiResponsible = (name) =>
+  typeof name === 'string' && name.trim().toLowerCase() === 'inventti';
+
+// Monta a URL padrão do Movidesk da Inventti a partir do número do ticket
+export const buildInventtiTicketUrl = (ticket) => {
+  const cleanTicket = typeof ticket === 'string' ? ticket.trim() : '';
+  return cleanTicket ? `${INVENTTI_TICKET_URL_PREFIX}${cleanTicket}` : '';
+};
+
+const alphanumericCollator = new Intl.Collator('pt-BR', {
+  sensitivity: 'base',
+  ignorePunctuation: true
+});
+
+// Ordenação alfanumérica considerando números primeiro [0-9, A-Z]
+export const compareAlphanumeric = (a, b) =>
+  alphanumericCollator.compare(String(a || '').trim(), String(b || '').trim());

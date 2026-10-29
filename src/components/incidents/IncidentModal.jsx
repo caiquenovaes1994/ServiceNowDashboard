@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { AlertOctagon, Flame, X, Plus, Trash2 } from 'lucide-react';
 import AutocompleteInput from '../common/AutocompleteInput.jsx';
+import {
+  INVENTTI_TICKET_URL_PREFIX,
+  isInventtiResponsible,
+  buildInventtiTicketUrl
+} from '../../utils/incidentUtils.js';
 
 const IncidentModal = ({
   isOpen,
@@ -71,6 +76,47 @@ const IncidentModal = ({
   }, [incident, isOpen]);
 
   if (!isOpen) return null;
+
+  const isAutoFillableInventtiLink = (link) =>
+    !link || link.trim() === '' || link.startsWith(INVENTTI_TICKET_URL_PREFIX);
+
+  const handleResponsibleChange = (nome, id = null) => {
+    const matchedResp =
+      id !== null
+        ? null
+        : responsibles.find(
+            (r) => (r.nome || '').trim().toLowerCase() === (nome || '').trim().toLowerCase()
+          );
+    const resolvedId = id !== null ? id : matchedResp ? matchedResp.id : null;
+
+    setFormData((prev) => {
+      const next = {
+        ...prev,
+        responsavel_nome: nome,
+        id_responsavel: resolvedId
+      };
+
+      if (isInventtiResponsible(nome)) {
+        if (prev.ticket.trim() && isAutoFillableInventtiLink(prev.link)) {
+          next.link = buildInventtiTicketUrl(prev.ticket);
+        }
+      } else if (prev.link.startsWith(INVENTTI_TICKET_URL_PREFIX)) {
+        next.link = '';
+      }
+
+      return next;
+    });
+  };
+
+  const handleTicketChange = (ticketValue) => {
+    setFormData((prev) => {
+      const next = { ...prev, ticket: ticketValue };
+      if (isInventtiResponsible(prev.responsavel_nome) && isAutoFillableInventtiLink(prev.link)) {
+        next.link = buildInventtiTicketUrl(ticketValue);
+      }
+      return next;
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -197,8 +243,8 @@ const IncidentModal = ({
                 <AutocompleteInput
                   options={responsibles}
                   value={formData.responsavel_nome}
-                  onChange={(val) => setFormData(prev => ({ ...prev, responsavel_nome: val, id_responsavel: null }))}
-                  onSelect={(r) => setFormData(prev => ({ ...prev, responsavel_nome: r.nome, id_responsavel: r.id }))}
+                  onChange={(val) => handleResponsibleChange(val, null)}
+                  onSelect={(r) => handleResponsibleChange(r.nome, r.id)}
                   placeholder="Selecione o responsável..."
                   required
                 />
@@ -258,7 +304,7 @@ const IncidentModal = ({
                       className="form-input"
                       placeholder="Número do Ticket"
                       value={formData.ticket}
-                      onChange={(e) => setFormData(prev => ({ ...prev, ticket: e.target.value }))}
+                      onChange={(e) => handleTicketChange(e.target.value)}
                     />
                   </div>
 
@@ -267,7 +313,11 @@ const IncidentModal = ({
                     <input
                       type="url"
                       className="form-input"
-                      placeholder="https://exemplo.service-now.com/..."
+                      placeholder={
+                        isInventtiResponsible(formData.responsavel_nome)
+                          ? 'https://inventti.movidesk.com/Ticket/Edit/...'
+                          : 'https://exemplo.service-now.com/...'
+                      }
                       value={formData.link}
                       onChange={(e) => setFormData(prev => ({ ...prev, link: e.target.value }))}
                     />
@@ -287,7 +337,7 @@ const IncidentModal = ({
                       className="form-input"
                       placeholder="Número do Ticket Master"
                       value={formData.ticket}
-                      onChange={(e) => setFormData(prev => ({ ...prev, ticket: e.target.value }))}
+                      onChange={(e) => handleTicketChange(e.target.value)}
                     />
                   </div>
 
@@ -296,7 +346,11 @@ const IncidentModal = ({
                     <input
                       type="url"
                       className="form-input"
-                      placeholder="https://exemplo.service-now.com/..."
+                      placeholder={
+                        isInventtiResponsible(formData.responsavel_nome)
+                          ? 'https://inventti.movidesk.com/Ticket/Edit/...'
+                          : 'https://exemplo.service-now.com/...'
+                      }
                       value={formData.link}
                       onChange={(e) => setFormData(prev => ({ ...prev, link: e.target.value }))}
                     />
