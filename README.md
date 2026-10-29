@@ -320,7 +320,7 @@ O projeto adota uma hierarquia tipográfica precisa, documentada em detalhes no 
 - **`--font-main` (`Plus Jakarta Sans`)**: Interface principal, textos e tabelas operacionais.
 - **`--font-title` (`Montserrat`)**: Títulos de grande impacto visual, cabeçalhos de modais e KPIs.
 - **`--font-mono` (`JetBrains Mono`)**: Tickets, dados tabulares, valores numéricos e relógio.
-- **`Calibri`**: Utilizada com exclusividade na **Folha de Ponto em PDF** (14px para título e 11px para corpo e dados tabulares), seguindo rigorosamente a identidade corporativa do documento impresso.
+- **`Calibri`**: Utilizada com exclusividade na **Folha de Ponto em PDF**.
 
 ---
 
