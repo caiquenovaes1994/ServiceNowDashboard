@@ -38,3 +38,9 @@ backups/
 # Uploads Temporários
 server/uploads/
 uploads/
+
+# Secrets & Environment
+.env
+.env.*
+server/.encryption_key
+

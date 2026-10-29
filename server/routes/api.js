@@ -3,6 +3,9 @@ import IncidentController from '../controllers/IncidentController.js';
 import HotelController from '../controllers/HotelController.js';
 import ResponsibleController from '../controllers/ResponsibleController.js';
 import MajorIncidentController from '../controllers/MajorIncidentController.js';
+import OvertimeAuthController from '../controllers/OvertimeAuthController.js';
+import OvertimeController from '../controllers/OvertimeController.js';
+import BackupController from '../controllers/BackupController.js';
 
 const router = express.Router();
 
@@ -33,4 +36,21 @@ router.delete('/responsaveis/:id', ResponsibleController.delete);
 router.get('/incidentes-maiores', MajorIncidentController.getAll);
 router.post('/incidentes-maiores/:numero/toggle', MajorIncidentController.toggleResponsibility);
 
+// ── Rotas de Horas Extras ─────────────────────────────────────────────────────
+router.get('/overtime/auth/status', OvertimeAuthController.getStatus);
+router.post('/overtime/auth/setup', OvertimeAuthController.setup);
+router.post('/overtime/auth/verify', OvertimeAuthController.verify);
+router.put('/overtime/auth/config', OvertimeAuthController.updateConfig);
+
+router.get('/overtime/chamados', OvertimeController.getChamados);
+router.post('/overtime/chamados', OvertimeController.createChamado);
+router.put('/overtime/chamados/:id', OvertimeController.updateChamado);
+router.delete('/overtime/chamados/:id', OvertimeController.deleteChamado);
+router.post('/overtime/chamados/bulk-delete', OvertimeController.bulkDeleteChamados);
+router.get('/overtime/download-pdf', OvertimeController.downloadPdf);
+
+// ── Rotas de Backup Integrado do Sistema ──────────────────────────────────────
+router.get('/backup/download', BackupController.downloadBackup);
+
 export default router;
+

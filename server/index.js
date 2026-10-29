@@ -370,6 +370,18 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n❌ [PORT ERROR] A porta ${PORT} já está em uso por outro processo.`);
+    console.error(`No Windows, execute para encerrar o processo que está segurando a porta:`);
+    console.error(`  netstat -ano | findstr :${PORT}`);
+    console.error(`  taskkill /F /PID <PID_ENCONTRADO>\n`);
+  } else {
+    console.error('Erro no servidor HTTP:', err);
+  }
+  process.exit(1);
 });

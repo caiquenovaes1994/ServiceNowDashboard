@@ -14,8 +14,10 @@ import { isIncidentStale } from './utils/incidentUtils.js';
 import HotelManagement from './components/settings/HotelManagement.jsx';
 import ResponsibleManagement from './components/settings/ResponsibleManagement.jsx';
 import SettingsDropdown from './components/common/SettingsDropdown.jsx';
+import OvertimeModule from './components/overtime/OvertimeModule.jsx';
 
 const API_BASE = '/api';
+
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -442,6 +444,27 @@ function App() {
     });
   }, [fetchData, fetchIncidents, fetchMajorRecords, fetchHotels, fetchResponsibles]);
 
+  // Auto-bloqueio de Horas Extras por inatividade (2 minutos sem ação na aba Horas Extras)
+  // O timer continua contando em segundo plano mesmo quando o usuário estiver em outra aba
+  useEffect(() => {
+    const INACTIVITY_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutos (120.000 ms)
+
+    const checkOvertimeInactivity = () => {
+      const isUnlocked = sessionStorage.getItem('ot_unlocked') === 'true';
+      if (!isUnlocked) return;
+
+      const lastActivity = Number(sessionStorage.getItem('ot_last_activity') || 0);
+      if (!lastActivity || Date.now() - lastActivity >= INACTIVITY_TIMEOUT_MS) {
+        sessionStorage.removeItem('ot_unlocked');
+        sessionStorage.removeItem('ot_last_activity');
+        window.dispatchEvent(new CustomEvent('ot_lock'));
+      }
+    };
+
+    const interval = setInterval(checkOvertimeInactivity, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSaveMonth = async (month, data) => {
     try {
       await axios.post(`${API_BASE}/metrics`, { ...data, year, month });
@@ -690,7 +713,7 @@ function App() {
         <div className="title-section">
           <div>
             <h1>ServiceNow Dashboard</h1>
-            <p className="welcome-msg">Painel Integrado de Gestão de Incidentes e<br></br> Análise de Desempenho</p>
+            <p className="welcome-msg">Gerenciamento profissional completo em gestão de<br></br> incidentes, horas extras e desempenho pessoal.</p>
           </div>
           
           {activeMainTab === TABS.METRICS && (
@@ -1009,6 +1032,11 @@ function App() {
         />
       )}
 
+      {/* Módulo: Controle de Horas Extras */}
+      {activeMainTab === TABS.OVERTIME && (
+        <OvertimeModule />
+      )}
+
       {/* Módulo 3: Gestão de Hotéis */}
       {activeMainTab === TABS.HOTELS && (
         <HotelManagement
@@ -1031,5 +1059,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;

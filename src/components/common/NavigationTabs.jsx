@@ -1,10 +1,11 @@
 import React from 'react';
-import { BarChart3, AlertOctagon } from 'lucide-react';
+import { BarChart3, AlertOctagon, Clock } from 'lucide-react';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const TABS = {
   METRICS: 'metrics',
   INCIDENTS: 'incidents',
+  OVERTIME: 'overtime',
   HOTELS: 'hotels',
   RESPONSIBLES: 'responsibles'
 };
@@ -42,9 +43,19 @@ const NavigationTabs = ({
             </span>
           )}
         </button>
+
+        <button
+          type="button"
+          className={`nav-tab-btn ${activeTab === TABS.OVERTIME ? 'active' : ''}`}
+          onClick={() => onTabChange(TABS.OVERTIME)}
+        >
+          <Clock size={18} />
+          <span>Horas Extras</span>
+        </button>
       </nav>
     </div>
   );
 };
+
 
 export default NavigationTabs;

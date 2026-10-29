@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Settings, Building2, Users } from 'lucide-react';
+import { Settings, Building2, Users, Download } from 'lucide-react';
 import { TABS } from './NavigationTabs.jsx';
 
 const SettingsDropdown = ({ activeTab, onSelectTab }) => {
@@ -54,10 +54,24 @@ const SettingsDropdown = ({ activeTab, onSelectTab }) => {
             <Users size={16} />
             <span>Responsáveis</span>
           </button>
+
+          <hr style={{ borderColor: 'rgba(255, 255, 255, 0.08)', margin: '4px 0' }} />
+
+          <a
+            href="/api/backup/download?format=db"
+            className="settings-menu-item"
+            style={{ textDecoration: 'none' }}
+            onClick={() => setIsOpen(false)}
+            title="Download do arquivo SQLite completo (Métricas, Incidentes e Horas Extras)"
+          >
+            <Download size={16} />
+            <span>Baixar Backup</span>
+          </a>
         </div>
       )}
     </div>
   );
 };
+
 
 export default SettingsDropdown;

@@ -1,0 +1,548 @@
+/* ── Módulo de Horas Extras - Design System ─────────────────────────────── */
+
+:root {
+  --wine-primary: #800000;
+  --wine-hover: #9c0000;
+  --wine-active: #660000;
+  --wine-glow: rgba(128, 0, 0, 0.35);
+  --wine-subtle: rgba(128, 0, 0, 0.12);
+  --wine-border: rgba(156, 0, 0, 0.4);
+}
+
+/* ── Container Principal ─────────────────────────────────────────────────── */
+.overtime-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.5rem 1.75rem 3rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tela de Bloqueio & Configuração Inicial ─────────────────────────────── */
+.ot-lock-wrapper {
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.ot-lock-card {
+  width: 100%;
+  max-width: 460px;
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 30px var(--wine-glow);
+  backdrop-filter: var(--backdrop-blur);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ot-lock-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #800000, #ff4d4d, #800000);
+}
+
+.ot-lock-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem auto;
+  background: var(--wine-subtle);
+  border: 1px solid var(--wine-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b6b;
+  box-shadow: 0 0 20px var(--wine-glow);
+}
+
+.ot-lock-title {
+  font-family: var(--font-title);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.ot-lock-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin-bottom: 1.75rem;
+}
+
+.ot-lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  text-align: left;
+}
+
+.ot-password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Oculta o ícone nativo do Edge/Windows para evitar duplicidade com o botão customizado */
+input::-ms-reveal {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+input::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.ot-password-field input::-ms-reveal {
+  display: none !important;
+}
+
+.ot-password-field input::-ms-clear {
+  display: none !important;
+}
+
+.ot-password-field input {
+  padding-right: 2.75rem;
+}
+
+.ot-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.ot-password-toggle:hover {
+  color: var(--text-white);
+}
+
+/* ── Cabeçalho do Painel Desbloqueado ─────────────────────────────────────── */
+.ot-header-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--backdrop-blur);
+  box-shadow: var(--shadow-sm);
+}
+
+.ot-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ot-badge-wine {
+  background: var(--wine-subtle);
+  border: 1px solid var(--wine-border);
+  color: #ff7675;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.ot-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ot-select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--card-border);
+  color: var(--text-white);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.ot-select:hover, .ot-select:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px var(--wine-glow);
+}
+
+.ot-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* ── Botões Customizados ─────────────────────────────────────────────────── */
+.btn-wine {
+  background: var(--wine-primary);
+  color: #ffffff;
+  border: 1px solid var(--wine-border);
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(128, 0, 0, 0.3);
+}
+
+.btn-wine:hover {
+  background: var(--wine-hover);
+  box-shadow: 0 6px 16px var(--wine-glow);
+  transform: translateY(-1px);
+}
+
+.btn-wine:active {
+  background: var(--wine-active);
+  transform: translateY(0);
+}
+
+.btn-wine-outline {
+  background: transparent;
+  color: #ff8585;
+  border: 1px solid var(--wine-border);
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-wine-outline:hover {
+  background: var(--wine-subtle);
+  border-color: #ff4d4d;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ── Grid de 4 KPI Cards Executivos ───────────────────────────────────────── */
+.ot-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .ot-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ot-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ot-kpi-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.85));
+  border: 1px solid var(--wine-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.45rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.ot-kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: #ff6b6b;
+  box-shadow: 0 10px 24px -4px rgba(128, 0, 0, 0.4), 0 0 16px var(--wine-glow);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(20, 28, 48, 0.95));
+}
+
+.ot-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.ot-kpi-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ot-kpi-icon {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ot-kpi-value {
+  font-family: var(--font-title);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ff5252;
+  letter-spacing: -0.02em;
+  margin-top: 0.2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.ot-kpi-desc {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+/* ── Barra de Ações em Massa (Bulk Delete) ────────────────────────────────── */
+.ot-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(128, 0, 0, 0.2);
+  border: 1px solid #ff4d4d;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.ot-bulk-info {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ff8585;
+}
+
+/* ── Tabela de Registros ─────────────────────────────────────────────────── */
+.ot-table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.ot-table-header {
+  padding: 1.15rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.ot-table-title {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ot-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.ot-table th {
+  background: rgba(15, 23, 42, 0.75);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+}
+
+.ot-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.ot-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ot-table tr.ot-row-holiday td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ot-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.ot-badge-100 {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.ot-badge-50 {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.ot-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ot-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+}
+
+.ot-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* ── Grade de Horários nos Formulários ─────────────────────────────────────── */
+.ot-times-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .ot-times-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ot-field-hint {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  margin-top: 0.25rem;
+}
+
+/* ── Dropdown Sensível à Escrita (Autocomplete Hotel) ────────────────────── */
+.ot-combobox-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.ot-combobox-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  background: #0f172a;
+  border: 1px solid var(--wine-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.75), 0 0 15px var(--wine-glow);
+  z-index: 100;
+  padding: 0.35rem 0;
+}
+
+.ot-combobox-item {
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.ot-combobox-item:hover,
+.ot-combobox-item.active {
+  background: var(--wine-subtle);
+  color: var(--text-white);
+}
+
+.ot-combobox-rid {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: #ff8585;
+  font-weight: 700;
+}
+
+.ot-times-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}

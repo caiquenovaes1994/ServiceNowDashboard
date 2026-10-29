@@ -3,6 +3,7 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import CryptoService from './services/CryptoService.js';
 
 let backupTimeout = null;
 
@@ -175,6 +176,99 @@ export const initDb = () => {
     db.run(`CREATE INDEX IF NOT EXISTS idx_incidentes_id_responsavel ON incidentes(id_responsavel)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_historico_id_incidente ON historico_situacao(id_incidente)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_chamados_id_incidente ON chamados_filhos(id_incidente)`);
+
+    // ── Tabelas do Módulo de Horas Extras ──────────────────────────────────────
+    db.run(`CREATE TABLE IF NOT EXISTS chamados (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      data DATE NOT NULL,
+      caso TEXT,
+      pms TEXT,
+      hotel TEXT,
+      inicio TEXT NOT NULL,
+      intervalo TEXT,
+      volta TEXT,
+      termino TEXT NOT NULL,
+      observacoes TEXT,
+      motivo TEXT,
+      valor_base_snapshot TEXT DEFAULT '0.0'
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS overtime_config (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS overtime_salary_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      salario TEXT NOT NULL,
+      data_vigencia DATE NOT NULL,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Semeia o histórico com o salário base inicial se a tabela estiver vazia
+    db.get("SELECT COUNT(*) as count FROM overtime_salary_history", (err, row) => {
+      if (!err && row && row.count === 0) {
+        db.get("SELECT value FROM overtime_config WHERE key = 'base_salary'", (err2, sRow) => {
+          const initNum = sRow ? CryptoService.decryptNumber(sRow.value, 6850) : 6850;
+          const enc = CryptoService.encrypt(initNum);
+          db.run(
+            "INSERT INTO overtime_salary_history (salario, data_vigencia) VALUES (?, '2020-01-01')",
+            [enc]
+          );
+        });
+      }
+    });
+
+    // Migração de Criptografia para dados financeiros confidenciais (AES-256-GCM)
+    // 1. Criptografar base_salary em overtime_config se estiver em texto puro
+    db.get("SELECT value FROM overtime_config WHERE key = 'base_salary'", (err, sRow) => {
+      if (!err && sRow && sRow.value && !CryptoService.isEncrypted(sRow.value)) {
+        const enc = CryptoService.encrypt(sRow.value);
+        db.run("UPDATE overtime_config SET value = ? WHERE key = 'base_salary'", [enc]);
+      }
+    });
+
+    // 2. Criptografar valor_base_snapshot em chamados se estiver em texto puro
+    db.all("SELECT id, valor_base_snapshot FROM chamados", (err, cRows) => {
+      if (!err && cRows) {
+        cRows.forEach(r => {
+          if (r.valor_base_snapshot && !CryptoService.isEncrypted(r.valor_base_snapshot)) {
+            const enc = CryptoService.encrypt(r.valor_base_snapshot);
+            db.run("UPDATE chamados SET valor_base_snapshot = ? WHERE id = ?", [enc, r.id]);
+          }
+        });
+      }
+    });
+
+    // 3. Criptografar salario em overtime_salary_history se estiver em texto puro
+    db.all("SELECT id, salario FROM overtime_salary_history", (err, hRows) => {
+      if (!err && hRows) {
+        hRows.forEach(r => {
+          if (r.salario && !CryptoService.isEncrypted(String(r.salario))) {
+            const enc = CryptoService.encrypt(r.salario);
+            db.run("UPDATE overtime_salary_history SET salario = ? WHERE id = ?", [enc, r.id]);
+          }
+        });
+      }
+    });
+
+    db.run(`CREATE INDEX IF NOT EXISTS idx_chamados_data ON chamados(data)`);
+
+    // Migração de colunas para chamados (se já existia de versões anteriores)
+    db.all("PRAGMA table_info(chamados)", (err, rows) => {
+      if (!err && rows) {
+        const columns = rows.map(r => r.name);
+        if (!columns.includes('intervalo')) {
+          db.run('ALTER TABLE chamados ADD COLUMN intervalo TEXT');
+        }
+        if (!columns.includes('volta')) {
+          db.run('ALTER TABLE chamados ADD COLUMN volta TEXT');
+        }
+        if (!columns.includes('valor_base_snapshot')) {
+          db.run("ALTER TABLE chamados ADD COLUMN valor_base_snapshot TEXT DEFAULT '0.0'");
+        }
+      }
+    });
 
     // Auto-seed if empty
     db.get("SELECT COUNT(*) as count FROM metrics", (err, row) => {
