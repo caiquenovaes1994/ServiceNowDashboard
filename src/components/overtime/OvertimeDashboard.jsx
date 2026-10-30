@@ -413,24 +413,7 @@ const OvertimeDashboard = ({
                         </span>
                       </td>
                       <td style={{ fontWeight: 700, color: 'var(--text-white)' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <span>{item.duracaoFormatada}</span>
-                          {item.isOverlapping && (
-                            <span
-                              className="ot-badge-tag"
-                              style={{
-                                background: 'rgba(59, 130, 246, 0.15)',
-                                color: '#60a5fa',
-                                fontSize: '0.65rem',
-                                padding: '1px 5px',
-                                fontWeight: 600
-                              }}
-                              title="Horário sobreposto com outro apontamento do mesmo dia (Agrupado na apuração e no PDF)"
-                            >
-                              Sobreposto
-                            </span>
-                          )}
-                        </div>
+                        {item.duracaoFormatada}
                       </td>
                       <td>
                         <span
