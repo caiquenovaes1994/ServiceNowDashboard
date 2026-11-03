@@ -102,12 +102,11 @@
   cursor: not-allowed;
 }
 
-.input-csv-only {
-  border-color: rgba(56, 189, 248, 0.12) !important;
-  border-style: dashed !important;
-  color: var(--primary) !important;
-  opacity: 0.7;
-  cursor: not-allowed;
+.input-minimal.input-readonly {
+  border-color: transparent !important;
+  color: var(--text-muted) !important;
+  cursor: not-allowed !important;
+  opacity: 0.85;
 }
 
 /* ── Botões Globais ──────────────────────────────────────────────────────── */

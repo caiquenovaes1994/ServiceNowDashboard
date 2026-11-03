@@ -186,7 +186,7 @@ const OvertimeLockScreen = ({ isConfigured, onUnlockSuccess }) => {
             style={{ width: '100%', justifyContent: 'center', marginTop: '0.75rem', padding: '0.75rem' }}
             disabled={loading}
           >
-            {loading ? 'Validando...' : isConfigured ? '🔓 Desbloquear Módulo' : '💾 Salvar'}
+            {loading ? 'Validando...' : isConfigured ? '🔓 Desbloquear' : '💾 Salvar'}
           </button>
         </form>
       </div>

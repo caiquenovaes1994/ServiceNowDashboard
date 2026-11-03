@@ -284,10 +284,11 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
 
   const handleChange = (field, value) => {
     if (readOnly) return;
+    if (field === 'closed_count' || field === 'nps_general') return;
     let clampedValue = value;
-    if (field === 'closed_count' || field === 'evaluated_count' || field === 'within_sla_count' || field === 'perfect_fix_count') {
+    if (field === 'evaluated_count' || field === 'within_sla_count' || field === 'perfect_fix_count') {
       clampedValue = Math.min(Math.max(value, 0), 999);
-    } else if (field === 'nps' || field === 'nps_general') {
+    } else if (field === 'nps') {
       clampedValue = Math.min(Math.max(value, 0), 5.0);
     }
     setEditData(prev => ({ ...prev, [field]: clampedValue }));
@@ -303,11 +304,12 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
       <span className="row-label">{month}</span>
       <input 
         type="number" 
-        className="input-minimal font-mono" 
+        className="input-minimal font-mono input-readonly" 
         value={editData.closed_count} 
-        onChange={(e) => handleChange('closed_count', parseInt(e.target.value) || 0)}
-        onBlur={handleBlur}
-        disabled={readOnly}
+        disabled
+        readOnly
+        tabIndex={-1}
+        title="Fechados: atualizado automaticamente via arquivo CSV (somente leitura)"
         placeholder="Fechados"
       />
       <input 
@@ -317,6 +319,7 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
         onChange={(e) => handleChange('evaluated_count', parseInt(e.target.value) || 0)}
         onBlur={handleBlur}
         disabled={readOnly}
+        title={readOnly ? "Mês fechado para edição" : "Avaliados: inserção manual"}
         placeholder="Avaliados"
       />
 
@@ -328,16 +331,18 @@ const MetricRow = ({ month, data, onSave, readOnly }) => {
         onChange={(e) => handleChange('nps', parseFloat(e.target.value) || 0)}
         onBlur={handleBlur}
         disabled={readOnly}
+        title={readOnly ? "Mês fechado para edição" : "Meu NPS: inserção manual"}
         placeholder="Meu NPS"
       />
       <input 
         type="number" 
         step="0.01"
-        className="input-minimal font-mono" 
+        className="input-minimal font-mono input-readonly" 
         value={editData.nps_general} 
-        onChange={(e) => handleChange('nps_general', parseFloat(e.target.value) || 0)}
-        onBlur={handleBlur}
-        disabled={readOnly}
+        disabled
+        readOnly
+        tabIndex={-1}
+        title="NPS Geral: atualizado automaticamente via arquivo JSON (somente leitura)"
         placeholder="NPS Geral"
       />
       <div 
@@ -967,11 +972,11 @@ function App() {
             <div className="metrics-grid">
               <div className="metrics-row" style={{background: 'transparent', border: 'none', paddingBottom: 0}}>
                 <span className="row-label">Mês</span>
-                <span className="row-label">Fechados</span>
-                <span className="row-label">Avaliados</span>
+                <span className="row-label" title="Atualizado via upload CSV (somente leitura)">Fechados</span>
+                <span className="row-label" title="Inserção manual">Avaliados</span>
 
-                <span className="row-label">Meu NPS</span>
-                <span className="row-label">NPS Geral</span>
+                <span className="row-label" title="Inserção manual">Meu NPS</span>
+                <span className="row-label" title="Atualizado via upload JSON (somente leitura)">NPS Geral</span>
                 <span className="row-label">Férias</span>
                 <span className="row-label">Projeto</span>
               </div>

@@ -47,7 +47,7 @@ const getWeekdayLabel = (dateStr) => {
   return dias[dt.getDay()];
 };
 
-const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = false, hotels = [] }) => {
+const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) => {
   const [data, setData] = useState('');
   const [caso, setCaso] = useState('');
   const [selectedHotel, setSelectedHotel] = useState('');
@@ -187,7 +187,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
         <div className="modal-header">
           <h2 className="modal-title">
             <Clock size={20} style={{ color: '#ff6b6b' }} />
-            {record ? (isViewOnly ? 'Visualizar Apontamento' : 'Editar Apontamento') : 'Novo Apontamento de Hora Extra'}
+            {record ? 'Editar Apontamento' : 'Novo Apontamento de Hora Extra'}
           </h2>
           <button type="button" className="modal-close-btn" onClick={onClose}>
             <X size={20} />
@@ -215,7 +215,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                   className="form-input"
                   value={data}
                   onChange={(e) => setData(e.target.value)}
-                  disabled={isViewOnly}
                   required
                 />
                 {data && getWeekdayLabel(data) && (
@@ -233,7 +232,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                   placeholder="Ex: INC0123456"
                   value={caso}
                   onChange={(e) => setCaso(e.target.value)}
-                  disabled={isViewOnly}
                 />
               </div>
             </div>
@@ -252,12 +250,11 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                   placeholder="Digite o nome ou código do hotel..."
                   value={hotelQuery}
                   onChange={handleHotelChange}
-                  onFocus={() => !isViewOnly && setIsHotelOpen(true)}
-                  disabled={isViewOnly}
-                  style={{ paddingRight: hotelQuery && !isViewOnly ? '2.2rem' : '1rem' }}
+                  onFocus={() => setIsHotelOpen(true)}
+                  style={{ paddingRight: hotelQuery ? '2.2rem' : '1rem' }}
                 />
 
-                {hotelQuery && !isViewOnly && (
+                {hotelQuery && (
                   <button
                     type="button"
                     onClick={handleClearHotel}
@@ -280,7 +277,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
               </div>
 
               {/* Menu dropdown com opções compatíveis */}
-              {isHotelOpen && !isViewOnly && (
+              {isHotelOpen && (
                 <div className="ot-combobox-dropdown">
                   {filteredHotels.length > 0 ? (
                     filteredHotels.map((h) => {
@@ -293,10 +290,12 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                           className={`ot-combobox-item ${isSelected ? 'active' : ''}`}
                           onMouseDown={() => handleSelectHotel(h)}
                         >
-                          <span style={{ fontWeight: isSelected ? 700 : 500 }}>
-                            {h.nome}
-                          </span>
-                          {h.rid && <span className="ot-combobox-rid">{h.rid}</span>}
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem', width: '100%', overflow: 'hidden' }}>
+                            {h.rid && <span className="ot-combobox-rid">{h.rid}</span>}
+                            <span style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {h.nome}
+                            </span>
+                          </div>
                         </div>
                       );
                     })
@@ -332,7 +331,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                     value={inicio}
                     onChange={(e) => setInicio(e.target.value)}
                     onBlur={(e) => setInicio(formatTimeMask(e.target.value))}
-                    disabled={isViewOnly}
                     required
                   />
                   <span className="ot-field-hint">Horário de Início *</span>
@@ -346,7 +344,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                     value={termino}
                     onChange={(e) => setTermino(e.target.value)}
                     onBlur={(e) => setTermino(formatTimeMask(e.target.value))}
-                    disabled={isViewOnly}
                     required
                   />
                   <span className="ot-field-hint" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -371,7 +368,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                 placeholder="Ex: Atendimento de chamado emergencial de virada de auditoria"
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
-                disabled={isViewOnly}
                 required
               />
             </div>
@@ -385,21 +381,18 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, isViewOnly = fal
                 placeholder="Detalhes adicionais, procedimentos executados, etc."
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
-                disabled={isViewOnly}
               />
             </div>
           </div>
 
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              {isViewOnly ? 'Fechar' : 'Cancelar'}
+              Cancelar
             </button>
-            {!isViewOnly && (
-              <button type="submit" className="btn-wine">
-                <Check size={16} />
-                <span>Salvar Apontamento</span>
-              </button>
-            )}
+            <button type="submit" className="btn-wine">
+              <Check size={16} />
+              <span>Salvar Apontamento</span>
+            </button>
           </div>
         </form>
       </div>

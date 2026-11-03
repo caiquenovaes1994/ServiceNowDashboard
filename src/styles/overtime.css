@@ -428,26 +428,13 @@ input::-ms-clear {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.ot-badge-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
-
-.ot-badge-100 {
-  background: rgba(239, 68, 68, 0.18);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.35);
-}
-
-.ot-badge-50 {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+.ot-cell-wrap {
+  min-width: 180px;
+  max-width: 320px;
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.45;
 }
 
 .ot-action-btn {
@@ -517,8 +504,8 @@ input::-ms-clear {
   padding: 0.6rem 0.85rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  justify-content: flex-start;
+  gap: 0.65rem;
   font-size: 0.86rem;
   color: var(--text-main);
   cursor: pointer;

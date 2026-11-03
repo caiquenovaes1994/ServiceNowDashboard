@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { 
-  Clock, Plus, Download, Settings, Lock, Eye, Edit2, Trash2, 
+  Clock, Plus, Download, Settings, Lock, Edit2, Trash2, 
   Calendar, CheckSquare, Square, AlertTriangle, FileText, CheckCircle2 
 } from 'lucide-react';
 import OvertimeRecordModal from './OvertimeRecordModal.jsx';
@@ -34,7 +34,6 @@ const OvertimeDashboard = ({
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [activeRecord, setActiveRecord] = useState(null);
-  const [isViewOnly, setIsViewOnly] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
 
@@ -61,19 +60,11 @@ const OvertimeDashboard = ({
 
   const handleOpenNew = () => {
     setActiveRecord(null);
-    setIsViewOnly(false);
     setIsRecordModalOpen(true);
   };
 
   const handleOpenEdit = (rec) => {
     setActiveRecord(rec);
-    setIsViewOnly(false);
-    setIsRecordModalOpen(true);
-  };
-
-  const handleOpenView = (rec) => {
-    setActiveRecord(rec);
-    setIsViewOnly(true);
     setIsRecordModalOpen(true);
   };
 
@@ -328,7 +319,6 @@ const OvertimeDashboard = ({
                 <th>Início</th>
                 <th>Término</th>
                 <th>Duração</th>
-                <th>Taxa</th>
                 <th>Motivo</th>
                 <th>Observações</th>
                 <th style={{ textAlign: 'center', width: '90px' }}>Ações</th>
@@ -337,13 +327,13 @@ const OvertimeDashboard = ({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="12" style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
+                  <td colSpan="11" style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
                     Carregando apontamentos...
                   </td>
                 </tr>
               ) : chamados.length === 0 ? (
                 <tr>
-                  <td colSpan="12" style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
+                  <td colSpan="11" style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
                     Nenhum apontamento registrado para o período de {selectedMonth}/{selectedYear}.
                     <div style={{ marginTop: '0.75rem' }}>
                       <button type="button" className="btn-wine" onClick={handleOpenNew}>
@@ -378,14 +368,8 @@ const OvertimeDashboard = ({
                         </button>
                       </td>
                       <td style={{ fontWeight: 600 }}>{dataFormatted}</td>
-                      <td>
-                        <span
-                          className={`ot-badge-tag ${
-                            item.isFeriadoOuDomingo ? 'ot-badge-100' : 'ot-badge-50'
-                          }`}
-                        >
-                          {item.diaSemana}
-                        </span>
+                      <td style={{ fontWeight: item.isFeriadoOuDomingo ? 700 : 500, color: item.isFeriadoOuDomingo ? '#ff5252' : 'var(--text-main)' }}>
+                        {item.diaSemana}
                       </td>
                       <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
                         {item.caso || '—'}
@@ -415,31 +399,14 @@ const OvertimeDashboard = ({
                       <td style={{ fontWeight: 700, color: 'var(--text-white)' }}>
                         {item.duracaoFormatada}
                       </td>
-                      <td>
-                        <span
-                          className={`ot-badge-tag ${
-                            item.isFeriadoOuDomingo ? 'ot-badge-100' : 'ot-badge-50'
-                          }`}
-                        >
-                          {item.isFeriadoOuDomingo ? '100%' : '50%'}
-                        </span>
-                      </td>
-                      <td style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.motivo}>
+                      <td className="ot-cell-wrap" title={item.motivo}>
                         {item.motivo}
                       </td>
-                      <td style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-muted)' }} title={item.observacoes || ''}>
+                      <td className="ot-cell-wrap" style={{ color: 'var(--text-muted)' }} title={item.observacoes || ''}>
                         {item.observacoes || '—'}
                       </td>
                       <td style={{ textAlign: 'center' }}>
                         <div style={{ display: 'inline-flex', gap: '4px' }}>
-                          <button
-                            type="button"
-                            className="ot-action-btn"
-                            onClick={() => handleOpenView(item)}
-                            title="Visualizar Detalhes"
-                          >
-                            <Eye size={16} />
-                          </button>
                           <button
                             type="button"
                             className="ot-action-btn"
@@ -473,7 +440,6 @@ const OvertimeDashboard = ({
         onClose={() => setIsRecordModalOpen(false)}
         onSave={handleSaveRecord}
         record={activeRecord}
-        isViewOnly={isViewOnly}
         hotels={hotels}
       />
 

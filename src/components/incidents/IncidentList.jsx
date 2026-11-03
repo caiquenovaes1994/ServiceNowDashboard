@@ -523,10 +523,9 @@ const IncidentList = ({
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-                          {item.hotel_rid && <span className="badge-rid">{item.hotel_rid}</span>}
-                          <span>{item.hotel_nome || 'Não definido'}</span>
-                        </div>
+                        <span>
+                          {item.hotel_rid ? `${item.hotel_rid} - ${item.hotel_nome || 'Não definido'}` : (item.hotel_nome || 'Não definido')}
+                        </span>
                       )}
                     </td>
 
@@ -715,8 +714,7 @@ const IncidentList = ({
                   >
                     <div className="stat-bar" style={{ width: `${perc}%` }} />
                     <span className="stat-name">
-                      {item.rid && <span className="badge-rid">{item.rid}</span>}
-                      <span>{item.name}</span>
+                      {item.rid ? `${item.rid} - ${item.name}` : item.name}
                     </span>
                     <span className="stat-count">{item.count}</span>
                   </div>
