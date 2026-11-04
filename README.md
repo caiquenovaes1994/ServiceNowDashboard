@@ -58,7 +58,7 @@ O **ServiceNow Dashboard** é uma plataforma corporativa unificada projetada par
 - [⚙️ 7. Comandos Úteis](#comandos-uteis)
 - [🎨 8. Tipografia e Tokens Visuais](#tipografia-e-tokens)
 - [📄 9. Licença](#licenca)
-- [👨‍💻 10. Desenvolvedor](#desenvolvido-por)
+- [👨‍💻 10. Autor](#desenvolvido-por)
 
 ---
 
@@ -381,7 +381,8 @@ Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquiv
 
 ## <a id="desenvolvido-por"></a>👨‍💻 Desenvolvido por
 
-**Caique Novaes** — Analista de Suporte & Desenvolvedor
+**Caique Novaes**<br>
+<sub>Analista de Suporte & Desenvolvedor</sub>
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/caiquenovaes1994)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:caiquenovaes1994@gmail.com)
