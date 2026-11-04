@@ -34,7 +34,7 @@ O **ServiceNow Dashboard** é uma plataforma corporativa unificada projetada par
 | **Geração de Documentos** | Folha de Ponto executiva A4 Paisagem gerada diretamente em memória via **pdfmake** (100% Node.js) e exportação XLSX via **ExcelJS**. |
 | **Identidade & Autonomia** | Design System proprietário em Vanilla CSS (*Deep Blue* e *Wine*) com tipografia 100% local (sem dependência de conexões ou CDNs externas). |
 
-### 🧭 Índice de Navegação Direta
+### 🧭 Índice
 
 - [📋 1. Sobre o Projeto](#sobre-o-projeto)
 - [✨ 2. Módulos da Aplicação](#modulos-da-aplicacao)
