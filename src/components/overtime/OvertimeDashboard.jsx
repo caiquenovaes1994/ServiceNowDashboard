@@ -127,7 +127,7 @@ const OvertimeDashboard = ({
       showNotification('Folha de Hora Extra gerada com sucesso!');
     } catch (err) {
       console.error('[OvertimeDashboard] Erro ao gerar PDF:', err.message);
-      alert('Erro ao gerar o relatório PDF. Verifique se o Python com ReportLab está instalado.');
+      alert('Erro ao gerar o relatório PDF. Verifique se o servidor está ativo.');
     } finally {
 
       setIsGeneratingPdf(false);

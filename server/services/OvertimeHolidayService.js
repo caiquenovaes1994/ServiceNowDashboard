@@ -110,6 +110,10 @@ export function isHoliday(dateInput) {
 export function getDiaSemana(dateInput) {
   const d = parseLocalDate(dateInput);
   if (!d || isNaN(d.getTime())) return '';
+  // Se feriado for domingo, no PDF e relatórios manter como DOMINGO
+  if (d.getDay() === 0) {
+    return 'DOMINGO';
+  }
   if (isHoliday(d)) {
     return 'FERIADO';
   }

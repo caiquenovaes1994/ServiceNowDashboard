@@ -3,7 +3,6 @@ import OvertimeHolidayService from '../services/OvertimeHolidayService.js';
 import OvertimeTimeUtils from '../services/OvertimeTimeUtils.js';
 import OvertimePdfService from '../services/OvertimePdfService.js';
 import CryptoService from '../services/CryptoService.js';
-import fs from 'fs';
 
 function formatCurrency(val) {
   if (!val || val <= 0) return 'R$ 0,00';
@@ -276,7 +275,7 @@ export class OvertimeController {
         };
       });
 
-      const { pdfPath, cleanup } = await OvertimePdfService.generateOvertimePdf({
+      const { pdfBuffer } = await OvertimePdfService.generateOvertimePdf({
         registros: registrosProcessados,
         plantonista,
         mes: faixa.mesExtenso,
@@ -286,19 +285,11 @@ export class OvertimeController {
       const fileName = `Folha_Horas_Extras_${faixa.mesExtenso}_${faixa.ano}.pdf`;
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
 
-      const fileStream = fs.createReadStream(pdfPath);
-      fileStream.pipe(res);
-      fileStream.on('close', () => {
-        cleanup();
-      });
-      fileStream.on('error', (err) => {
-        console.error('[OvertimeController] Erro no stream do PDF:', err.message);
-        cleanup();
-        res.status(500).end();
-      });
-
+      return res.end(pdfBuffer);
     } catch (err) {
+      console.error('[OvertimeController] Erro ao gerar PDF:', err);
       res.status(500).json({ error: err.message });
     }
   }

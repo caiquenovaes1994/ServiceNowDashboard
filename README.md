@@ -11,26 +11,68 @@
 ![Vite 5.4+](https://img.shields.io/badge/Vite-5.4%2B-646CFF?style=flat&logo=vite&logoColor=white)
 ![Express 4.18.2](https://img.shields.io/badge/Express-4.18.2-000000?style=flat&logo=express&logoColor=white)
 ![SQLite3 5.1.7](https://img.shields.io/badge/SQLite3-5.1.7-003B57?style=flat&logo=sqlite&logoColor=white)
-![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)
-![ReportLab](https://img.shields.io/badge/PDF-ReportLab-FF6F00?style=flat)
-![Security AES-256-GCM](https://img.shields.io/badge/Security-AES--256--GCM-dc2626?style=flat)
+![PDF pdfmake](https://img.shields.io/badge/PDF-pdfmake-FF6F00?style=flat)
 ![ExcelJS 4.4.0](https://img.shields.io/badge/ExcelJS-4.4.0-217346?style=flat&logo=microsoft-excel&logoColor=white)
 
 </div>
 
 ---
 
-## 📋 Sobre o Projeto
+## <a id="sumario-executivo"></a>📑 Sumário Executivo
 
-O **ServiceNow Dashboard** é uma solução corporativa unificada desenvolvida para centralizar a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix, volume), a **gestão operacional de incidentes em tempo real** e o **controle e apuração de plantões e horas extras**.
+O **ServiceNow Dashboard** é uma plataforma corporativa unificada projetada para centralizar a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix), a **gestão operacional de incidentes em tempo real** e o **controle e apuração de plantões e horas extras**.
 
-Construído com base em uma arquitetura modular moderna (React 18 + Vite no frontend, Express nativo em ESM com SQLite no backend, motor Python para renderização de PDFs corporativos de alta fidelidade e Design System em **Vanilla CSS**), o sistema opera de forma autônoma, ultrarrápida e com segurança de ponta a ponta.
+### 📌 Resumo Operacional da Plataforma
+
+| Pilar | Destaque Técnico / Funcional |
+| :--- | :--- |
+| **Arquitetura** | Frontend modular em React 18 + Vite e Backend nativo em Node.js ESM + Express com banco SQLite 3 embarcado. |
+| **Métricas & Qualidade** | Ingestão automatizada de CSV e JSON com cálculo de SLA útil (considerando feriados nacionais/estaduais/municipais de SP) e Perfect Fix. |
+| **Operação de Incidentes** | Suporte a Major Incidents, vinculação de chamados filhos, drag & drop de linhas, filtros dinâmicos e alertas visuais de inatividade (+3d). |
+| **Horas Extras & Plantão** | Apuração oficial (50% e 100%), proteção de histórico salarial, agrupamento de sobreposições e tratamento de virada de meia-noite (+1). |
+| **Segurança & Auditoria** | Senha Mestre com Bcrypt, auto-lock por inatividade (2 min), criptografia autenticada AES-256-GCM para valores salariais e backups com debounce. |
+| **Geração de Documentos** | Folha de Ponto executiva A4 Paisagem gerada diretamente em memória via **pdfmake** (100% Node.js) e exportação XLSX via **ExcelJS**. |
+| **Identidade & Autonomia** | Design System proprietário em Vanilla CSS (*Deep Blue* e *Wine*) com tipografia 100% local (sem dependência de conexões ou CDNs externas). |
+
+### 🧭 Índice de Navegação Direta
+
+- [📋 1. Sobre o Projeto](#sobre-o-projeto)
+- [✨ 2. Módulos da Aplicação](#modulos-da-aplicacao)
+  - [📈 Módulo Analítico (Métricas & KPIs)](#modulo-analitico)
+  - [🚨 Módulo Operacional de Incidentes](#modulo-operacional)
+  - [⏱️ Módulo de Gestão de Horas Extras (Plantão & Apontamentos)](#modulo-horas-extras)
+  - [⚙️ Módulo de Cadastros Base & Configurações](#modulo-cadastros)
+- [🛠️ 3. Stack Tecnológica](#stack-tecnologica)
+- [📁 4. Estrutura de Diretórios](#estrutura-de-diretorios)
+- [🚀 5. Como Executar](#como-executar)
+  - [Pré-requisitos](#pre-requisitos)
+  - [1. Instalação das Dependências](#instalacao-dependencias)
+  - [2. Execução em Desenvolvimento (Frontend + Backend)](#execucao-desenvolvimento)
+  - [3. Execução em Produção](#execucao-producao)
+  - [4. Inicialização Rápida no Windows (.bat)](#inicializacao-windows)
+- [📡 6. Endpoints da API REST](#endpoints-da-api)
+  - [Métricas & Análises](#api-metricas)
+  - [Gestão de Incidentes](#api-incidentes)
+  - [Horas Extras & Plantões](#api-horas-extras)
+  - [Cadastros Base](#api-cadastros)
+- [⚙️ 7. Comandos Úteis](#comandos-uteis)
+- [🎨 8. Tipografia e Tokens Visuais](#tipografia-e-tokens)
+- [📄 9. Licença](#licenca)
+- [👨‍💻 10. Desenvolvedor](#desenvolvido-por)
 
 ---
 
-## ✨ Módulos da Aplicação
+## <a id="sobre-o-projeto"></a>📋 Sobre o Projeto
 
-### 1. 📈 Módulo Analítico (Métricas & KPIs)
+O **ServiceNow Dashboard** é uma solução corporativa unificada desenvolvida para centralizar a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix, volume), a **gestão operacional de incidentes em tempo real** e o **controle e apuração de plantões e horas extras**.
+
+Construído com base em uma arquitetura modular moderna (React 18 + Vite no frontend, Express nativo em ESM com SQLite no backend, motor nativo em Node.js (pdfmake) para renderização de PDFs corporativos de alta fidelidade e Design System em **Vanilla CSS**), o sistema opera de forma autônoma, ultrarrápida e com segurança de ponta a ponta.
+
+---
+
+## <a id="modulos-da-aplicacao"></a>✨ Módulos da Aplicação
+
+### <a id="modulo-analitico"></a>1. 📈 Módulo Analítico (Métricas & KPIs)
 
 - **8 Cards Dinâmicos de KPI**: Visão rápida de fechados no ano, fechados por mês, NPS pessoal, NPS geral corporativo, SLA%, avaliados no ano, avaliações por mês e taxa de Perfect Fix.
 - **Gráficos Comparativos Recharts**:
@@ -42,7 +84,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
   - Ingestão de export CSV do ServiceNow com cálculo automático de SLA útil (considerando horário comercial e feriados nacionais, estaduais-SP e municipais de SP) e Perfect Fix.
   - Ingestão de JSON corporativo (`asmt_metric_result.json`) para cálculo do NPS Geral.
 
-### 2. 🚨 Módulo Operacional de Incidentes
+### <a id="modulo-operacional"></a>2. 🚨 Módulo Operacional de Incidentes
 
 - **Visualização por Sub-abas**: Alternância instantânea entre incidentes **Abertos** e **Resolvidos**.
 - **Ordenação Inteligente**:
@@ -64,7 +106,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
   - Geração de planilhas Excel formatadas profissionalmente via **ExcelJS** com cabeçalho executivo escuro (`#1F2937`), zebrado de linhas (`#FFFFFF` e `#D9D9D9`) e criação automática de abas filhas dedicadas `(!) [Incidente]` para cada Major Incident.
   - Code-splitting dinâmico com carregamento assíncrono do módulo de exportação apenas sob demanda.
 
-### 3. ⏱️ Módulo de Gestão de Horas Extras (Plantão & Apontamentos)
+### <a id="modulo-horas-extras"></a>3. ⏱️ Módulo de Gestão de Horas Extras (Plantão & Apontamentos)
 
 - **Autenticação Segura & Auto-Lock por Inatividade**:
   - Proteção por Senha Mestre criptografada com **Bcrypt** (salt rounds 10).
@@ -89,7 +131,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
   - Tabela completa de apontamentos com colunas: *Data*, *Semana*, *Caso/INC*, *Hotel*, *Início*, *Término*, *Duração*, *Taxa*, *Motivo*, *Observações* e *Ações*.
   - Exclusão individual e exclusão em massa com seleção múltipla via checkboxes.
 - **Geração e Download Oficial de Folha de Ponto em PDF**:
-  - Gerador em Python integrado via **ReportLab** produzindo documento A4 Paisagem executivo de padrão oficial.
+  - Gerador nativo em Node.js integrado via **pdfmake** produzindo documento A4 Paisagem executivo de padrão oficial diretamente em memória.
   - Cabeçalho padronizado idêntico ao modelo Excel de 4 linhas: tipografia Calibri (14px no título, 11px no corpo), fundo cinza `#D9D9D9` no nome do colaborador, mês e ano, e largura perfeitamente alinhada à tabela.
   - Tabela com colunas: `DIA`, `SEMANA`, `DATA`, `INÍCIO`, `INTERVALO`, `VOLTA`, `TÉRMINO`, `HORAS TRABALHADAS`, `Horas a Receber (50% / 100%)` e `OBSERVAÇÕES`.
   - Dois atendimentos no mesmo dia são organizados em Início/Intervalo e Volta/Término.
@@ -99,7 +141,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
   - A cada inserção, alteração ou exclusão no módulo de Horas Extras, um backup automático do SQLite é acionado com debounce de 5 segundos, protegendo o banco contra falhas sem sobrecarga de disco.
   - Botão de download manual instantâneo do arquivo de banco de dados (`dashboard.db`).
 
-### 4. ⚙️ Módulo de Cadastros Base & Configurações
+### <a id="modulo-cadastros"></a>4. ⚙️ Módulo de Cadastros Base & Configurações
 
 - Centralizado no dropdown de **Configurações** (ícone de engrenagem) no cabeçalho.
 - CRUD completo de Hotéis (RID, Nome, status Ativo/Inativo) e Responsáveis (Nome, status Ativo/Inativo).
@@ -109,7 +151,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
 
 ---
 
-## 🛠️ Stack Tecnológica
+## <a id="stack-tecnologica"></a>🛠️ Stack Tecnológica
 
 | Camada | Tecnologia | Propósito |
 | :--- | :--- | :--- |
@@ -118,8 +160,9 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
 | **PWA** | vite-plugin-pwa | Suporte a Service Worker, cache offline e manifesto instalável |
 | **Gráficos** | Recharts 2.12 | Visualização interativa e responsiva de métricas e indicadores |
 | **Ícones** | Lucide React | Biblioteca de ícones SVG limpos e padronizados (sem CDNs externas) |
+| **Tipografia** | WOFF2 Local + TTF | Fontes 100% autônomas em diretórios dedicados sem chamadas externas (Plus Jakarta Sans, Montserrat, JetBrains Mono, Calibri) |
 | **Exportação XLSX** | ExcelJS 4.4 | Geração client-side de planilhas `.xlsx` formatadas e zebradas |
-| **Gerador de PDF** | Python 3 + ReportLab | Geração de Folha de Ponto A4 Paisagem oficial de alta fidelidade |
+| **Gerador de PDF** | Node.js + pdfmake | Geração de Folha de Ponto A4 Paisagem oficial de alta fidelidade em memória |
 | **Feriados** | date-holidays | Cálculo preciso de feriados nacionais, estaduais e municipais de SP |
 | **Backend** | Node.js + Express (ESM) | API RESTful nativa em módulos ECMAScript |
 | **Banco de Dados** | SQLite 3 | Banco de dados relacional embarcado em arquivo único local (`server/dashboard.db`) |
@@ -130,11 +173,13 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
 
 ---
 
-## 📁 Estrutura de Diretórios
+## <a id="estrutura-de-diretorios"></a>📁 Estrutura de Diretórios
 
 ```text
 ServiceNowDashboard/
 ├── server/                          # Backend da aplicação (ESM nativo)
+│   ├── assets/                      # Recursos estáticos do servidor
+│   │   └── fonts/                   # Fontes dedicadas para renderização de PDF (Calibri TTF)
 │   ├── controllers/                 # Controladores de negócio
 │   │   ├── IncidentController.js    # CRUD de Incidentes, reordenação e históricos
 │   │   ├── HotelController.js       # CRUD de Hotéis
@@ -147,8 +192,9 @@ ServiceNowDashboard/
 │   │   ├── CryptoService.js         # Criptografia simétrica AES-256-GCM (Salários e Snapshots)
 │   │   ├── OvertimeTimeUtils.js     # Tratamento de horas, sobreposições e virada de noite
 │   │   ├── OvertimeHolidayService.js# Apuração de domingos e feriados (100% vs 50%)
-│   │   ├── OvertimePdfService.js    # Bridge Node.js -> subprocesso Python para PDF
-│   │   ├── pdf_generator.py         # Motor de renderização ReportLab (Folha de Ponto oficial)
+│   │   ├── OvertimePdfService.js    # Serviço de streaming em memória de Folha de Ponto em PDF
+│   │   ├── OvertimePdfGenerator.js  # Motor de renderização em Node.js/pdfmake (Folha de Ponto oficial)
+│   │   ├── pdf_generator.js         # Wrapper de compatibilidade em JavaScript ESM
 │   │   ├── IncidentService.js       # Regras de persistência de incidentes
 │   │   ├── MajorIncidentService.js  # Lógica de chamados massivos vinculados
 │   │   ├── AuditService.js          # Auditoria de ações no sistema
@@ -173,6 +219,7 @@ ServiceNowDashboard/
 │   │   │   └── OvertimeSettingsModal.jsx# Modal de configurações (colaborador, salário, senha)
 │   │   └── settings/                # Módulos de gestão de Hotéis e Responsáveis
 │   ├── styles/                      # Design System Vanilla CSS Refatorado
+│   │   ├── fonts.css                # Declarações @font-face locais autônomas (offline total)
 │   │   ├── tokens.css               # Cores, fontes, sombras e transições (Deep Blue)
 │   │   ├── base.css                 # Reset, tipografia global e scrollbars
 │   │   ├── layout.css               # Grid do dashboard, toolbar, relógio e rodapé
@@ -188,6 +235,7 @@ ServiceNowDashboard/
 │   ├── App.jsx                      # Componente raiz com navegação e abas
 │   └── main.jsx                     # Ponto de entrada React com registro PWA
 ├── public/                          # Assets estáticos, favicon e manifest
+│   └── fonts/                       # Tipografia web local WOFF2 (Plus Jakarta Sans, Montserrat, JetBrains Mono)
 ├── start_dashboard.bat              # Inicializador para Windows com auto-restart em falhas
 ├── package.json                     # Dependências e scripts npm
 ├── vite.config.js                   # Configuração de build, proxy e PWA
@@ -196,21 +244,20 @@ ServiceNowDashboard/
 
 ---
 
-## 🚀 Como Executar
+## <a id="como-executar"></a>🚀 Como Executar
 
-### Pré-requisitos
+### <a id="pre-requisitos"></a>Pré-requisitos
 
 - [Node.js](https://nodejs.org/) v18 ou superior instalado.
-- [Python](https://www.python.org/) 3.10+ com a biblioteca `reportlab` instalada (`pip install reportlab`), necessária para a geração da Folha de Ponto em PDF.
 - npm (incluído no instalador do Node.js).
 
-### 1. Instalação das Dependências
+### <a id="instalacao-dependencias"></a>1. Instalação das Dependências
 
 ```bash
 npm install
 ```
 
-### 2. Execução em Desenvolvimento (Frontend + Backend)
+### <a id="execucao-desenvolvimento"></a>2. Execução em Desenvolvimento (Frontend + Backend)
 
 ```bash
 npm run dev
@@ -219,7 +266,7 @@ npm run dev
 - **Frontend (Vite)**: `http://localhost:3002`
 - **Backend (Express API)**: `http://localhost:5000` (com proxy automático configurado no Vite)
 
-### 3. Execução em Produção
+### <a id="execucao-producao"></a>3. Execução em Produção
 
 ```bash
 # Gera os arquivos minificados do frontend na pasta dist/
@@ -229,7 +276,7 @@ npm run build
 npm start
 ```
 
-### 4. Inicialização Rápida no Windows (Script com Auto-Restart)
+### <a id="inicializacao-windows"></a>4. Inicialização Rápida no Windows (Script com Auto-Restart)
 
 Dê um duplo clique no arquivo:
 
@@ -241,9 +288,9 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 
 ---
 
-## 📡 Endpoints da API REST
+## <a id="endpoints-da-api"></a>📡 Endpoints da API REST
 
-### Métricas & Análises
+### <a id="api-metricas"></a>Métricas & Análises
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -252,7 +299,7 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 | `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow para cálculo de SLA e Perfect Fix |
 | `POST` | `/api/upload-json` | Processa JSON de avaliações para cálculo do NPS Geral corporativo |
 
-### Gestão de Incidentes
+### <a id="api-incidentes"></a>Gestão de Incidentes
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -269,7 +316,7 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 | `GET` | `/api/incidentes-maiores` | Retorna dados agregados de incidentes massivos ativos |
 | `POST` | `/api/incidentes-maiores/:num/toggle` | Alterna a flag de responsabilidade do analista sobre o Major Incident |
 
-### Horas Extras & Plantões
+### <a id="api-horas-extras"></a>Horas Extras & Plantões
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -285,7 +332,7 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 | `GET` | `/api/overtime/download-pdf?mes=X&ano=Y` | Gera e faz o download da Folha de Ponto oficial em PDF A4 Paisagem |
 | `GET` | `/api/backup/download` | Faz o download do backup binário do banco de dados SQLite (`dashboard.db`) |
 
-### Cadastros Base
+### <a id="api-cadastros"></a>Cadastros Base
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -300,7 +347,7 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 
 ---
 
-## ⚙️ Comandos Úteis
+## <a id="comandos-uteis"></a>⚙️ Comandos Úteis
 
 | Comando | Descrição |
 | :--- | :--- |
@@ -313,7 +360,7 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 
 ---
 
-## 🎨 Tipografia e Tokens Visuais
+## <a id="tipografia-e-tokens"></a>🎨 Tipografia e Tokens Visuais
 
 O projeto adota uma hierarquia tipográfica precisa, documentada em detalhes no artifact [font_families_inventory.md](file:///C:/Users/caiqu/.gemini/antigravity-ide/brain/d1841552-cd8c-4025-9fc8-77014c0058a1/font_families_inventory.md):
 
@@ -324,7 +371,7 @@ O projeto adota uma hierarquia tipográfica precisa, documentada em detalhes no 
 
 ---
 
-## 📄 Licença
+## <a id="licenca"></a>📄 Licença
 
 Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
@@ -332,7 +379,7 @@ Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquiv
 
 <div align="center">
 
-## 👨‍💻 Desenvolvido por
+## <a id="desenvolvido-por"></a>👨‍💻 Desenvolvido por
 
 **Caique Novaes** — Analista de Suporte & Desenvolvedor
 
