@@ -127,7 +127,7 @@ Construído com base em uma arquitetura modular moderna (React 18 + Vite no fron
   - Horários sobrepostos no mesmo dia são unificados automaticamente (início mais cedo e término mais tarde), sem duplicar horas trabalhadas.
   - Separação precisa de adicionais: **100%** para domingos e feriados (calculados via biblioteca de feriados brasileiros e de SP) e **50%** para dias úteis e sábados.
 - **Cards Analíticos Executivos Centralizados**:
-  - 4 cards simetricamente centralizados no topo: **Horas (50% / 100%)**, **Ganhos Estimados** (cálculo privado), **Total de Chamados** e **Média por Chamado**.
+  - 4 cards simetricamente centralizados no topo: **Horas (50% / 100%)**, **Ganhos Estimados** (cálculo privado), **Total de Chamados** e **Tempo Médio por Chamado**.
   - Tabela completa de apontamentos com colunas: *Data*, *Semana*, *Caso/INC*, *Hotel*, *Início*, *Término*, *Duração*, *Taxa*, *Motivo*, *Observações* e *Ações*.
   - Exclusão individual e exclusão em massa com seleção múltipla via checkboxes.
 - **Geração e Download Oficial de Folha de Ponto em PDF**:

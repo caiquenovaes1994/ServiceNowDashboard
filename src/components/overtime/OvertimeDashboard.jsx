@@ -260,7 +260,7 @@ const OvertimeDashboard = ({
         <div className="ot-kpi-card">
           <div className="ot-kpi-top">
             <span className="ot-kpi-icon">📊</span>
-            <span className="ot-kpi-label">Média por Chamado</span>
+            <span className="ot-kpi-label">Tempo Médio por Chamado</span>
           </div>
           <div className="ot-kpi-value" style={{ color: '#f59e0b' }}>
             {kpis.mediaChamado || '00:00'}
