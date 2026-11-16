@@ -15,6 +15,7 @@ import HotelManagement from './components/settings/HotelManagement.jsx';
 import ResponsibleManagement from './components/settings/ResponsibleManagement.jsx';
 import SettingsDropdown from './components/common/SettingsDropdown.jsx';
 import OvertimeModule from './components/overtime/OvertimeModule.jsx';
+import Footer from './components/common/Footer.jsx';
 
 const API_BASE = '/api';
 
@@ -391,51 +392,71 @@ function App() {
   const [hotels, setHotels] = useState([]);
   const [responsibles, setResponsibles] = useState([]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (retries = 2) => {
     try {
       const response = await axios.get(`${API_BASE}/metrics?year=${year}`);
       if (response.data && Array.isArray(response.data.metrics)) {
         setMetrics(response.data.metrics);
       }
     } catch (err) {
-      console.error("Error fetching metrics", err);
+      if (retries > 0) {
+        setTimeout(() => fetchData(retries - 1), 1500);
+      } else {
+        console.error("Error fetching metrics", err);
+      }
     }
   }, [year]);
 
   // Carregamento de dados operacionais
-  const fetchIncidents = useCallback(async () => {
+  const fetchIncidents = useCallback(async (retries = 2) => {
     try {
       const res = await axios.get(`${API_BASE}/incidentes?status=Todos`);
       if (Array.isArray(res.data)) setIncidents(res.data);
     } catch (err) {
-      console.error("Error fetching incidentes", err);
+      if (retries > 0) {
+        setTimeout(() => fetchIncidents(retries - 1), 1500);
+      } else {
+        console.error("Error fetching incidentes", err);
+      }
     }
   }, []);
 
-  const fetchMajorRecords = useCallback(async () => {
+  const fetchMajorRecords = useCallback(async (retries = 2) => {
     try {
       const res = await axios.get(`${API_BASE}/incidentes-maiores`);
       if (Array.isArray(res.data)) setMajorRecords(res.data);
     } catch (err) {
-      console.error("Error fetching major records", err);
+      if (retries > 0) {
+        setTimeout(() => fetchMajorRecords(retries - 1), 1500);
+      } else {
+        console.error("Error fetching major records", err);
+      }
     }
   }, []);
 
-  const fetchHotels = useCallback(async () => {
+  const fetchHotels = useCallback(async (retries = 2) => {
     try {
       const res = await axios.get(`${API_BASE}/hoteis`);
       if (Array.isArray(res.data)) setHotels(res.data);
     } catch (err) {
-      console.error("Error fetching hoteis", err);
+      if (retries > 0) {
+        setTimeout(() => fetchHotels(retries - 1), 1500);
+      } else {
+        console.error("Error fetching hoteis", err);
+      }
     }
   }, []);
 
-  const fetchResponsibles = useCallback(async () => {
+  const fetchResponsibles = useCallback(async (retries = 2) => {
     try {
       const res = await axios.get(`${API_BASE}/responsaveis`);
       if (Array.isArray(res.data)) setResponsibles(res.data);
     } catch (err) {
-      console.error("Error fetching responsaveis", err);
+      if (retries > 0) {
+        setTimeout(() => fetchResponsibles(retries - 1), 1500);
+      } else {
+        console.error("Error fetching responsaveis", err);
+      }
     }
   }, []);
 
@@ -1061,6 +1082,9 @@ function App() {
           onDeleteResponsible={handleDeleteResponsible}
         />
       )}
+
+      {/* Rodapé Fixo Always Visible */}
+      <Footer />
     </div>
   );
 }

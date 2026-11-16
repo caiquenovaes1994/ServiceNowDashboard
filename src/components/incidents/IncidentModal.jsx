@@ -291,7 +291,7 @@ const IncidentModal = ({
                     options={hotels}
                     value={formData.hotel_nome}
                     onChange={(val) => setFormData(prev => ({ ...prev, hotel_nome: val, id_hotel: null }))}
-                    onSelect={(h) => setFormData(prev => ({ ...prev, hotel_nome: `${h.rid} - ${h.nome}`, id_hotel: h.id }))}
+                    onSelect={(h) => setFormData(prev => ({ ...prev, hotel_nome: h.rid ? `${h.rid} - ${h.nome}` : h.nome, id_hotel: h.id }))}
                     placeholder="Selecione o hotel..."
                   />
                 </div>
@@ -309,7 +309,7 @@ const IncidentModal = ({
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Link do Ticket (URL)</label>
+                    <label className="form-label">Link do Ticket</label>
                     <input
                       type="url"
                       className="form-input"
@@ -360,7 +360,7 @@ const IncidentModal = ({
                 {!incident && (
                   <div>
                     <h4 style={{ fontSize: '0.85rem', color: 'var(--text-white)', margin: '1rem 0 0.5rem 0' }}>
-                      Vincular Chamados Filhos Iniciais (Opcional)
+                      Vincular Chamados Filhos Iniciais
                     </h4>
                     <div className="form-row" style={{ alignItems: 'flex-end', marginBottom: '0.75rem' }}>
                       <div className="form-group" style={{ flex: 2, margin: 0 }}>
@@ -373,7 +373,7 @@ const IncidentModal = ({
                           }}
                           onSelect={(h) => {
                             setNovoFilhoHotel(h);
-                            setNovoFilhoHotelQuery(`${h.rid} - ${h.nome}`);
+                            setNovoFilhoHotelQuery(h.rid ? `${h.rid} - ${h.nome}` : h.nome);
                           }}
                           placeholder="Buscar hotel..."
                         />

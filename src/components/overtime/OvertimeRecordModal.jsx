@@ -208,7 +208,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               <div>
                 <label className="form-label">
                   <Calendar size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                  Data do Atendimento *
+                  Data do Atendimento <span className="required-star">*</span>
                 </label>
                 <input
                   type="date"
@@ -225,7 +225,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               </div>
 
               <div>
-                <label className="form-label">Caso / Incidente (INC)</label>
+                <label className="form-label">Caso / Incidente</label>
                 <input
                   type="text"
                   className="form-input"
@@ -240,7 +240,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
             <div ref={hotelWrapperRef} className="ot-combobox-wrapper">
               <label className="form-label">
                 <Building2 size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Hotel / PMS (digite para filtrar)
+                Hotel / PMS
               </label>
 
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -291,7 +291,13 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
                           onMouseDown={() => handleSelectHotel(h)}
                         >
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem', width: '100%', overflow: 'hidden' }}>
-                            {h.rid && <span className="ot-combobox-rid">{h.rid}</span>}
+                            {h.rid ? (
+                              <span className="ot-combobox-rid">{h.rid}</span>
+                            ) : (
+                              h.rede === 'Intercity' && (
+                                <span className="badge-intercity" style={{ fontSize: '0.68rem', padding: '0.1rem 0.38rem' }}>Intercity</span>
+                              )
+                            )}
                             <span style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {h.nome}
                             </span>
@@ -314,7 +320,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
             {/* Linha 3: Horários (Apenas Início e Término/Fim) */}
             <div>
               <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Horário do Atendimento (Início e Término) *</span>
+                <span>Horário do Atendimento <span className="required-star">*</span></span>
                 {durationPreview && (
                   <span style={{ color: '#4ade80', fontWeight: 600, fontSize: '0.8rem' }}>
                     ⏱️ Duração: {durationPreview}
@@ -333,7 +339,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
                     onBlur={(e) => setInicio(formatTimeMask(e.target.value))}
                     required
                   />
-                  <span className="ot-field-hint">Horário de Início *</span>
+                  <span className="ot-field-hint">Horário de Início <span className="required-star">*</span></span>
                 </div>
 
                 <div>
@@ -347,7 +353,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
                     required
                   />
                   <span className="ot-field-hint" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Horário de Término / Fim *</span>
+                    <span>Horário de Término / Fim <span className="required-star">*</span></span>
                     {isTerminoOvernight && (
                       <span style={{ color: '#f87171', fontWeight: 600 }}>+1 dia (pós meia-noite)</span>
                     )}
@@ -360,7 +366,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
             <div>
               <label className="form-label">
                 <FileText size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Motivo do Atendimento *
+                Motivo do Atendimento <span className="required-star">*</span>
               </label>
               <input
                 type="text"

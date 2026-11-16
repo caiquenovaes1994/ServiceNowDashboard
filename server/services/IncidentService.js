@@ -3,7 +3,7 @@ import { dbAll, dbGet, dbRun } from '../database.js';
 class IncidentService {
   static async getAll(status = 'Aberto') {
     let sql = `
-      SELECT i.*, h.nome as hotel_nome, h.rid as hotel_rid, r.nome as responsavel_nome,
+      SELECT i.*, h.nome as hotel_nome, h.rid as hotel_rid, h.rede as hotel_rede, r.nome as responsavel_nome,
              (SELECT COUNT(*) FROM chamados_filhos cf WHERE cf.id_incidente = i.id) AS total_chamados
       FROM incidentes i
       LEFT JOIN hoteis h ON i.id_hotel = h.id
@@ -109,7 +109,7 @@ class IncidentService {
 
   static async getChamadosFilhos(idIncidente) {
     return await dbAll(
-      `SELECT c.*, h.nome as hotel_nome, h.rid as hotel_rid 
+      `SELECT c.*, h.nome as hotel_nome, h.rid as hotel_rid, h.rede as hotel_rede 
        FROM chamados_filhos c
        LEFT JOIN hoteis h ON c.id_hotel = h.id
        WHERE c.id_incidente = ?

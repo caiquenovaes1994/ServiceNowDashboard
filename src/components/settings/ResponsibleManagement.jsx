@@ -231,7 +231,9 @@ const ResponsibleManagement = ({
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">Nome Completo (Obrigatório)</label>
+                  <label className="form-label">
+                    Nome Completo <span className="required-star">*</span>
+                  </label>
                   <input
                     type="text"
                     className="form-input"
@@ -243,7 +245,7 @@ const ResponsibleManagement = ({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Equipe / Setor (Opcional)</label>
+                  <label className="form-label">Equipe / Setor</label>
                   <input
                     type="text"
                     className="form-input"

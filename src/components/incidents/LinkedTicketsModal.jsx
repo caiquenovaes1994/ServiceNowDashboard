@@ -94,14 +94,16 @@ const LinkedTicketsModal = ({
                 }}
                 onSelect={(h) => {
                   setSelectedHotel(h);
-                  setHotelQuery(`${h.rid} - ${h.nome}`);
+                  setHotelQuery(h.rid ? `${h.rid} - ${h.nome}` : h.nome);
                 }}
                 placeholder="Pesquisar hotel por RID ou Nome..."
               />
             </div>
 
             <div className="form-group" style={{ flex: 1.2, margin: 0 }}>
-              <label className="form-label">Número do Chamado</label>
+              <label className="form-label">
+                Número do Chamado <span className="required-star">*</span>
+              </label>
               <input
                 type="text"
                 className="form-input"

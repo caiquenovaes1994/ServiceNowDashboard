@@ -5,7 +5,8 @@ import Scheduler from '../services/Scheduler.js';
 class HotelController {
   static async getAll(req, res) {
     try {
-      const hoteis = await HotelService.getAll();
+      const { rede } = req.query;
+      const hoteis = await HotelService.getAll(rede || null);
       res.json(hoteis);
     } catch (err) {
       AuditService.error('Erro ao listar hotéis', err);
@@ -16,7 +17,8 @@ class HotelController {
   static async create(req, res) {
     try {
       const id = await HotelService.create(req.body);
-      AuditService.log('HOTEL_CRIADO', `RID: ${req.body.rid}, Nome: ${req.body.nome}`, id, 'hoteis');
+      const rede = req.body.rede || 'Accor';
+      AuditService.log('HOTEL_CRIADO', `Rede: ${rede}, RID: ${req.body.rid || '-'}, Nome: ${req.body.nome}`, id, 'hoteis');
       Scheduler.scheduleBackup();
       res.json({ id });
     } catch (err) {
@@ -29,7 +31,8 @@ class HotelController {
     try {
       const { id } = req.params;
       await HotelService.update(id, req.body);
-      AuditService.log('HOTEL_ATUALIZADO', `ID: ${id}, Nome: ${req.body.nome}`, id, 'hoteis');
+      const rede = req.body.rede || 'Accor';
+      AuditService.log('HOTEL_ATUALIZADO', `ID: ${id}, Rede: ${rede}, Nome: ${req.body.nome}`, id, 'hoteis');
       Scheduler.scheduleBackup();
       res.json({ success: true });
     } catch (err) {

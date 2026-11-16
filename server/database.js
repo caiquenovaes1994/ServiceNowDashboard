@@ -103,7 +103,8 @@ export const initDb = () => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       rid TEXT UNIQUE,
       nome TEXT NOT NULL,
-      ativo BOOLEAN DEFAULT 1
+      ativo BOOLEAN DEFAULT 1,
+      rede TEXT DEFAULT 'Accor'
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS responsaveis (
@@ -252,6 +253,87 @@ export const initDb = () => {
         }
         if (!columns.includes('valor_base_snapshot')) {
           db.run("ALTER TABLE chamados ADD COLUMN valor_base_snapshot TEXT DEFAULT '0.0'");
+        }
+      }
+    });
+
+    // Migração de coluna rede para hoteis e carga de hotéis Intercity
+    db.all("PRAGMA table_info(hoteis)", (err, rows) => {
+      if (!err && rows) {
+        const columns = rows.map(r => r.name);
+        const proceedWithSeed = () => {
+          // Seed idempotente dos 45 hotéis Intercity
+          const intercityHotels = [
+            'Hotel Nacional Distributed by Intercity',
+            'ICH Administração de Hotéis S/A',
+            'Intercity 7 de Setembro',
+            'Intercity Address Faria Lima',
+            'Intercity Aeroporto Porto Alegre',
+            'Intercity Anápolis',
+            'Intercity Anhembi',
+            'Intercity Bauru',
+            'Intercity Berrini',
+            'Intercity BH Expo',
+            'Intercity Campinas',
+            'Intercity Canoas',
+            'Intercity Caxias do Sul',
+            'Intercity Cidade Baixa',
+            'Intercity Cuiabá',
+            'Intercity Curitiba - Centro Cívico',
+            'Intercity Curitiba Batel',
+            'Intercity Florianópolis',
+            'Intercity Ibirapuera',
+            'Intercity Interative Jardins',
+            'Intercity Itupeva',
+            'Intercity LED Águas Claras',
+            'Intercity Maceió',
+            'Intercity Manaus',
+            'Intercity Montes Claros',
+            'Intercity Nações Unidas',
+            'Intercity Pátio Pinda',
+            'Intercity Paulista',
+            'Intercity Porto Maravilha',
+            'Intercity Portofino',
+            'Intercity Praia de Belas',
+            'Intercity Ribeirão Preto',
+            'Intercity Salvador',
+            'Intercity Salvador Aeroporto',
+            'Intercity São Leopoldo',
+            'Intercity Shopping Gravataí',
+            'Intercity Suape',
+            'Intercity Tatuapé',
+            'Intercity Teresópolis',
+            'Intercity Vinhedo',
+            'Pamplona (The Universe)',
+            'Piazza Navona by Intercity',
+            'Tru by Hilton Chapecó',
+            'Tru by Hilton Criciúma',
+            'Yoo2 Rio de Janeiro'
+          ];
+
+          db.serialize(() => {
+            const stmt = db.prepare(`
+              INSERT INTO hoteis (rid, nome, ativo, rede)
+              SELECT NULL, ?, 1, 'Intercity'
+              WHERE NOT EXISTS (
+                SELECT 1 FROM hoteis WHERE nome = ? AND rede = 'Intercity'
+              )
+            `);
+            intercityHotels.forEach(hotelName => {
+              stmt.run(hotelName, hotelName);
+            });
+            stmt.finalize();
+          });
+        };
+
+        if (!columns.includes('rede')) {
+          db.run("ALTER TABLE hoteis ADD COLUMN rede TEXT DEFAULT 'Accor'", () => {
+            db.run("UPDATE hoteis SET rede = 'Accor' WHERE rede IS NULL", () => {
+              proceedWithSeed();
+            });
+          });
+        } else {
+          proceedWithSeed();
         }
       }
     });

@@ -98,7 +98,7 @@ const OvertimeSettingsModal = ({ isOpen, onClose, currentName, currentSalary, on
             <div>
               <label className="form-label">
                 <User size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Nome do Titular (Cabeçalho dos Relatórios)
+                Nome do Titular <span className="required-star">*</span>
               </label>
               <input
                 type="text"
@@ -113,7 +113,7 @@ const OvertimeSettingsModal = ({ isOpen, onClose, currentName, currentSalary, on
             <div>
               <label className="form-label">
                 <DollarSign size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Salário Base Mensal (R$)
+                Salário Base Mensal
               </label>
               <input
                 type="number"

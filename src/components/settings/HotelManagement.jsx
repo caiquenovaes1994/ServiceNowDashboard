@@ -9,27 +9,40 @@ const HotelManagement = ({
   onUpdateHotel,
   onDeleteHotel
 }) => {
+  // Rede selecionada: 'Accor' ou 'Intercity' (separação estrita)
+  const [selectedRede, setSelectedRede] = useState('Accor');
   const [statusFilter, setStatusFilter] = useState('ativos'); // 'ativos', 'inativos', 'ambos'
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
 
-  // Resetar página quando filtros mudarem
+  // Separação dos hotéis por rede
+  const accorHotels = useMemo(() => {
+    return hotels.filter(h => (h.rede || 'Accor') === 'Accor');
+  }, [hotels]);
+
+  const intercityHotels = useMemo(() => {
+    return hotels.filter(h => h.rede === 'Intercity');
+  }, [hotels]);
+
+  const activeChainHotels = selectedRede === 'Intercity' ? intercityHotels : accorHotels;
+
+  // Resetar página quando rede ou filtros mudarem
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, searchQuery]);
+  }, [selectedRede, statusFilter, searchQuery]);
 
   // Modal de edição / criação
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHotel, setEditingHotel] = useState(null);
-  const [formData, setFormData] = useState({ rid: '', nome: '', ativo: true });
+  const [formData, setFormData] = useState({ rid: '', nome: '', ativo: true, rede: 'Accor' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Diálogo de confirmação
   const [deletingHotel, setDeletingHotel] = useState(null);
 
   const filteredHotels = useMemo(() => {
-    return hotels.filter((h) => {
+    return activeChainHotels.filter((h) => {
       if (statusFilter === 'ativos' && !h.ativo) return false;
       if (statusFilter === 'inativos' && h.ativo) return false;
 
@@ -41,7 +54,7 @@ const HotelManagement = ({
       }
       return true;
     });
-  }, [hotels, statusFilter, searchQuery]);
+  }, [activeChainHotels, statusFilter, searchQuery]);
 
   const paginatedHotels = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -50,13 +63,18 @@ const HotelManagement = ({
 
   const handleOpenCreate = () => {
     setEditingHotel(null);
-    setFormData({ rid: '', nome: '', ativo: true });
+    setFormData({ rid: '', nome: '', ativo: true, rede: selectedRede });
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (h) => {
     setEditingHotel(h);
-    setFormData({ rid: h.rid || '', nome: h.nome || '', ativo: Boolean(h.ativo) });
+    setFormData({
+      rid: h.rid || '',
+      nome: h.nome || '',
+      ativo: Boolean(h.ativo),
+      rede: h.rede || 'Accor'
+    });
     setIsModalOpen(true);
   };
 
@@ -66,10 +84,15 @@ const HotelManagement = ({
 
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        rid: formData.rede === 'Intercity' ? null : (formData.rid ? formData.rid.trim() : null)
+      };
+
       if (editingHotel) {
-        await onUpdateHotel(editingHotel.id, formData);
+        await onUpdateHotel(editingHotel.id, payload);
       } else {
-        await onCreateHotel(formData);
+        await onCreateHotel(payload);
       }
       setIsModalOpen(false);
     } finally {
@@ -79,30 +102,55 @@ const HotelManagement = ({
 
   return (
     <div className="hotel-management-module">
+      {/* Seletor de Redes Hoteleiras com Logotipos Oficiais */}
+      <div className="hotel-network-selector">
+        <button
+          type="button"
+          className={`network-tab-btn accor ${selectedRede === 'Accor' ? 'active' : ''}`}
+          onClick={() => setSelectedRede('Accor')}
+          title="Exibir catálogo de hotéis da Rede Accor"
+        >
+          <img src="/accor_logo.png" alt="Accor" className="network-logo" />
+          <span className="network-name">Accor</span>
+          <span className="network-badge">{accorHotels.length}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`network-tab-btn intercity ${selectedRede === 'Intercity' ? 'active' : ''}`}
+          onClick={() => setSelectedRede('Intercity')}
+          title="Exibir catálogo de hotéis da Rede Intercity"
+        >
+          <img src="/intercity_logo.png" alt="Intercity" className="network-logo" />
+          <span className="network-name">Intercity</span>
+          <span className="network-badge">{intercityHotels.length}</span>
+        </button>
+      </div>
+
       <div className="dashboard-toolbar">
         <div className="dashboard-toolbar-left">
-          {/* Segmented Control */}
+          {/* Segmented Control de Status para a Rede Ativa */}
           <div className="segmented-control">
             <button
               type="button"
               className={`segmented-btn ${statusFilter === 'ativos' ? 'active' : ''}`}
               onClick={() => setStatusFilter('ativos')}
             >
-              Ativos ({hotels.filter(h => h.ativo).length})
+              Ativos ({activeChainHotels.filter(h => h.ativo).length})
             </button>
             <button
               type="button"
               className={`segmented-btn ${statusFilter === 'inativos' ? 'active' : ''}`}
               onClick={() => setStatusFilter('inativos')}
             >
-              Inativos ({hotels.filter(h => !h.ativo).length})
+              Inativos ({activeChainHotels.filter(h => !h.ativo).length})
             </button>
             <button
               type="button"
               className={`segmented-btn ${statusFilter === 'ambos' ? 'active' : ''}`}
               onClick={() => setStatusFilter('ambos')}
             >
-              Todos ({hotels.length})
+              Todos ({activeChainHotels.length})
             </button>
           </div>
 
@@ -112,7 +160,11 @@ const HotelManagement = ({
             <input
               type="text"
               className="search-input"
-              placeholder="Pesquisar por RID ou Nome..."
+              placeholder={
+                selectedRede === 'Accor'
+                  ? 'Pesquisar por RID ou Nome na Accor...'
+                  : 'Pesquisar por Nome na Intercity...'
+              }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -135,13 +187,15 @@ const HotelManagement = ({
       <div className="table-wrapper">
         {filteredHotels.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-faint)' }}>
-            Nenhum hotel encontrado.
+            Nenhum hotel encontrado para a rede {selectedRede}.
           </div>
         ) : (
           <table className="app-table">
             <thead>
               <tr>
-                <th style={{ width: '120px' }}>RID</th>
+                {selectedRede === 'Accor' && (
+                  <th style={{ width: '120px' }}>RID</th>
+                )}
                 <th style={{ textAlign: 'left', paddingLeft: '1.5rem' }}>Nome do Hotel</th>
                 <th style={{ width: '130px' }}>Status</th>
                 <th style={{ width: '110px' }}>Ações</th>
@@ -150,9 +204,11 @@ const HotelManagement = ({
             <tbody>
               {paginatedHotels.map((h) => (
                 <tr key={h.id}>
-                  <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)', fontWeight: 600 }}>
-                    {h.rid || '-'}
-                  </td>
+                  {selectedRede === 'Accor' && (
+                    <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)', fontWeight: 600 }}>
+                      {h.rid || '-'}
+                    </td>
+                  )}
                   <td style={{ textAlign: 'left', paddingLeft: '1.5rem', fontWeight: 500 }}>
                     {h.nome}
                   </td>
@@ -192,9 +248,9 @@ const HotelManagement = ({
       </div>
 
       <div className="record-count">
-        {filteredHotels.length === hotels.length
-          ? `Total: ${hotels.length} hotéis cadastrados.`
-          : `Total: ${filteredHotels.length} de ${hotels.length} hotéis listados.`}
+        {filteredHotels.length === activeChainHotels.length
+          ? `Total: ${activeChainHotels.length} hotéis da rede ${selectedRede} cadastrados.`
+          : `Total: ${filteredHotels.length} de ${activeChainHotels.length} hotéis listados da rede ${selectedRede}.`}
       </div>
 
       {/* Paginação Inteligente */}
@@ -230,23 +286,58 @@ const HotelManagement = ({
 
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
+                {/* Seletor de Rede no Modal */}
                 <div className="form-group">
-                  <label className="form-label">RID (Código do Hotel)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Ex: 0155"
-                    value={formData.rid}
-                    onChange={(e) => setFormData(prev => ({ ...prev, rid: e.target.value }))}
-                  />
+                  <label className="form-label">Rede Hoteleira</label>
+                  <div className="segmented-control" style={{ width: '100%', display: 'flex' }}>
+                    <button
+                      type="button"
+                      style={{ flex: 1 }}
+                      className={`segmented-btn network-name ${formData.rede === 'Accor' ? 'active' : ''}`}
+                      onClick={() => setFormData(prev => ({ ...prev, rede: 'Accor' }))}
+                    >
+                      Accor
+                    </button>
+                    <button
+                      type="button"
+                      style={{ flex: 1 }}
+                      className={`segmented-btn network-name ${formData.rede === 'Intercity' ? 'active' : ''}`}
+                      onClick={() => setFormData(prev => ({ ...prev, rede: 'Intercity', rid: '' }))}
+                    >
+                      Intercity
+                    </button>
+                  </div>
                 </div>
 
+                {/* Campo de RID (Somente Accor) */}
+                {formData.rede === 'Accor' && (
+                  <div className="form-group">
+                    <label className="form-label">
+                      RID <span className="required-star">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Ex: 0155"
+                      value={formData.rid}
+                      onChange={(e) => setFormData(prev => ({ ...prev, rid: e.target.value }))}
+                      required
+                    />
+                  </div>
+                )}
+
                 <div className="form-group">
-                  <label className="form-label">Nome do Hotel (Obrigatório)</label>
+                  <label className="form-label">
+                    Nome do Hotel <span className="required-star">*</span>
+                  </label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="Ex: Novotel São Paulo Morumbi"
+                    placeholder={
+                      formData.rede === 'Intercity'
+                        ? 'Ex: Intercity Berrini'
+                        : 'Ex: Novotel São Paulo Morumbi'
+                    }
                     value={formData.nome}
                     onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
                     required
@@ -292,7 +383,7 @@ const HotelManagement = ({
       <ConfirmDialog
         isOpen={Boolean(deletingHotel)}
         title="Inativar ou Excluir Hotel"
-        message={`Deseja inativar ou excluir o hotel "${deletingHotel?.nome}"?`}
+        message={`Deseja inativar ou excluir o hotel "${deletingHotel?.nome}" (${deletingHotel?.rede || 'Accor'})?`}
         subtext="Se houver incidentes ou chamados associados a este hotel, ele será inativado para proteger o histórico operacional."
         confirmLabel="Confirmar"
         confirmVariant="danger"

@@ -417,3 +417,96 @@
   .app-table th, .app-table td { padding: 0.6rem 0.5rem; }
   .metrics-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
 }
+
+/* ── Seletor de Redes Hoteleiras com Logos Oficiais (Accor & Intercity) ── */
+.hotel-network-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.network-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--card-bg, #0f172a);
+  border: 1px solid var(--card-border, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+  user-select: none;
+  outline: none;
+}
+
+.network-name {
+  font-family: 'Montserrat', var(--font-title), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.network-tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--text-white, #f8fafc);
+  transform: translateY(-1px);
+}
+
+.network-tab-btn .network-logo {
+  height: 24px;
+  width: auto;
+  max-width: 32px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.network-tab-btn.accor.active {
+  background: linear-gradient(135deg, rgba(0, 43, 73, 0.65) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-color: #38bdf8;
+  color: #f8fafc;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.22);
+}
+
+.network-tab-btn.intercity.active {
+  background: linear-gradient(135deg, rgba(242, 92, 5, 0.22) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-color: #f25c05;
+  color: #f8fafc;
+  box-shadow: 0 0 16px rgba(242, 92, 5, 0.25);
+}
+
+.network-tab-btn .network-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill, 9999px);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted, #94a3b8);
+}
+
+.network-tab-btn.accor.active .network-badge {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.network-tab-btn.intercity.active .network-badge {
+  background: rgba(242, 92, 5, 0.25);
+  color: #ff7b2b;
+}
+
+.network-info-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  background: rgba(242, 92, 5, 0.08);
+  border: 1px dashed rgba(242, 92, 5, 0.35);
+  border-radius: var(--radius-md, 8px);
+  color: #fed7aa;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}

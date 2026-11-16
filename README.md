@@ -6,6 +6,7 @@
 
 > Plataforma Integrada de Gestão Operacional de Incidentes, Monitoramento de Chamados, Análise de NPS, SLA, Perfect Fix e Gestão de Plantões / Horas Extras
 
+![Versão 2.0.0](https://img.shields.io/badge/versão-2.0.0-0ea5e9?style=flat&logo=semver&logoColor=white)
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
 ![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
 ![Vite 5.4+](https://img.shields.io/badge/Vite-5.4%2B-646CFF?style=flat&logo=vite&logoColor=white)
@@ -336,8 +337,8 @@ Ou execute via prompt de comando. O script monitora o processo e reinicia automa
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/api/hoteis` | Lista hotéis cadastrados |
-| `POST` | `/api/hoteis` | Cadastra novo hotel (RID único e Nome) |
+| `GET` | `/api/hoteis` | Lista hotéis cadastrados (suporta filtro opcional `?rede=Accor` ou `?rede=Intercity`) |
+| `POST` | `/api/hoteis` | Cadastra novo hotel (Rede, Nome e RID opcional para redes sem RID como Intercity) |
 | `PUT` | `/api/hoteis/:id` | Atualiza dados do hotel ou status ativo/inativo |
 | `DELETE` | `/api/hoteis/:id` | Exclui hotel do catálogo |
 | `GET` | `/api/responsaveis` | Lista responsáveis cadastrados |

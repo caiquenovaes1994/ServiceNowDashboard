@@ -105,7 +105,7 @@ const OvertimeLockScreen = ({ isConfigured, onUnlockSuccess }) => {
               <div>
                 <label className="form-label">
                   <User size={15} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                  Seu Nome Completo
+                  Seu Nome Completo <span className="required-star">*</span>
                 </label>
                 <input
                   type="text"
@@ -120,7 +120,7 @@ const OvertimeLockScreen = ({ isConfigured, onUnlockSuccess }) => {
               <div>
                 <label className="form-label">
                   <DollarSign size={15} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                  Salário Base Mensal (R$)
+                  Salário Base Mensal
                 </label>
                 <input
                   type="number"
@@ -138,7 +138,7 @@ const OvertimeLockScreen = ({ isConfigured, onUnlockSuccess }) => {
           <div>
             <label className="form-label">
               <KeyRound size={15} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-              {isConfigured ? 'Senha de Acesso' : 'Definir Senha'}
+              {isConfigured ? 'Senha de Acesso' : 'Definir Senha'} <span className="required-star">*</span>
             </label>
             <div className="ot-password-field">
               <input

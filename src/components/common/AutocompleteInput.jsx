@@ -75,8 +75,12 @@ const AutocompleteInput = ({
               onMouseDown={() => handleSelect(item)}
             >
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem', width: '100%', overflow: 'hidden' }}>
-                {secondaryKey && item[secondaryKey] && (
+                {secondaryKey && item[secondaryKey] ? (
                   <span className="badge-rid">{item[secondaryKey]}</span>
+                ) : (
+                  item.rede === 'Intercity' && (
+                    <span className="badge-intercity">Intercity</span>
+                  )
                 )}
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item[displayKey]}
