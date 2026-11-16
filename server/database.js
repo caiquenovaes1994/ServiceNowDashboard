@@ -10,7 +10,7 @@ let backupTimeout = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Better fallback logic for Render Free tier
+// Resolução de caminho do banco SQLite com suporte a variáveis de ambiente e fallback local
 let dbPath = process.env.DATABASE_PATH || path.resolve(__dirname, 'dashboard.db');
 let dbDir = path.dirname(dbPath);
 
@@ -73,7 +73,7 @@ export const initDb = () => {
       UNIQUE(year, month)
     )`);
 
-    // Migration for existing databases
+    // Migração de schema: adição de colunas complementares na tabela metrics
     db.all("PRAGMA table_info(metrics)", (err, rows) => {
       const columns = rows.map(r => r.name);
       if (!columns.includes('nps_general')) {
@@ -98,7 +98,7 @@ export const initDb = () => {
       value TEXT
     )`);
 
-    // ── Tabelas do Incident Manager (migradas do SNOW_INC) ──────────────────
+    // Tabelas do módulo de gestão operacional de incidentes
     db.run(`CREATE TABLE IF NOT EXISTS hoteis (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       rid TEXT UNIQUE,
@@ -178,7 +178,7 @@ export const initDb = () => {
     db.run(`CREATE INDEX IF NOT EXISTS idx_historico_id_incidente ON historico_situacao(id_incidente)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_chamados_id_incidente ON chamados_filhos(id_incidente)`);
 
-    // ── Tabelas do Módulo de Horas Extras ──────────────────────────────────────
+    // Tabelas do módulo de controle de horas extras e plantão
     db.run(`CREATE TABLE IF NOT EXISTS chamados (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       data DATE NOT NULL,
@@ -206,8 +206,8 @@ export const initDb = () => {
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // Migração de Criptografia para dados financeiros confidenciais (AES-256-GCM)
-    // 1. Criptografar base_salary em overtime_config se estiver em texto puro
+    // Migração de segurança: criptografia AES-256-GCM para dados sensíveis em repouso
+    // 1. Criptografia de base_salary em overtime_config
     db.get("SELECT value FROM overtime_config WHERE key = 'base_salary'", (err, sRow) => {
       if (!err && sRow && sRow.value && !CryptoService.isEncrypted(sRow.value)) {
         const enc = CryptoService.encrypt(sRow.value);
@@ -215,7 +215,7 @@ export const initDb = () => {
       }
     });
 
-    // 2. Criptografar valor_base_snapshot em chamados se estiver em texto puro
+    // 2. Criptografia de valor_base_snapshot em chamados
     db.all("SELECT id, valor_base_snapshot FROM chamados", (err, cRows) => {
       if (!err && cRows) {
         cRows.forEach(r => {
@@ -227,7 +227,7 @@ export const initDb = () => {
       }
     });
 
-    // 3. Criptografar salario em overtime_salary_history se estiver em texto puro
+    // 3. Criptografia de salário em overtime_salary_history
     db.all("SELECT id, salario FROM overtime_salary_history", (err, hRows) => {
       if (!err && hRows) {
         hRows.forEach(r => {
@@ -241,7 +241,7 @@ export const initDb = () => {
 
     db.run(`CREATE INDEX IF NOT EXISTS idx_chamados_data ON chamados(data)`);
 
-    // Migração de colunas para chamados (se já existia de versões anteriores)
+    // Migração de schema: suporte a intervalos e snapshot salarial na tabela chamados
     db.all("PRAGMA table_info(chamados)", (err, rows) => {
       if (!err && rows) {
         const columns = rows.map(r => r.name);
@@ -257,12 +257,12 @@ export const initDb = () => {
       }
     });
 
-    // Migração de coluna rede para hoteis e carga de hotéis Intercity
+    // Migração de schema: inclusão da coluna rede e carga inicial de hotéis Intercity
     db.all("PRAGMA table_info(hoteis)", (err, rows) => {
       if (!err && rows) {
         const columns = rows.map(r => r.name);
         const proceedWithSeed = () => {
-          // Seed idempotente dos 45 hotéis Intercity
+          // Carga idempotente do catálogo de hotéis Intercity
           const intercityHotels = [
             'Hotel Nacional Distributed by Intercity',
             'ICH Administração de Hotéis S/A',
@@ -426,8 +426,7 @@ export const saveSetting = (key, value) => {
   });
 };
 
-// Atualiza within_sla_count, perfect_fix_count e closed_count para um mês/ano.
-// Se a linha ainda não existe, insere um registro mínimo (outros campos = 0).
+// Atualização de métricas mensais de SLA e Perfect Fix (upsert)
 export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_count, closed_count) => {
   return new Promise((resolve, reject) => {
     db.run(
@@ -451,8 +450,7 @@ export const updateSlaMetrics = (year, month, within_sla_count, perfect_fix_coun
   });
 };
 
-// Atualiza nps_general para um mês/ano.
-// Se a linha ainda não existe, insere um registro mínimo (outros campos = 0).
+// Atualização de métrica mensal de NPS Geral (upsert)
 export const updateNpsGeneralMetrics = (year, month, nps_general) => {
   return new Promise((resolve, reject) => {
     db.run(
@@ -474,7 +472,7 @@ export const updateNpsGeneralMetrics = (year, month, nps_general) => {
   });
 };
 
-// ── Generic Async DB Helpers ───────────────────────────────────────────────
+// Utilitários assíncronos para operações no SQLite (Promises)
 export const dbAll = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {

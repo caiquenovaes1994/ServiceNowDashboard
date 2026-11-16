@@ -136,7 +136,7 @@ const OvertimeDashboard = ({
 
   return (
     <div className="overtime-container">
-      {/* ── Barra Superior de Controle ────────────────────────────────────── */}
+      {/* Barra de controles e filtros */}
       <div className="ot-header-bar">
         <div className="ot-title-group">
           <div className="ot-badge-wine">
@@ -225,7 +225,7 @@ const OvertimeDashboard = ({
         </div>
       )}
 
-      {/* ── 4 KPI Cards Executivos ────────────────────────────────────────── */}
+      {/* Indicadores de desempenho (KPIs) */}
       <div className="ot-kpi-grid">
         <div className="ot-kpi-card">
           <div className="ot-kpi-top">
@@ -268,7 +268,7 @@ const OvertimeDashboard = ({
         </div>
       </div>
 
-      {/* ── Barra de Exclusão em Massa (Se houver selecionados) ────────────── */}
+      {/* Barra de ações em lote */}
       {selectedIds.length > 0 && (
         <div className="ot-bulk-bar">
           <span className="ot-bulk-info">
@@ -281,7 +281,7 @@ const OvertimeDashboard = ({
         </div>
       )}
 
-      {/* ── Tabela de Apontamentos ────────────────────────────────────────── */}
+      {/* Tabela de apontamentos */}
       <div className="ot-table-card">
         <div className="ot-table-header">
           <div className="ot-table-title">
@@ -434,7 +434,7 @@ const OvertimeDashboard = ({
         </div>
       </div>
 
-      {/* ── Modais Auxiliares ────────────────────────────────────────────── */}
+      {/* Modais de apontamento e configurações */}
       <OvertimeRecordModal
         isOpen={isRecordModalOpen}
         onClose={() => setIsRecordModalOpen(false)}

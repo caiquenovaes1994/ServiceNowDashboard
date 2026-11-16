@@ -203,7 +203,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-            {/* Linha 1: Data + Caso INC */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
               <div>
                 <label className="form-label">
@@ -236,7 +235,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               </div>
             </div>
 
-            {/* Linha 2: Hotel com Dropdown Sensível à Escrita (Autocomplete) */}
+            {/* Seleção de hotel com busca preditiva (Autocomplete) */}
             <div ref={hotelWrapperRef} className="ot-combobox-wrapper">
               <label className="form-label">
                 <Building2 size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
@@ -317,7 +316,7 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               )}
             </div>
 
-            {/* Linha 3: Horários (Apenas Início e Término/Fim) */}
+            {/* Intervalo de início e término do atendimento */}
             <div>
               <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span>Horário do Atendimento <span className="required-star">*</span></span>
@@ -362,7 +361,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               </div>
             </div>
 
-            {/* Linha 4: Motivo */}
             <div>
               <label className="form-label">
                 <FileText size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
@@ -378,7 +376,6 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
               />
             </div>
 
-            {/* Linha 5: Observações */}
             <div>
               <label className="form-label">Observações Complementares</label>
               <textarea

@@ -34,19 +34,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Multer: armazena o CSV em uploads/ dentro de server/ ──────────────────────
+// Configuração do Multer para upload temporário
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({ dest: uploadDir });
 
-// ── Mapeamento numérico de mês → nome PT-BR ───────────────────────────────────
+// Mapeamento de meses por extenso (PT-BR)
 const MONTH_NAMES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ];
 
-// ── SLA por prioridade (em segundos) ─────────────────────────────────────────
+// Limites de SLA por prioridade (em segundos)
 const SLA_LIMITS = {
   '1': 4  * 3600,   // P1 → 4 h
   '2': 24 * 3600,   // P2 → 24 h
@@ -54,7 +54,7 @@ const SLA_LIMITS = {
   '4': 96 * 3600,   // P4 → 96 h
 };
 
-// ── Cálculo de horas úteis (Segunda a Sexta, 9:00 às 18:00) ──────────────────
+// Cálculo de tempo útil comercial (segunda a sexta, 09:00 às 18:00, excluindo feriados)
 const calculateBusinessSeconds = (start, end) => {
   if (start >= end) return 0;
   
@@ -84,13 +84,13 @@ const calculateBusinessSeconds = (start, end) => {
 };
 
 app.use(helmet({
-  contentSecurityPolicy: false // Mantém compatibilidade total com dev server e Vite HMR
+  contentSecurityPolicy: false // Compatibilidade com dev server e Vite HMR
 }));
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Logger de auditoria para chamadas /api
+// Logger de auditoria para requisições de modificação (/api)
 app.use((req, res, next) => {
   if (req.url.startsWith('/api') && req.method !== 'GET') {
     AuditService.logger.info(`${req.method} ${req.url}`);
@@ -98,14 +98,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Inicialização do Banco e Scheduler
+// Inicialização do banco de dados e rotinas agendadas
 initDb();
 Scheduler.init(path.join(__dirname, 'backups'));
 
-// Rotas operacionais modularizadas (/api/incidentes, /api/hoteis, /api/responsaveis, /api/incidentes-maiores)
+// Rotas operacionais e analíticas da API
 app.use('/api', apiRouter);
 
-// API Routes Analíticas existentes
+// Rotas de métricas analíticas
 app.get('/api/metrics', async (req, res) => {
   try {
     const { year } = req.query;
@@ -136,46 +136,42 @@ app.post('/api/settings', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// ── POST /api/upload-metrics ─────────────────────────────────────────────────
+// Ingestão e processamento de métricas via CSV
 app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
   }
 
   const filePath = req.file.path;
-
-  // Accumulate per-month totals: { 'YYYY-MM': { within_sla: N, perfect_fix: N } }
   const monthTotals = {};
-
   const rows = [];
 
   fs.createReadStream(filePath)
     .pipe(csvParser())
     .on('data', (row) => rows.push(row))
     .on('end', async () => {
-      // ── Higiene: remove o arquivo temporário ────────────────────────────
+      // Remove arquivo temporário após leitura
       fs.unlink(filePath, (unlinkErr) => {
         if (unlinkErr) console.warn('[Upload] Aviso: não foi possível remover arquivo temp:', unlinkErr.message);
         else console.log('[Upload] Arquivo temporário removido:', filePath);
       });
 
-      // ── Diagnóstico: mostra as colunas reais do CSV ──────────────────────
+      // Diagnóstico de colunas detectadas no CSV
       if (rows.length > 0) {
         const sampleKeys = Object.keys(rows[0]).map(k => k.trim().replace(/^\uFEFF/, ''));
         console.log('[Upload] Colunas detectadas:', sampleKeys);
         console.log('[Upload] Primeira linha (amostra):', JSON.stringify(rows[0], null, 2));
       }
 
-      // ── Parseia datas de forma robusta (suporta "YYYY-MM-DD HH:mm:ss") ──────
+      // Conversão de datas para padrão ISO-8601
       const parseDate = (str) => {
         if (!str || !str.trim()) return null;
-        // Substitui espaço por T para tornar ISO-8601 válido no Node.js
         const iso = str.trim().replace(' ', 'T');
         const d = new Date(iso);
         return isNaN(d) ? null : d;
       };
 
-      // ── Processar cada linha ────────────────────────────────────────────
+      // Processamento linha a linha
       let skipped = 0;
       for (const row of rows) {
         // Normaliza chaves (remove BOM e espaços)
@@ -246,7 +242,7 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
         console.warn(`[Upload] ${skipped} linha(s) ignorada(s) por datas inválidas ou ausentes.`);
       }
 
-      // ── Persistir no banco ──────────────────────────────────────────────
+      // Persistência das métricas calculadas no banco de dados
       try {
         const updates = Object.values(monthTotals);
         for (const entry of updates) {
@@ -279,7 +275,7 @@ app.post('/api/upload-metrics', upload.single('file'), (req, res) => {
     });
 });
 
-// ── POST /api/upload-json ───────────────────────────────────────────────────
+// Ingestão de resultados de NPS via JSON
 app.post('/api/upload-json', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
@@ -362,10 +358,10 @@ app.post('/api/upload-json', upload.single('file'), (req, res) => {
   });
 });
 
-// Serve static files from Vite's build output (dist)
+// Arquivos estáticos do frontend em produção (dist)
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// SPA Catch-all: Route anything not matching an API or static file to index.html
+// Fallback SPA para roteamento client-side
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });

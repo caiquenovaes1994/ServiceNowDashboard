@@ -9,14 +9,13 @@ const HotelManagement = ({
   onUpdateHotel,
   onDeleteHotel
 }) => {
-  // Rede selecionada: 'Accor' ou 'Intercity' (separação estrita)
+  // Rede selecionada: 'Accor' ou 'Intercity'
   const [selectedRede, setSelectedRede] = useState('Accor');
   const [statusFilter, setStatusFilter] = useState('ativos'); // 'ativos', 'inativos', 'ambos'
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
 
-  // Separação dos hotéis por rede
   const accorHotels = useMemo(() => {
     return hotels.filter(h => (h.rede || 'Accor') === 'Accor');
   }, [hotels]);
@@ -32,13 +31,11 @@ const HotelManagement = ({
     setCurrentPage(1);
   }, [selectedRede, statusFilter, searchQuery]);
 
-  // Modal de edição / criação
+  // Estado do formulário modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHotel, setEditingHotel] = useState(null);
   const [formData, setFormData] = useState({ rid: '', nome: '', ativo: true, rede: 'Accor' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Diálogo de confirmação
   const [deletingHotel, setDeletingHotel] = useState(null);
 
   const filteredHotels = useMemo(() => {
@@ -102,7 +99,7 @@ const HotelManagement = ({
 
   return (
     <div className="hotel-management-module">
-      {/* Seletor de Redes Hoteleiras com Logotipos Oficiais */}
+      {/* Seletor de redes */}
       <div className="hotel-network-selector">
         <button
           type="button"
@@ -129,7 +126,7 @@ const HotelManagement = ({
 
       <div className="dashboard-toolbar">
         <div className="dashboard-toolbar-left">
-          {/* Segmented Control de Status para a Rede Ativa */}
+          {/* Filtro de status */}
           <div className="segmented-control">
             <button
               type="button"
@@ -183,7 +180,7 @@ const HotelManagement = ({
         </div>
       </div>
 
-      {/* Tabela de Hotéis */}
+      {/* Tabela de hotéis */}
       <div className="table-wrapper">
         {filteredHotels.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-faint)' }}>
@@ -253,7 +250,7 @@ const HotelManagement = ({
           : `Total: ${filteredHotels.length} de ${activeChainHotels.length} hotéis listados da rede ${selectedRede}.`}
       </div>
 
-      {/* Paginação Inteligente */}
+      {/* Paginação */}
       <Pagination
         currentPage={currentPage}
         totalItems={filteredHotels.length}
@@ -261,7 +258,7 @@ const HotelManagement = ({
         onPageChange={setCurrentPage}
       />
 
-      {/* Modal de Criação / Edição de Hotel */}
+      {/* Modal de criação / edição */}
       {isModalOpen && (
         <div className="modal-backdrop">
           <div
@@ -286,30 +283,7 @@ const HotelManagement = ({
 
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
-                {/* Seletor de Rede no Modal */}
-                <div className="form-group">
-                  <label className="form-label">Rede Hoteleira</label>
-                  <div className="segmented-control" style={{ width: '100%', display: 'flex' }}>
-                    <button
-                      type="button"
-                      style={{ flex: 1 }}
-                      className={`segmented-btn network-name ${formData.rede === 'Accor' ? 'active' : ''}`}
-                      onClick={() => setFormData(prev => ({ ...prev, rede: 'Accor' }))}
-                    >
-                      Accor
-                    </button>
-                    <button
-                      type="button"
-                      style={{ flex: 1 }}
-                      className={`segmented-btn network-name ${formData.rede === 'Intercity' ? 'active' : ''}`}
-                      onClick={() => setFormData(prev => ({ ...prev, rede: 'Intercity', rid: '' }))}
-                    >
-                      Intercity
-                    </button>
-                  </div>
-                </div>
-
-                {/* Campo de RID (Somente Accor) */}
+                {/* Campo de RID (exclusivo Accor) */}
                 {formData.rede === 'Accor' && (
                   <div className="form-group">
                     <label className="form-label">
@@ -379,7 +353,7 @@ const HotelManagement = ({
         </div>
       )}
 
-      {/* Diálogo de Confirmação */}
+      {/* Diálogo de confirmação */}
       <ConfirmDialog
         isOpen={Boolean(deletingHotel)}
         title="Inativar ou Excluir Hotel"

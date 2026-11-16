@@ -376,7 +376,7 @@ export function buildDocumentDefinition({ registros = [], plantonista = 'CAIQUE 
     { text: '', border: [true, true, true, true] }
   ];
 
-  // ── Cabeçalho Unificado em 4 Linhas ──────────────────────────────────────────
+  // Cabeçalho da folha de horas
   const headerTable = {
     table: {
       widths: colWidths,
@@ -432,7 +432,7 @@ export function buildDocumentDefinition({ registros = [], plantonista = 'CAIQUE 
     }
   };
 
-  // ── Tabela Principal de Horas Trabalhadas ─────────────────────────────────────
+  // Tabela principal de horas trabalhadas
   const mainTable = {
     table: {
       widths: colWidths,

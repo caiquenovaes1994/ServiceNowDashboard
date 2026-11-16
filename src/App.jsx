@@ -25,7 +25,7 @@ const MONTHS = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-// ── Unified Dropzone Uploader ──────────────────────────────────────────────────
+// Componente unificado para upload de métricas (CSV/JSON)
 const UnifiedUploader = ({ onSuccess, currentYear }) => {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
@@ -119,7 +119,7 @@ const UnifiedUploader = ({ onSuccess, currentYear }) => {
   );
 };
 
-// ── Custom Styled Year Dropdown ────────────────────────────────────────────────
+// Seletor customizado de ano
 const YearDropdown = ({ value, onChange, options = [2024, 2025, 2026] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -500,7 +500,7 @@ function App() {
     }
   };
 
-  // ── Handlers de Incidentes ────────────────────────────────────────────────
+  // Handlers de incidentes
   const handleCreateIncident = async (data) => {
     try {
       await axios.post(`${API_BASE}/incidentes`, data);
@@ -589,7 +589,7 @@ function App() {
     }
   };
 
-  // ── Handlers de Hotéis ───────────────────────────────────────────────────
+  // Handlers de hotéis
   const handleCreateHotel = async (data) => {
     try {
       await axios.post(`${API_BASE}/hoteis`, data);
@@ -617,7 +617,7 @@ function App() {
     }
   };
 
-  // ── Handlers de Responsáveis ─────────────────────────────────────────────
+  // Handlers de responsáveis
   const handleCreateResponsible = async (data) => {
     try {
       await axios.post(`${API_BASE}/responsaveis`, data);
@@ -1037,7 +1037,7 @@ function App() {
       </>
       )}
 
-      {/* Módulo 2: Gestão Operacional de Incidentes */}
+      {/* Módulo de Gestão Operacional de Incidentes */}
       {activeMainTab === TABS.INCIDENTS && (
         <IncidentList
           incidents={incidents}
@@ -1058,12 +1058,12 @@ function App() {
         />
       )}
 
-      {/* Módulo: Controle de Horas Extras */}
+      {/* Módulo de Controle de Horas Extras */}
       {activeMainTab === TABS.OVERTIME && (
         <OvertimeModule />
       )}
 
-      {/* Módulo 3: Gestão de Hotéis */}
+      {/* Módulo de Gestão de Hotéis */}
       {activeMainTab === TABS.HOTELS && (
         <HotelManagement
           hotels={hotels}
@@ -1073,7 +1073,7 @@ function App() {
         />
       )}
 
-      {/* Módulo 4: Gestão de Responsáveis */}
+      {/* Módulo de Gestão de Responsáveis */}
       {activeMainTab === TABS.RESPONSIBLES && (
         <ResponsibleManagement
           responsibles={responsibles}
@@ -1083,7 +1083,7 @@ function App() {
         />
       )}
 
-      {/* Rodapé Fixo Always Visible */}
+      {/* Rodapé da Aplicação */}
       <Footer />
     </div>
   );

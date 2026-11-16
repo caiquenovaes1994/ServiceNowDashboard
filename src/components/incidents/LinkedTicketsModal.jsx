@@ -81,7 +81,7 @@ const LinkedTicketsModal = ({
         </div>
 
         <div className="modal-body">
-          {/* Formulário de Inclusão Rápida */}
+          {/* Formulário de inclusão rápida */}
           <form onSubmit={handleAdd} className="form-row" style={{ alignItems: 'flex-end', marginBottom: '1.25rem' }}>
             <div className="form-group" style={{ flex: 2, margin: 0 }}>
               <label className="form-label">Hotel</label>
@@ -125,7 +125,7 @@ const LinkedTicketsModal = ({
             </button>
           </form>
 
-          {/* Listagem de Chamados Filhos */}
+          {/* Lista de chamados vinculados */}
           <div className="table-wrapper" style={{ maxHeight: '320px' }}>
             {tickets.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-faint)' }}>

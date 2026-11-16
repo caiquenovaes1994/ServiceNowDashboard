@@ -191,7 +191,7 @@ const IncidentModal = ({
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
           <div className="modal-body">
-            {/* Opção Major Incident */}
+            {/* Identificação de Major Incident */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
               <label className="checkbox-container">
                 <div
@@ -206,7 +206,6 @@ const IncidentModal = ({
               </label>
             </div>
 
-            {/* Linha 1: Caso & Incidente */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Caso</label>
@@ -234,7 +233,6 @@ const IncidentModal = ({
               </div>
             </div>
 
-            {/* Linha 2: Responsável & Situação Atual */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">
@@ -265,7 +263,6 @@ const IncidentModal = ({
               </div>
             </div>
 
-            {/* Linha 4: Descrição do Problema */}
             <div className="form-group">
               <label className="form-label">
                 Problema / Descrição <span className="required-star" title="campo obrigatório">*</span>
@@ -282,7 +279,7 @@ const IncidentModal = ({
 
             <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', margin: '1.25rem 0' }} />
 
-            {/* Campos de Incidente Regular */}
+            {/* Configuração de incidentes regulares */}
             {!formData.is_major && (
               <div>
                 <div className="form-group">

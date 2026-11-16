@@ -19,13 +19,11 @@ const ResponsibleManagement = ({
     setCurrentPage(1);
   }, [statusFilter, searchQuery]);
 
-  // Modal de edição / criação
+  // Estado do formulário modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingResp, setEditingResp] = useState(null);
   const [formData, setFormData] = useState({ nome: '', equipe: '', ativo: true });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Diálogo de confirmação
   const [deletingResp, setDeletingResp] = useState(null);
 
   const filteredResponsibles = useMemo(() => {
@@ -81,7 +79,7 @@ const ResponsibleManagement = ({
     <div className="responsible-management-module">
       <div className="dashboard-toolbar">
         <div className="dashboard-toolbar-left">
-          {/* Segmented Control */}
+          {/* Filtro de status */}
           <div className="segmented-control">
             <button
               type="button"
@@ -131,7 +129,7 @@ const ResponsibleManagement = ({
         </div>
       </div>
 
-      {/* Tabela de Responsáveis */}
+      {/* Tabela de responsáveis */}
       <div className="table-wrapper">
         {filteredResponsibles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-faint)' }}>
@@ -197,7 +195,7 @@ const ResponsibleManagement = ({
           : `Total: ${filteredResponsibles.length} de ${responsibles.length} responsáveis listados.`}
       </div>
 
-      {/* Paginação Inteligente */}
+      {/* Paginação */}
       <Pagination
         currentPage={currentPage}
         totalItems={filteredResponsibles.length}
@@ -205,7 +203,7 @@ const ResponsibleManagement = ({
         onPageChange={setCurrentPage}
       />
 
-      {/* Modal de Criação / Edição de Responsável */}
+      {/* Modal de criação / edição */}
       {isModalOpen && (
         <div className="modal-backdrop">
           <div
@@ -290,7 +288,7 @@ const ResponsibleManagement = ({
         </div>
       )}
 
-      {/* Diálogo de Confirmação */}
+      {/* Diálogo de confirmação */}
       <ConfirmDialog
         isOpen={Boolean(deletingResp)}
         title="Inativar ou Excluir Responsável"

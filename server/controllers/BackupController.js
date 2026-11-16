@@ -31,7 +31,7 @@ export class BackupController {
           metadata: {
             app: 'ServiceNow Dashboard & Incident Suite',
             backupDate: new Date().toISOString(),
-            version: '2.5.0'
+            version: '2.0.0'
           },
           data: {
             metrics,
@@ -52,7 +52,7 @@ export class BackupController {
         return res.send(JSON.stringify(payload, null, 2));
       }
 
-      // Padrão: arquivo SQLite .db
+      // Download no formato binário SQLite (.db)
       const dbPath = path.resolve(__dirname, '../dashboard.db');
       if (!fs.existsSync(dbPath)) {
         return res.status(404).json({ error: 'Arquivo do banco de dados não encontrado.' });

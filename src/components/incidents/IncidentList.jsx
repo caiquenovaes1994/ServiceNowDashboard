@@ -467,7 +467,7 @@ const IncidentList = ({
                     onDragEnd={handleDragEnd}
                     className={`draggable-row ${isMajor ? 'major-row' : ''} ${isStale ? 'stale-row' : ''} ${draggedIndex === idx ? 'dragging-row' : ''} ${dragOverIndex === idx ? 'dragover-row' : ''}`}
                   >
-                    {/* Alça de Arrastar (Drag Handle) */}
+                    {/* Alça de reorganização manual (Drag Handle) */}
                     <td>
                       <div
                         className="drag-handle-container"
@@ -481,7 +481,6 @@ const IncidentList = ({
                       </div>
                     </td>
 
-                    {/* Caso (Fonte padrão do sistema) */}
                     <td className="cell-selectable" style={{ fontSize: '0.8125rem' }}>
                       {item.caso ? (
                         <span className="selectable-code">{item.caso}</span>
@@ -490,7 +489,6 @@ const IncidentList = ({
                       )}
                     </td>
 
-                    {/* Incidente */}
                     <td className="cell-selectable">
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                         {isMajor && <Flame size={15} color="var(--error)" />}
@@ -500,7 +498,6 @@ const IncidentList = ({
                       </div>
                     </td>
 
-                    {/* Hotel */}
                     <td style={{ textAlign: 'left' }}>
                       {isMajor ? (
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
@@ -529,19 +526,16 @@ const IncidentList = ({
                       )}
                     </td>
 
-                    {/* Problema */}
                     <td style={{ textAlign: 'left' }}>
                       <div className="cell-ellipsis" title={item.problema}>
                         {item.problema || '-'}
                       </div>
                     </td>
 
-                    {/* Responsável */}
                     <td>
                       <span style={{ fontWeight: 600 }}>{item.responsavel_nome || '-'}</span>
                     </td>
 
-                    {/* Ticket */}
                     <td>
                       {item.ticket ? (
                         item.link ? (
@@ -562,14 +556,12 @@ const IncidentList = ({
                       )}
                     </td>
 
-                    {/* Situação */}
                     <td style={{ textAlign: 'center' }}>
                       <div className="cell-wrap-center" title={item.situacao}>
                         {item.situacao || '-'}
                       </div>
                     </td>
 
-                    {/* Última Atualização */}
                     <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', width: '100%' }}>
                         <span>{item.ultima_atualizacao || '-'}</span>
@@ -585,10 +577,8 @@ const IncidentList = ({
                       </div>
                     </td>
 
-                    {/* Ações (Grid 2x2) */}
                     <td>
                       <div className="table-actions-grid">
-                        {/* Linha 1, Coluna 1: Botão de Status (Resolver ou Reabrir) */}
                         {item.status === 'Resolvido' ? (
                           <button
                             type="button"
@@ -621,7 +611,6 @@ const IncidentList = ({
                           </button>
                         )}
 
-                        {/* Linha 1, Coluna 2: Excluir */}
                         <button
                           type="button"
                           className="btn-table-action action-delete"
@@ -635,7 +624,6 @@ const IncidentList = ({
                           <Trash2 size={14} />
                         </button>
 
-                        {/* Linha 2, Coluna 1: Editar */}
                         <button
                           type="button"
                           className="btn-table-action"
@@ -650,7 +638,6 @@ const IncidentList = ({
                           <Edit2 size={14} />
                         </button>
 
-                        {/* Linha 2, Coluna 2: Ver Histórico */}
                         <button
                           type="button"
                           className="btn-table-action"
