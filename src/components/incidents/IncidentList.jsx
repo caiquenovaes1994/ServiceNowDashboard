@@ -544,7 +544,7 @@ const IncidentList = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             className="ticket-link"
-                            title="Abrir no ServiceNow"
+                            title="Abrir ticket"
                           >
                             {item.ticket}
                           </a>

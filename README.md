@@ -6,7 +6,7 @@
 
 > Plataforma Integrada de Gestão Operacional de Incidentes, Monitoramento de Chamados, Análise de NPS, SLA, Perfect Fix e Gestão de Plantões / Horas Extras
 
-![Versão 2.0.0](https://img.shields.io/badge/versão-2.0.0-0ea5e9?style=flat&logo=semver&logoColor=white)
+![Versão 1.2.0](https://img.shields.io/badge/versão-1.2.0-0ea5e9?style=flat&logo=semver&logoColor=white)
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
 ![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
 ![Vite 5.4+](https://img.shields.io/badge/Vite-5.4%2B-646CFF?style=flat&logo=vite&logoColor=white)

@@ -1,7 +1,7 @@
 {
   "name": "servicenowdashboard",
   "private": true,
-  "version": "2.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "server": "node server/index.js",

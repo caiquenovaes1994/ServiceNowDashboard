@@ -123,7 +123,7 @@ const OvertimeSettingsModal = ({ isOpen, onClose, currentName, currentSalary, on
                 onChange={(e) => setBaseSalary(e.target.value)}
               />
               <span className="ot-field-hint">
-                Usado exclusivamente no cálculo do card privado de Ganhos Estimados (Divisor legal: 200h/mês). Não é impresso no PDF.
+                Usado exclusivamente para cálculo privado de Ganhos Estimados (Divisor legal: 200h/mês). Não é impresso no PDF.
               </span>
             </div>
 
