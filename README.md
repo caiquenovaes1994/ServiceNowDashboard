@@ -2,11 +2,13 @@
 
 <div align="center">
 
+🇺🇸 English | [🇧🇷 Português (PT-BR)](./README.pt-BR.md)
+
 # 📊 ServiceNow Dashboard
 
-> Plataforma Integrada de Gestão Operacional de Incidentes, Monitoramento de Chamados, Análise de NPS, SLA, Perfect Fix e Gestão de Plantões / Horas Extras
+> Integrated Operational Platform for Incident Management, Ticket Monitoring, NPS, SLA, Perfect Fix Analysis, and On-Call / Overtime Management
 
-![Versão 1.2.0](https://img.shields.io/badge/versão-1.2.0-0ea5e9?style=flat&logo=semver&logoColor=white)
+![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-0ea5e9?style=flat&logo=semver&logoColor=white)
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)
 ![React 18.2.0](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=black)
 ![Vite 5.4+](https://img.shields.io/badge/Vite-5.4%2B-646CFF?style=flat&logo=vite&logoColor=white)
@@ -19,377 +21,377 @@
 
 ---
 
-## <a id="sumario-executivo"></a>📑 Sumário Executivo
+## <a id="executive-summary"></a>📑 Executive Summary
 
-O **ServiceNow Dashboard** é uma plataforma corporativa unificada projetada para centralizar a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix), a **gestão operacional de incidentes em tempo real** e o **controle e apuração de plantões e horas extras**.
+The **ServiceNow Dashboard** is a unified enterprise platform designed to centralize **strategic performance analysis** (NPS, SLA, Perfect Fix), **real-time operational incident management**, and **on-call and overtime tracking and calculation**.
 
-### 📌 Resumo Operacional da Plataforma
+### 📌 Platform Operational Summary
 
-| Pilar | Destaque Técnico / Funcional |
+| Pillar | Technical / Functional Highlight |
 | :--- | :--- |
-| **Arquitetura** | Frontend modular em React 18 + Vite e Backend nativo em Node.js ESM + Express com banco SQLite 3 embarcado. |
-| **Métricas & Qualidade** | Ingestão automatizada de CSV e JSON com cálculo de SLA útil (considerando feriados nacionais/estaduais/municipais de SP) e Perfect Fix. |
-| **Operação de Incidentes** | Suporte a Major Incidents, vinculação de chamados filhos, drag & drop de linhas, filtros dinâmicos e alertas visuais de inatividade (+3d). |
-| **Horas Extras & Plantão** | Apuração oficial (50% e 100%), proteção de histórico salarial, agrupamento de sobreposições e tratamento de virada de meia-noite (+1). |
-| **Segurança & Auditoria** | Senha Mestre com Bcrypt, auto-lock por inatividade (2 min), criptografia autenticada AES-256-GCM para valores salariais e backups com debounce. |
-| **Geração de Documentos** | Folha de Ponto executiva A4 Paisagem gerada diretamente em memória via **pdfmake** (100% Node.js) e exportação XLSX via **ExcelJS**. |
-| **Identidade & Autonomia** | Design System proprietário em Vanilla CSS (*Deep Blue* e *Wine*) com tipografia 100% local (sem dependência de conexões ou CDNs externas). |
+| **Architecture** | Modular frontend in React 18 + Vite and native backend in Node.js ESM + Express with an embedded SQLite 3 database. |
+| **Metrics & Quality** | Automated CSV and JSON ingestion with business-hours SLA calculation (accounting for Brazilian national, São Paulo state, and municipal holidays) and Perfect Fix. |
+| **Incident Operations** | Major Incidents support, child ticket linking, row drag & drop, dynamic filters, and visual inactivity alerts (+3d). |
+| **Overtime & On-Call** | Official calculation (50% and 100%), salary history protection, overlap grouping, and midnight rollover handling (+1). |
+| **Security & Auditing** | Master Password with Bcrypt, inactivity auto-lock (2 min), AES-256-GCM authenticated encryption for salary values, and debounced backups. |
+| **Document Generation** | Executive A4 Landscape Timesheet generated directly in memory via **pdfmake** (100% Node.js) and XLSX export via **ExcelJS**. |
+| **Identity & Autonomy** | Proprietary Vanilla CSS Design System (*Deep Blue* and *Wine*) with 100% local typography (zero dependency on external connections or CDNs). |
 
-### 🧭 Índice
+### 🧭 Table of Contents
 
-- [📋 1. Sobre o Projeto](#sobre-o-projeto)
-- [✨ 2. Módulos da Aplicação](#modulos-da-aplicacao)
-  - [📈 Módulo Analítico (Métricas & KPIs)](#modulo-analitico)
-  - [🚨 Módulo Operacional de Incidentes](#modulo-operacional)
-  - [⏱️ Módulo de Gestão de Horas Extras (Plantão & Apontamentos)](#modulo-horas-extras)
-  - [⚙️ Módulo de Cadastros Base & Configurações](#modulo-cadastros)
-- [🛠️ 3. Stack Tecnológica](#stack-tecnologica)
-- [📁 4. Estrutura de Diretórios](#estrutura-de-diretorios)
-- [🚀 5. Como Executar](#como-executar)
-  - [Pré-requisitos](#pre-requisitos)
-  - [1. Instalação das Dependências](#instalacao-dependencias)
-  - [2. Execução em Desenvolvimento (Frontend + Backend)](#execucao-desenvolvimento)
-  - [3. Execução em Produção](#execucao-producao)
-  - [4. Inicialização Rápida no Windows (.bat)](#inicializacao-windows)
-- [📡 6. Endpoints da API REST](#endpoints-da-api)
-  - [Métricas & Análises](#api-metricas)
-  - [Gestão de Incidentes](#api-incidentes)
-  - [Horas Extras & Plantões](#api-horas-extras)
-  - [Cadastros Base](#api-cadastros)
-- [⚙️ 7. Comandos Úteis](#comandos-uteis)
-- [🎨 8. Tipografia e Tokens Visuais](#tipografia-e-tokens)
-- [📄 9. Licença](#licenca)
-- [👨‍💻 10. Autor](#desenvolvido-por)
-
----
-
-## <a id="sobre-o-projeto"></a>📋 Sobre o Projeto
-
-O **ServiceNow Dashboard** é uma solução corporativa unificada desenvolvida para centralizar a **análise estratégica de desempenho** (NPS, SLA, Perfect Fix, volume), a **gestão operacional de incidentes em tempo real** e o **controle e apuração de plantões e horas extras**.
-
-Construído com base em uma arquitetura modular moderna (React 18 + Vite no frontend, Express nativo em ESM com SQLite no backend, motor nativo em Node.js (pdfmake) para renderização de PDFs corporativos de alta fidelidade e Design System em **Vanilla CSS**), o sistema opera de forma autônoma, ultrarrápida e com segurança de ponta a ponta.
+- [📋 1. About the Project](#about-the-project)
+- [✨ 2. Application Modules](#application-modules)
+  - [📈 Analytical Module (Metrics & KPIs)](#analytical-module)
+  - [🚨 Operational Incident Module](#operational-module)
+  - [⏱️ Overtime Management Module (On-Call & Entries)](#overtime-module)
+  - [⚙️ Base Records & Settings Module](#settings-module)
+- [🛠️ 3. Tech Stack](#tech-stack)
+- [📁 4. Directory Structure](#directory-structure)
+- [🚀 5. How to Run](#how-to-run)
+  - [Prerequisites](#prerequisites)
+  - [1. Installing Dependencies](#installing-dependencies)
+  - [2. Running in Development (Frontend + Backend)](#running-development)
+  - [3. Running in Production](#running-production)
+  - [4. Quick Startup on Windows (.bat)](#windows-startup)
+- [📡 6. REST API Endpoints](#api-endpoints)
+  - [Metrics & Analytics](#api-metrics)
+  - [Incident Management](#api-incidents)
+  - [Overtime & On-Call](#api-overtime)
+  - [Base Records](#api-base-records)
+- [⚙️ 7. Useful Commands](#useful-commands)
+- [🎨 8. Typography & Visual Tokens](#typography-and-tokens)
+- [📄 9. License](#license)
+- [👨‍💻 10. Author](#developed-by)
 
 ---
 
-## <a id="modulos-da-aplicacao"></a>✨ Módulos da Aplicação
+## <a id="about-the-project"></a>📋 About the Project
 
-### <a id="modulo-analitico"></a>1. 📈 Módulo Analítico (Métricas & KPIs)
+The **ServiceNow Dashboard** is a unified enterprise solution built to centralize **strategic performance analysis** (NPS, SLA, Perfect Fix, volume), **real-time operational incident management**, and **on-call and overtime tracking and calculation**.
 
-- **8 Cards Dinâmicos de KPI**: Visão rápida de fechados no ano, fechados por mês, NPS pessoal, NPS geral corporativo, SLA%, avaliados no ano, avaliações por mês e taxa de Perfect Fix.
-- **Gráficos Comparativos Recharts**:
-  - Comparativo de NPS (Pessoal vs. Média Geral da Empresa) com destaques dinâmicos de melhor/pior mês.
-  - Volume de chamados fechados vs. chamados avaliados.
-  - Acurácia de SLA e taxa de Perfect Fix com linha de meta (95%).
-- **Detalhamento Mensal Retrátil**: Tabela analítica expansível com animação CSS Grid para edição controlada do mês corrente e anterior.
-- **Upload Unificado de Dados**:
-  - Ingestão de export CSV do ServiceNow com cálculo automático de SLA útil (considerando horário comercial e feriados nacionais, estaduais-SP e municipais de SP) e Perfect Fix.
-  - Ingestão de JSON corporativo (`asmt_metric_result.json`) para cálculo do NPS Geral.
-
-### <a id="modulo-operacional"></a>2. 🚨 Módulo Operacional de Incidentes
-
-- **Visualização por Sub-abas**: Alternância instantânea entre incidentes **Abertos** e **Resolvidos**.
-- **Ordenação Inteligente**:
-  - Aba *Abertos*: Ordenação customizada com **Drag & Drop nativo (HTML5)** direto na linha através de alça visual (`GripVertical`), com persistência instantânea no banco de dados.
-  - Aba *Resolvidos*: Ordenação cronológica automática reversa por data/hora de resolução (mais recente no topo).
-- **Major Incidents & Chamados Filhos**:
-  - Banner dinâmico no topo destacando ocorrências massivas ativas (5+ chamados).
-  - Controle de atribuição *"Minha Responsabilidade"* com contadores sincronizados.
-  - Modal de gestão e vinculação de chamados filhos associados ao Major Incident com exportação individual.
-- **Destaque Visual para Incidentes Pendentes (+3 dias)**:
-  - Alerta visual marcante em linhas de incidentes sem atualização há 3 ou mais dias (fundo suave em tom âmbar, barra lateral luminosa de alerta e pill animado pulsante `+3d`).
-- **Atualização Rápida de Timestamp**:
-  - Botão de ação rápida (`RotateCw`) na coluna de data/hora para atualizar instantaneamente a data da última atualização para o momento presente, gravando entrada no histórico sem necessidade de abrir modais de edição.
-- **Estatísticas Interativas de Rodapé**:
-  - Painéis dinâmicos de *"Incidentes por Hotel"* e *"Incidentes por Responsável"* com barras de preenchimento proporcional e filtragem rápida por clique (toggle).
-- **Busca Rápida Animada**:
-  - Campo de busca neon expansível e colapsável com botão de limpeza rápida.
-- **Exportação XLSX Avançada**:
-  - Geração de planilhas Excel formatadas profissionalmente via **ExcelJS** com cabeçalho executivo escuro (`#1F2937`), zebrado de linhas (`#FFFFFF` e `#D9D9D9`) e criação automática de abas filhas dedicadas `(!) [Incidente]` para cada Major Incident.
-  - Code-splitting dinâmico com carregamento assíncrono do módulo de exportação apenas sob demanda.
-
-### <a id="modulo-horas-extras"></a>3. ⏱️ Módulo de Gestão de Horas Extras (Plantão & Apontamentos)
-
-- **Autenticação Segura & Auto-Lock por Inatividade**:
-  - Proteção por Senha Mestre criptografada com **Bcrypt** (salt rounds 10).
-  - **Timer de Inatividade de 2 minutos**: Bloqueia automaticamente a aba de Horas Extras se não houver interação (o timer é mantido mesmo se o usuário navegar temporariamente por outras abas).
-  - Botão de bloqueio manual imediato no cabeçalho.
-- **Segurança Financeira com Criptografia AES-256-GCM**:
-  - O valor do salário base e os snapshots financeiros são **criptografados com AES-256-GCM** (vetor de inicialização `IV` aleatório de 12 bytes por registro e tag de integridade) antes de serem persistidos no banco de dados SQLite (`overtime_config`, `chamados.valor_base_snapshot` e `overtime_salary_history`).
-  - Nenhum dado financeiro ou salarial confidencial é armazenado em texto puro.
-- **Imutabilidade e Proteção de Histórico Salarial**:
-  - Cada atendimento grava seu próprio `valor_base_snapshot` imutável. Alterar o salário nas configurações **não altera retroativamente** os ganhos e valores de períodos ou apontamentos anteriores.
-  - Tabela de histórico salarial (`overtime_salary_history`) para suporte inteligente a apontamentos lançados retroativamente, garantindo que recebam o salário vigente na data do atendimento.
-- **Modal de Apontamento Inteligente**:
-  - **Sensível à escrita (Autocomplete)**: Campo de Hotel com dropdown filtrado dinamicamente em tempo real ao digitar.
-  - **Máscara e Validação de Horários**: Formatação automática para `HH:MM`.
-  - **Virada de Meia-Noite (Overnight)**: Detecção automática quando o término for após a meia-noite, com indicador visual discreto `+1` na interface e divisão contábil correta para a folha oficial.
-  - **Prevenção de Perda de Dados**: O modal não fecha por clique acidental no backdrop, exigindo ação explícita em *Salvar* ou *Cancelar/Fechar*.
-- **Apuração Automatizada e Agrupamento de Sobreposições**:
-  - Horários sobrepostos no mesmo dia são unificados automaticamente (início mais cedo e término mais tarde), sem duplicar horas trabalhadas.
-  - Separação precisa de adicionais: **100%** para domingos e feriados (calculados via biblioteca de feriados brasileiros e de SP) e **50%** para dias úteis e sábados.
-- **Cards Analíticos Executivos Centralizados**:
-  - 4 cards simetricamente centralizados no topo: **Horas (50% / 100%)**, **Ganhos Estimados** (cálculo privado), **Total de Chamados** e **Tempo Médio por Chamado**.
-  - Tabela completa de apontamentos com colunas: *Data*, *Semana*, *Caso/INC*, *Hotel*, *Início*, *Término*, *Duração*, *Taxa*, *Motivo*, *Observações* e *Ações*.
-  - Exclusão individual e exclusão em massa com seleção múltipla via checkboxes.
-- **Geração e Download Oficial de Folha de Ponto em PDF**:
-  - Gerador nativo em Node.js integrado via **pdfmake** produzindo documento A4 Paisagem executivo de padrão oficial diretamente em memória.
-  - Cabeçalho padronizado idêntico ao modelo Excel de 4 linhas: tipografia Calibri (14px no título, 11px no corpo), fundo cinza `#D9D9D9` no nome do colaborador, mês e ano, e largura perfeitamente alinhada à tabela.
-  - Tabela com colunas: `DIA`, `SEMANA`, `DATA`, `INÍCIO`, `INTERVALO`, `VOLTA`, `TÉRMINO`, `HORAS TRABALHADAS`, `Horas a Receber (50% / 100%)` e `OBSERVAÇÕES`.
-  - Dois atendimentos no mesmo dia são organizados em Início/Intervalo e Volta/Término.
-  - A coluna **OBSERVAÇÕES** no PDF reflete **estritamente e exclusivamente** o que for preenchido no campo de observações no modal (sem vazamento de número de caso ou textos automáticos).
-  - Sem dados monetários e sem campos de assinatura desnecessários no documento.
-- **Backups Automáticos com Debounce**:
-  - A cada inserção, alteração ou exclusão no módulo de Horas Extras, um backup automático do SQLite é acionado com debounce de 5 segundos, protegendo o banco contra falhas sem sobrecarga de disco.
-  - Botão de download manual instantâneo do arquivo de banco de dados (`dashboard.db`).
-
-### <a id="modulo-cadastros"></a>4. ⚙️ Módulo de Cadastros Base & Configurações
-
-- Centralizado no dropdown de **Configurações** (ícone de engrenagem) no cabeçalho.
-- CRUD completo de Hotéis (RID, Nome, status Ativo/Inativo) e Responsáveis (Nome, status Ativo/Inativo).
-- Busca textual em tempo real e filtros de status (*Ativos*, *Inativos*, *Todos*).
-- **Paginação Completa**: 20 itens por página com controles numéricos inteligentes e elipses.
-- Diálogos de confirmação padronizados para exclusões seguras.
+Built on a modern modular architecture (React 18 + Vite on the frontend, native ESM Express with SQLite on the backend, native Node.js engine (pdfmake) for high-fidelity corporate PDF rendering, and a **Vanilla CSS** Design System), the system operates autonomously, ultra-fast, and with end-to-end security.
 
 ---
 
-## <a id="stack-tecnologica"></a>🛠️ Stack Tecnológica
+## <a id="application-modules"></a>✨ Application Modules
 
-| Camada | Tecnologia | Propósito |
+### <a id="analytical-module"></a>1. 📈 Analytical Module (Metrics & KPIs)
+
+- **8 Dynamic KPI Cards**: Quick overview of closed tickets YTD, closed per month, personal NPS, overall corporate NPS, SLA%, evaluated YTD, evaluations per month, and Perfect Fix rate.
+- **Recharts Comparative Charts**:
+  - NPS comparison (Personal vs. Company Overall Average) with dynamic best/worst month highlights.
+  - Closed tickets volume vs. evaluated tickets.
+  - SLA accuracy and Perfect Fix rate with target line (95%).
+- **Collapsible Monthly Breakdown**: Expandable analytical table with CSS Grid animation for controlled editing of the current and previous month.
+- **Unified Data Upload**:
+  - ServiceNow CSV export ingestion with automatic business-hours SLA calculation (considering business hours and national, São Paulo state, and São Paulo municipal holidays) and Perfect Fix.
+  - Corporate JSON ingestion (`asmt_metric_result.json`) for Overall NPS calculation.
+
+### <a id="operational-module"></a>2. 🚨 Operational Incident Module
+
+- **Sub-tab Views**: Instant switching between **Open** (`Abertos`) and **Resolved** (`Resolvidos`) incidents.
+- **Smart Sorting**:
+  - *Open* tab: Custom sorting with **native Drag & Drop (HTML5)** directly on the row via a visual handle (`GripVertical`), with instant database persistence.
+  - *Resolved* tab: Automatic reverse chronological sorting by resolution date/time (most recent on top).
+- **Major Incidents & Child Tickets**:
+  - Dynamic top banner highlighting active massive occurrences (5+ tickets).
+  - *"My Responsibility"* (`Minha Responsabilidade`) assignment tracking with synchronized counters.
+  - Management and linking modal for child tickets associated with a Major Incident, with individual export.
+- **Visual Highlight for Stale Incidents (+3 days)**:
+  - Prominent visual alert on incident rows without updates for 3 or more days (soft amber background, glowing alert side bar, and pulsing `+3d` pill).
+- **Quick Timestamp Update**:
+  - Quick action button (`RotateCw`) in the date/time column to instantly update the last updated timestamp to the current time, recording a history entry without opening edit modals.
+- **Interactive Footer Statistics**:
+  - Dynamic *"Incidents by Hotel"* and *"Incidents by Assignee"* panels with proportional fill bars and quick click-to-filter toggles.
+- **Animated Quick Search**:
+  - Expandable and collapsible neon search bar with a quick-clear button.
+- **Advanced XLSX Export**:
+  - Professionally formatted Excel spreadsheets via **ExcelJS** with a dark executive header (`#1F2937`), zebra-striped rows (`#FFFFFF` and `#D9D9D9`), and automatic dedicated child sheets `(!) [Incident]` for each Major Incident.
+  - Dynamic code-splitting with asynchronous loading of the export module only on demand.
+
+### <a id="overtime-module"></a>3. ⏱️ Overtime Management Module (On-Call & Entries)
+
+- **Secure Authentication & Inactivity Auto-Lock**:
+  - Protected by a **Bcrypt**-encrypted Master Password (10 salt rounds).
+  - **2-Minute Inactivity Timer**: Automatically locks the Overtime tab if there is no interaction (the timer keeps running even if the user temporarily navigates to other tabs).
+  - Immediate manual lock button in the header.
+- **Financial Security with AES-256-GCM Encryption**:
+  - Base salary and financial snapshots are **encrypted with AES-256-GCM** (random 12-byte `IV` per record and integrity tag) before being persisted to the SQLite database (`overtime_config`, `chamados.valor_base_snapshot`, and `overtime_salary_history`).
+  - No confidential financial or salary data is stored in plain text.
+- **Immutability & Salary History Protection**:
+  - Each entry records its own immutable `valor_base_snapshot`. Changing the salary in settings **does not retroactively alter** earnings and values from previous periods or entries.
+  - Salary history table (`overtime_salary_history`) to intelligently support retroactively logged entries, ensuring they receive the salary in effect on the date of service.
+- **Smart Entry Modal**:
+  - **Type-ahead (Autocomplete)**: Hotel field with a dropdown dynamically filtered in real time as you type.
+  - **Time Mask & Validation**: Automatic formatting to `HH:MM`.
+  - **Overnight Rollover**: Automatic detection when the end time passes midnight, with a discreet `+1` visual indicator in the UI and accurate accounting split for the official timesheet.
+  - **Data Loss Prevention**: The modal does not close on accidental backdrop clicks, requiring an explicit click on *Save* or *Cancel/Close*.
+- **Automated Calculation & Overlap Grouping**:
+  - Overlapping times on the same day are automatically merged (earliest start and latest end) without double-counting worked hours.
+  - Accurate rate separation: **100%** for Sundays and holidays (calculated via Brazilian and SP holiday library) and **50%** for weekdays and Saturdays.
+- **Centered Executive Analytical Cards**:
+  - 4 symmetrically centered cards at the top: **Hours (50% / 100%)**, **Estimated Earnings** (private calculation), **Total Tickets**, and **Average Time per Ticket**.
+  - Complete entries table with columns: *Date*, *Weekday*, *Case/INC*, *Hotel*, *Start*, *End*, *Duration*, *Rate*, *Reason*, *Notes*, and *Actions*.
+  - Individual deletion and bulk deletion with multi-select checkboxes.
+- **Official Timesheet PDF Generation & Download**:
+  - Native Node.js generator integrated via **pdfmake** producing an official executive A4 Landscape document directly in memory.
+  - Standardized 4-line header identical to the Excel template: Calibri typography (14px title, 11px body), `#D9D9D9` gray background on employee name, month, and year, and width aligned with the table.
+  - Table with columns: `DIA`, `SEMANA`, `DATA`, `INÍCIO`, `INTERVALO`, `VOLTA`, `TÉRMINO`, `HORAS TRABALHADAS`, `Horas a Receber (50% / 100%)`, and `OBSERVAÇÕES`.
+  - Two entries on the same day are organized into Start/Break and Return/End (`Início/Intervalo` and `Volta/Término`).
+  - The **OBSERVAÇÕES** column in the PDF reflects **strictly and exclusively** what is entered in the notes field in the modal (no case number leakage or automatic text).
+  - No monetary data and no unnecessary signature fields on the document.
+- **Debounced Automatic Backups**:
+  - On every insert, update, or delete in the Overtime module, an automatic SQLite backup is triggered with a 5-second debounce, protecting the database without disk overhead.
+  - Instant manual download button for the database file (`dashboard.db`).
+
+### <a id="settings-module"></a>4. ⚙️ Base Records & Settings Module
+
+- Centralized in the **Settings** dropdown (gear icon) in the header.
+- Complete CRUD for Hotels (RID, Name, Active/Inactive status) and Assignees (Name, Active/Inactive status).
+- Real-time text search and status filters (*Active*, *Inactive*, *All*).
+- **Full Pagination**: 20 items per page with smart numeric controls and ellipses.
+- Standardized confirmation dialogs for safe deletions.
+
+---
+
+## <a id="tech-stack"></a>🛠️ Tech Stack
+
+| Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Frontend** | React 18 + Vite 5 | Renderização reativa, HMR ultrarrápido e modularização |
-| **Design System** | Vanilla CSS Puro | Design executivo *Deep Blue* e *Wine* modularizado em 9 arquivos CSS |
-| **PWA** | vite-plugin-pwa | Suporte a Service Worker, cache offline e manifesto instalável |
-| **Gráficos** | Recharts 2.12 | Visualização interativa e responsiva de métricas e indicadores |
-| **Ícones** | Lucide React | Biblioteca de ícones SVG limpos e padronizados (sem CDNs externas) |
-| **Tipografia** | WOFF2 Local + TTF | Fontes 100% autônomas em diretórios dedicados sem chamadas externas (Plus Jakarta Sans, Montserrat, JetBrains Mono, Calibri) |
-| **Exportação XLSX** | ExcelJS 4.4 | Geração client-side de planilhas `.xlsx` formatadas e zebradas |
-| **Gerador de PDF** | Node.js + pdfmake | Geração de Folha de Ponto A4 Paisagem oficial de alta fidelidade em memória |
-| **Feriados** | date-holidays | Cálculo preciso de feriados nacionais, estaduais e municipais de SP |
-| **Backend** | Node.js + Express (ESM) | API RESTful nativa em módulos ECMAScript |
-| **Banco de Dados** | SQLite 3 | Banco de dados relacional embarcado em arquivo único local (`server/dashboard.db`) |
-| **Criptografia** | Node crypto + Bcrypt | Criptografia simétrica autenticada AES-256-GCM para dados sensíveis e Bcrypt para senhas |
-| **Auditoria & Logs** | Winston | Registro cronológico em arquivo (`audit.log`) e tabela SQLite com poda automática |
-| **Segurança** | Helmet + CORS | Headers de segurança HTTP e controle de acesso |
-| **Backups** | Scheduler customizado | Backups com debounce (5s) e rotação automática de arquivos `.bak` |
+| **Frontend** | React 18 + Vite 5 | Reactive rendering, ultra-fast HMR, and modularization |
+| **Design System** | Pure Vanilla CSS | Executive *Deep Blue* and *Wine* design modularized across 9 CSS files |
+| **PWA** | vite-plugin-pwa | Service Worker support, offline cache, and installable manifest |
+| **Charts** | Recharts 2.12 | Interactive and responsive visualization of metrics and indicators |
+| **Icons** | Lucide React | Clean, standardized SVG icon library (no external CDNs) |
+| **Typography** | Local WOFF2 + TTF | 100% self-hosted fonts in dedicated directories with no external requests (Plus Jakarta Sans, Montserrat, JetBrains Mono, Calibri) |
+| **XLSX Export** | ExcelJS 4.4 | Client-side generation of formatted, zebra-striped `.xlsx` spreadsheets |
+| **PDF Generator** | Node.js + pdfmake | High-fidelity official A4 Landscape Timesheet generation in memory |
+| **Holidays** | date-holidays | Accurate calculation of Brazilian national, state, and SP municipal holidays |
+| **Backend** | Node.js + Express (ESM) | Native ECMAScript Modules RESTful API |
+| **Database** | SQLite 3 | Embedded relational database in a single local file (`server/dashboard.db`) |
+| **Encryption** | Node crypto + Bcrypt | Authenticated symmetric AES-256-GCM encryption for sensitive data and Bcrypt for passwords |
+| **Auditing & Logs** | Winston | Chronological logging to file (`audit.log`) and SQLite table with automatic pruning |
+| **Security** | Helmet + CORS | HTTP security headers and access control |
+| **Backups** | Custom Scheduler | Debounced backups (5s) and automatic `.bak` file rotation |
 
 ---
 
-## <a id="estrutura-de-diretorios"></a>📁 Estrutura de Diretórios
+## <a id="directory-structure"></a>📁 Directory Structure
 
 ```text
 ServiceNowDashboard/
-├── server/                          # Backend da aplicação (ESM nativo)
-│   ├── assets/                      # Recursos estáticos do servidor
-│   │   └── fonts/                   # Fontes dedicadas para renderização de PDF (Calibri TTF)
-│   ├── controllers/                 # Controladores de negócio
-│   │   ├── IncidentController.js    # CRUD de Incidentes, reordenação e históricos
-│   │   ├── HotelController.js       # CRUD de Hotéis
-│   │   ├── ResponsibleController.js # CRUD de Responsáveis
-│   │   ├── MajorIncidentController.js# Gestão de Major Incidents
-│   │   ├── OvertimeController.js    # CRUD de Horas Extras, apuração e KPIs
-│   │   ├── OvertimeAuthController.js# Autenticação, senha mestre e configs
-│   │   └── BackupController.js      # Download manual e gestão de backups
-│   ├── services/                    # Serviços especializados
-│   │   ├── CryptoService.js         # Criptografia simétrica AES-256-GCM (Salários e Snapshots)
-│   │   ├── OvertimeTimeUtils.js     # Tratamento de horas, sobreposições e virada de noite
-│   │   ├── OvertimeHolidayService.js# Apuração de domingos e feriados (100% vs 50%)
-│   │   ├── OvertimePdfService.js    # Serviço de streaming em memória de Folha de Ponto em PDF
-│   │   ├── OvertimePdfGenerator.js  # Motor de renderização em Node.js/pdfmake (Folha de Ponto oficial)
-│   │   ├── pdf_generator.js         # Wrapper de compatibilidade em JavaScript ESM
-│   │   ├── IncidentService.js       # Regras de persistência de incidentes
-│   │   ├── MajorIncidentService.js  # Lógica de chamados massivos vinculados
-│   │   ├── AuditService.js          # Auditoria de ações no sistema
-│   │   └── BackupService.js         # Rotinas de backup rotativo
-│   ├── routes/                      # Rotas da API RESTful (/api/...)
-│   │   └── api.js                   # Mapeamento centralizado de endpoints
-│   ├── uploads/                     # Arquivos temporários de upload e geração (ignorado no git)
-│   ├── backups/                     # Backups automáticos rotativos do SQLite (ignorado no git)
-│   ├── database.js                  # Inicialização do banco, schema e migrações
-│   ├── dashboard.db                 # Banco de dados principal SQLite (ignorado no git)
-│   └── index.js                     # Ponto de entrada do servidor Express
-├── src/                             # Frontend React
+├── server/                          # Application Backend (native ESM)
+│   ├── assets/                      # Server static assets
+│   │   └── fonts/                   # Dedicated fonts for PDF rendering (Calibri TTF)
+│   ├── controllers/                 # Business controllers
+│   │   ├── IncidentController.js    # Incidents CRUD, reordering, and history
+│   │   ├── HotelController.js       # Hotels CRUD
+│   │   ├── ResponsibleController.js # Assignees CRUD
+│   │   ├── MajorIncidentController.js# Major Incidents management
+│   │   ├── OvertimeController.js    # Overtime CRUD, calculation, and KPIs
+│   │   ├── OvertimeAuthController.js# Authentication, master password, and configs
+│   │   └── BackupController.js      # Manual download and backup management
+│   ├── services/                    # Specialized services
+│   │   ├── CryptoService.js         # Symmetric AES-256-GCM encryption (Salaries and Snapshots)
+│   │   ├── OvertimeTimeUtils.js     # Time handling, overlaps, and overnight rollover
+│   │   ├── OvertimeHolidayService.js# Sunday and holiday calculation (100% vs 50%)
+│   │   ├── OvertimePdfService.js    # In-memory Timesheet PDF streaming service
+│   │   ├── OvertimePdfGenerator.js  # Node.js/pdfmake rendering engine (Official Timesheet)
+│   │   ├── pdf_generator.js         # ESM JavaScript compatibility wrapper
+│   │   ├── IncidentService.js       # Incident persistence rules
+│   │   ├── MajorIncidentService.js  # Linked massive tickets logic
+│   │   ├── AuditService.js          # System action auditing
+│   │   └── BackupService.js         # Rotating backup routines
+│   ├── routes/                      # RESTful API routes (/api/...)
+│   │   └── api.js                   # Centralized endpoint mapping
+│   ├── uploads/                     # Temporary upload and generation files (gitignored)
+│   ├── backups/                     # Automatic rotating SQLite backups (gitignored)
+│   ├── database.js                  # Database initialization, schema, and migrations
+│   ├── dashboard.db                 # Main SQLite database (gitignored)
+│   └── index.js                     # Express server entry point
+├── src/                             # React Frontend
 │   ├── components/
-│   │   ├── common/                  # Componentes compartilhados (Header, NavTabs, Pagination, Modals)
-│   │   ├── incidents/               # Tabela de incidentes, modais de histórico e major cards
-│   │   ├── metrics/                 # Cards de KPI, gráficos Recharts e tabelas de métricas
-│   │   ├── overtime/                # Módulo de Horas Extras
-│   │   │   ├── OvertimeModule.jsx   # Container principal e gerenciador de estado/auto-lock
-│   │   │   ├── OvertimeDashboard.jsx# KPIs centralizados, tabela de apontamentos e ações
-│   │   │   ├── OvertimeLockScreen.jsx# Tela de bloqueio e primeiro setup
-│   │   │   ├── OvertimeRecordModal.jsx# Modal de criação/edição com autocomplete e overnight +1
-│   │   │   └── OvertimeSettingsModal.jsx# Modal de configurações (colaborador, salário, senha)
-│   │   └── settings/                # Módulos de gestão de Hotéis e Responsáveis
-│   ├── styles/                      # Design System Vanilla CSS Refatorado
-│   │   ├── fonts.css                # Declarações @font-face locais autônomas (offline total)
-│   │   ├── tokens.css               # Cores, fontes, sombras e transições (Deep Blue)
-│   │   ├── base.css                 # Reset, tipografia global e scrollbars
-│   │   ├── layout.css               # Grid do dashboard, toolbar, relógio e rodapé
-│   │   ├── cards.css                # Cards com glassmorphism e badges de status
-│   │   ├── tables.css               # Tabelas com linhas zebradas, drag & drop e alertas (+3d)
-│   │   ├── forms.css                # Inputs, autocomplete, botões e campo de busca neon
-│   │   ├── modals.css               # Janelas modais flutuantes com backdrop blur
-│   │   ├── badges.css               # Badges de RID, tags de status e pills pulsantes
-│   │   ├── overtime.css             # Estilos dedicados ao módulo de Horas Extras (tema Wine)
-│   │   └── index.css                # Ponto de unificação de todos os estilos
+│   │   ├── common/                  # Shared components (Header, NavTabs, Pagination, Modals)
+│   │   ├── incidents/               # Incident table, history modals, and major cards
+│   │   ├── metrics/                 # KPI cards, Recharts charts, and metrics tables
+│   │   ├── overtime/                # Overtime Module
+│   │   │   ├── OvertimeModule.jsx   # Main container and state/auto-lock manager
+│   │   │   ├── OvertimeDashboard.jsx# Centered KPIs, entries table, and actions
+│   │   │   ├── OvertimeLockScreen.jsx# Lock screen and initial setup
+│   │   │   ├── OvertimeRecordModal.jsx# Create/edit modal with autocomplete and overnight +1
+│   │   │   └── OvertimeSettingsModal.jsx# Settings modal (employee, salary, password)
+│   │   └── settings/                # Hotels and Assignees management modules
+│   ├── styles/                      # Refactored Vanilla CSS Design System
+│   │   ├── fonts.css                # Local self-hosted @font-face declarations (100% offline)
+│   │   ├── tokens.css               # Colors, fonts, shadows, and transitions (Deep Blue)
+│   │   ├── base.css                 # Reset, global typography, and scrollbars
+│   │   ├── layout.css               # Dashboard grid, toolbar, clock, and footer
+│   │   ├── cards.css                # Glassmorphism cards and status badges
+│   │   ├── tables.css               # Zebra-striped tables, drag & drop, and alerts (+3d)
+│   │   ├── forms.css                # Inputs, autocomplete, buttons, and neon search bar
+│   │   ├── modals.css               # Floating modal windows with backdrop blur
+│   │   ├── badges.css               # RID badges, status tags, and pulsing pills
+│   │   ├── overtime.css             # Dedicated styles for the Overtime module (Wine theme)
+│   │   └── index.css                # Unification entry point for all styles
 │   ├── utils/
-│   │   └── excelExport.js           # Utilitário assíncrono para exportação XLSX com ExcelJS
-│   ├── App.jsx                      # Componente raiz com navegação e abas
-│   └── main.jsx                     # Ponto de entrada React com registro PWA
-├── public/                          # Assets estáticos, favicon e manifest
-│   └── fonts/                       # Tipografia web local WOFF2 (Plus Jakarta Sans, Montserrat, JetBrains Mono)
-├── start_dashboard.bat              # Inicializador para Windows com auto-restart em falhas
-├── package.json                     # Dependências e scripts npm
-├── vite.config.js                   # Configuração de build, proxy e PWA
-└── eslint.config.js                 # Regras de linting do projeto
+│   │   └── excelExport.js           # Async utility for XLSX export with ExcelJS
+│   ├── App.jsx                      # Root component with navigation and tabs
+│   └── main.jsx                     # React entry point with PWA registration
+├── public/                          # Static assets, favicon, and manifest
+│   └── fonts/                       # Local WOFF2 web typography (Plus Jakarta Sans, Montserrat, JetBrains Mono)
+├── start_dashboard.bat              # Windows launcher with auto-restart on failure
+├── package.json                     # Dependencies and npm scripts
+├── vite.config.js                   # Build, proxy, and PWA configuration
+└── eslint.config.js                 # Project linting rules
 ```
 
 ---
 
-## <a id="como-executar"></a>🚀 Como Executar
+## <a id="how-to-run"></a>🚀 How to Run
 
-### <a id="pre-requisitos"></a>Pré-requisitos
+### <a id="prerequisites"></a>Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 ou superior instalado.
-- npm (incluído no instalador do Node.js).
+- [Node.js](https://nodejs.org/) v18 or higher installed.
+- npm (included in the Node.js installer).
 
-### <a id="instalacao-dependencias"></a>1. Instalação das Dependências
+### <a id="installing-dependencies"></a>1. Installing Dependencies
 
 ```bash
 npm install
 ```
 
-### <a id="execucao-desenvolvimento"></a>2. Execução em Desenvolvimento (Frontend + Backend)
+### <a id="running-development"></a>2. Running in Development (Frontend + Backend)
 
 ```bash
 npm run dev
 ```
 
 - **Frontend (Vite)**: `http://localhost:3002`
-- **Backend (Express API)**: `http://localhost:5000` (com proxy automático configurado no Vite)
+- **Backend (Express API)**: `http://localhost:5000` (with automatic proxy configured in Vite)
 
-### <a id="execucao-producao"></a>3. Execução em Produção
+### <a id="running-production"></a>3. Running in Production
 
 ```bash
-# Gera os arquivos minificados do frontend na pasta dist/
+# Builds minified frontend files into the dist/ folder
 npm run build
 
-# Inicia o servidor Node.js servindo a API e os arquivos estáticos de dist/
+# Starts the Node.js server serving the API and static files from dist/
 npm start
 ```
 
-### <a id="inicializacao-windows"></a>4. Inicialização Rápida no Windows (Script com Auto-Restart)
+### <a id="windows-startup"></a>4. Quick Startup on Windows (Auto-Restart Script)
 
-Dê um duplo clique no arquivo:
+Double-click the file:
 
 ```text
 start_dashboard.bat
 ```
 
-Ou execute via prompt de comando. O script monitora o processo e reinicia automaticamente os serviços caso ocorra alguma interrupção inesperada.
+Or run it via Command Prompt. The script monitors the process and automatically restarts services if any unexpected interruption occurs.
 
 ---
 
-## <a id="endpoints-da-api"></a>📡 Endpoints da API REST
+## <a id="api-endpoints"></a>📡 REST API Endpoints
 
-### <a id="api-metricas"></a>Métricas & Análises
+### <a id="api-metrics"></a>Metrics & Analytics
 
-| Método | Endpoint | Descrição |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/metrics?year=2026` | Retorna métricas analíticas mensais do ano especificado |
-| `POST` | `/api/metrics` | Cria ou atualiza manualmente métrica mensal (UPSERT) |
-| `POST` | `/api/upload-metrics` | Processa CSV do ServiceNow para cálculo de SLA e Perfect Fix |
-| `POST` | `/api/upload-json` | Processa JSON de avaliações para cálculo do NPS Geral corporativo |
+| `GET` | `/api/metrics?year=2026` | Returns monthly analytical metrics for the specified year |
+| `POST` | `/api/metrics` | Manually creates or updates a monthly metric (UPSERT) |
+| `POST` | `/api/upload-metrics` | Processes ServiceNow CSV for SLA and Perfect Fix calculation |
+| `POST` | `/api/upload-json` | Processes evaluation JSON for corporate Overall NPS calculation |
 
-### <a id="api-incidentes"></a>Gestão de Incidentes
+### <a id="api-incidents"></a>Incident Management
 
-| Método | Endpoint | Descrição |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/incidentes?status=Aberto` | Lista incidentes filtrados por status (*Aberto* ou *Resolvido*) |
-| `GET` | `/api/incidentes/:id` | Retorna os detalhes de um incidente específico |
-| `POST` | `/api/incidentes` | Cria um novo incidente (e vincula chamados caso seja Major) |
-| `PUT` | `/api/incidentes/:id` | Atualiza dados do incidente (ou apenas data de atualização com `forcar_historico`) |
-| `DELETE` | `/api/incidentes/:id` | Exclui permanentemente o incidente, chamados filhos e histórico |
-| `PUT` | `/api/incidentes/reordenar` | Persiste a nova ordem das linhas (Drag & Drop) via array de IDs |
-| `GET` | `/api/incidentes/:id/historico` | Retorna o histórico cronológico de situações do incidente |
-| `GET` | `/api/incidentes/:id/chamados` | Retorna todos os chamados filhos vinculados ao incidente |
-| `POST` | `/api/incidentes/:id/chamados` | Adiciona chamado filho a um incidente massivo (*Major*) |
-| `DELETE` | `/api/chamados/:id` | Remove um chamado filho vinculado |
-| `GET` | `/api/incidentes-maiores` | Retorna dados agregados de incidentes massivos ativos |
-| `POST` | `/api/incidentes-maiores/:num/toggle` | Alterna a flag de responsabilidade do analista sobre o Major Incident |
+| `GET` | `/api/incidentes?status=Aberto` | Lists incidents filtered by status (*Aberto* or *Resolvido*) |
+| `GET` | `/api/incidentes/:id` | Returns details of a specific incident |
+| `POST` | `/api/incidentes` | Creates a new incident (and links tickets if it is a Major Incident) |
+| `PUT` | `/api/incidentes/:id` | Updates incident data (or only update timestamp with `forcar_historico`) |
+| `DELETE` | `/api/incidentes/:id` | Permanently deletes the incident, child tickets, and history |
+| `PUT` | `/api/incidentes/reordenar` | Persists the new row order (Drag & Drop) via an array of IDs |
+| `GET` | `/api/incidentes/:id/historico` | Returns the chronological status history of the incident |
+| `GET` | `/api/incidentes/:id/chamados` | Returns all child tickets linked to the incident |
+| `POST` | `/api/incidentes/:id/chamados` | Adds a child ticket to a massive (*Major*) incident |
+| `DELETE` | `/api/chamados/:id` | Removes a linked child ticket |
+| `GET` | `/api/incidentes-maiores` | Returns aggregated data of active Major Incidents |
+| `POST` | `/api/incidentes-maiores/:num/toggle` | Toggles the analyst's responsibility flag on the Major Incident |
 
-### <a id="api-horas-extras"></a>Horas Extras & Plantões
+### <a id="api-overtime"></a>Overtime & On-Call
 
-| Método | Endpoint | Descrição |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/overtime/auth/status` | Verifica se o módulo está configurado e retorna dados do colaborador |
-| `POST` | `/api/overtime/auth/setup` | Configuração inicial com senha mestre, colaborador e salário base |
-| `POST` | `/api/overtime/auth/verify` | Valida senha de desbloqueio do módulo |
-| `PUT` | `/api/overtime/auth/config` | Atualiza nome, salário base (AES-256) e/ou senha mestre |
-| `GET` | `/api/overtime/chamados?mes=X&ano=Y` | Lista apontamentos do período com cálculo oficial de KPIs e adicionais |
-| `POST` | `/api/overtime/chamados` | Registra novo apontamento de hora extra com snapshot salarial |
-| `PUT` | `/api/overtime/chamados/:id` | Atualiza apontamento preservando seu snapshot financeiro original |
-| `DELETE` | `/api/overtime/chamados/:id` | Exclui apontamento de hora extra e dispara backup com debounce |
-| `POST` | `/api/overtime/chamados/bulk-delete` | Exclusão em lote de múltiplos apontamentos |
-| `GET` | `/api/overtime/download-pdf?mes=X&ano=Y` | Gera e faz o download da Folha de Ponto oficial em PDF A4 Paisagem |
-| `GET` | `/api/backup/download` | Faz o download do backup binário do banco de dados SQLite (`dashboard.db`) |
+| `GET` | `/api/overtime/auth/status` | Checks if the module is configured and returns employee details |
+| `POST` | `/api/overtime/auth/setup` | Initial setup with master password, employee, and base salary |
+| `POST` | `/api/overtime/auth/verify` | Validates module unlock password |
+| `PUT` | `/api/overtime/auth/config` | Updates name, base salary (AES-256), and/or master password |
+| `GET` | `/api/overtime/chamados?mes=X&ano=Y` | Lists entries for the period with official KPI and rate calculations |
+| `POST` | `/api/overtime/chamados` | Records a new overtime entry with salary snapshot |
+| `PUT` | `/api/overtime/chamados/:id` | Updates an entry while preserving its original financial snapshot |
+| `DELETE` | `/api/overtime/chamados/:id` | Deletes an overtime entry and triggers a debounced backup |
+| `POST` | `/api/overtime/chamados/bulk-delete` | Bulk deletion of multiple entries |
+| `GET` | `/api/overtime/download-pdf?mes=X&ano=Y` | Generates and downloads the official A4 Landscape Timesheet PDF |
+| `GET` | `/api/backup/download` | Downloads the binary backup of the SQLite database (`dashboard.db`) |
 
-### <a id="api-cadastros"></a>Cadastros Base
+### <a id="api-base-records"></a>Base Records
 
-| Método | Endpoint | Descrição |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/hoteis` | Lista hotéis cadastrados (suporta filtro opcional `?rede=Accor` ou `?rede=Intercity`) |
-| `POST` | `/api/hoteis` | Cadastra novo hotel (Rede, Nome e RID opcional para redes sem RID como Intercity) |
-| `PUT` | `/api/hoteis/:id` | Atualiza dados do hotel ou status ativo/inativo |
-| `DELETE` | `/api/hoteis/:id` | Exclui hotel do catálogo |
-| `GET` | `/api/responsaveis` | Lista responsáveis cadastrados |
-| `POST` | `/api/responsaveis` | Cadastra novo responsável |
-| `PUT` | `/api/responsaveis/:id` | Atualiza nome ou status do responsável |
-| `DELETE` | `/api/responsaveis/:id` | Exclui responsável do catálogo |
+| `GET` | `/api/hoteis` | Lists registered hotels (supports optional filter `?rede=Accor` or `?rede=Intercity`) |
+| `POST` | `/api/hoteis` | Registers a new hotel (Chain, Name, and optional RID for chains without RID such as Intercity) |
+| `PUT` | `/api/hoteis/:id` | Updates hotel details or active/inactive status |
+| `DELETE` | `/api/hoteis/:id` | Deletes a hotel from the catalog |
+| `GET` | `/api/responsaveis` | Lists registered assignees |
+| `POST` | `/api/responsaveis` | Registers a new assignee |
+| `PUT` | `/api/responsaveis/:id` | Updates assignee name or status |
+| `DELETE` | `/api/responsaveis/:id` | Deletes an assignee from the catalog |
 
 ---
 
-## <a id="comandos-uteis"></a>⚙️ Comandos Úteis
+## <a id="useful-commands"></a>⚙️ Useful Commands
 
-| Comando | Descrição |
+| Command | Description |
 | :--- | :--- |
-| `npm run dev` | Inicia simultaneamente o servidor backend e o cliente Vite em modo desenvolvimento |
-| `npm run server` | Inicia apenas o backend Express (`server/index.js`) na porta 5000 |
-| `npm run client` | Inicia apenas o cliente Vite (`localhost:3002`) |
-| `npm run build` | Compila o bundle minificado de produção em `dist/` |
-| `npm run lint` | Executa o linter ESLint em todo o código-fonte |
-| `npm run preview` | Executa visualização prévia local da pasta `dist/` |
+| `npm run dev` | Starts both the backend server and the Vite client simultaneously in development mode |
+| `npm run server` | Starts only the Express backend (`server/index.js`) on port 5000 |
+| `npm run client` | Starts only the Vite client (`localhost:3002`) |
+| `npm run build` | Compiles the minified production bundle into `dist/` |
+| `npm run lint` | Runs ESLint across the entire source code |
+| `npm run preview` | Runs a local preview of the `dist/` folder |
 
 ---
 
-## <a id="tipografia-e-tokens"></a>🎨 Tipografia e Tokens Visuais
+## <a id="typography-and-tokens"></a>🎨 Typography & Visual Tokens
 
-O projeto adota uma hierarquia tipográfica precisa, documentada em detalhes no artifact [font_families_inventory.md](file:///C:/Users/caiqu/.gemini/antigravity-ide/brain/d1841552-cd8c-4025-9fc8-77014c0058a1/font_families_inventory.md):
+The project adopts a precise typographic hierarchy, documented in detail in the artifact [font_families_inventory.md](file:///C:/Users/caiqu/.gemini/antigravity-ide/brain/d1841552-cd8c-4025-9fc8-77014c0058a1/font_families_inventory.md):
 
-- **`--font-main` (`Plus Jakarta Sans`)**: Interface principal, textos e tabelas operacionais.
-- **`--font-title` (`Montserrat`)**: Títulos de grande impacto visual, cabeçalhos de modais e KPIs.
-- **`--font-mono` (`JetBrains Mono`)**: Tickets, dados tabulares, valores numéricos e relógio.
-- **`Calibri`**: Utilizada com exclusividade na **Folha de Ponto em PDF**.
+- **`--font-main` (`Plus Jakarta Sans`)**: Main interface, body text, and operational tables.
+- **`--font-title` (`Montserrat`)**: High-impact visual titles, modal headers, and KPIs.
+- **`--font-mono` (`JetBrains Mono`)**: Tickets, tabular data, numeric values, and clock.
+- **`Calibri`**: Used exclusively in the **PDF Timesheet**.
 
 ---
 
-## <a id="licenca"></a>📄 Licença
+## <a id="license"></a>📄 License
 
-Este projeto é de uso interno corporativo sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+This project is for internal corporate use under the **MIT** license. See the [LICENSE](LICENSE) file for more details.
 
 ---
 
 <div align="center">
 
-## <a id="desenvolvido-por"></a>👨‍💻 Desenvolvido por
+## <a id="developed-by"></a>👨‍💻 Developed by
 
 **Caique Novaes**<br>
-<sub>Analista de Suporte & Desenvolvedor</sub>
+<sub>Support Analyst & Developer</sub>
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/caiquenovaes1994)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:caiquenovaes1994@gmail.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/caiquenovaes)
 [![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=flat&logo=telegram&logoColor=white)](https://t.me/caiquenovaes1994)
 
-Feito com ❤️ e ☕ — *2024–2026*
+Made with ❤️ and ☕ — *2024–2026*
 
 </div>
