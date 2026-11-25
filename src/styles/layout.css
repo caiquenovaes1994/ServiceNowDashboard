@@ -480,10 +480,9 @@
   width: 25%;
   text-align: right;
   white-space: nowrap;
-  font-family: var(--font-mono);
+  font-family: var(--font-main);
   font-size: 0.8rem;
   color: var(--text-muted);
-  letter-spacing: 0.02em;
 }
 
 @media (max-width: 768px) {

@@ -2,7 +2,7 @@ import React from 'react';
 import packageJson from '../../../package.json';
 
 const Footer = () => {
-  const version = packageJson?.version || '2.0.0';
+  const version = packageJson?.version || '1.2.0';
 
   return (
     <footer className="app-footer-fixed">
