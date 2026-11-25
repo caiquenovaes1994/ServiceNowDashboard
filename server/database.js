@@ -323,6 +323,23 @@ export const initDb = () => {
               stmt.run(hotelName, hotelName);
             });
             stmt.finalize();
+
+            // Carga idempotente do catálogo de hotéis Emiliano
+            const emilianoHotels = [
+              'Emiliano SP',
+              'Emiliano RJ'
+            ];
+            const stmtEmiliano = db.prepare(`
+              INSERT INTO hoteis (rid, nome, ativo, rede)
+              SELECT NULL, ?, 1, 'Emiliano'
+              WHERE NOT EXISTS (
+                SELECT 1 FROM hoteis WHERE nome = ? AND rede = 'Emiliano'
+              )
+            `);
+            emilianoHotels.forEach(hotelName => {
+              stmtEmiliano.run(hotelName, hotelName);
+            });
+            stmtEmiliano.finalize();
           });
         };
 

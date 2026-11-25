@@ -31,7 +31,7 @@ export class BackupController {
           metadata: {
             app: 'ServiceNow Dashboard & Incident Suite',
             backupDate: new Date().toISOString(),
-            version: '1.2.0'
+            version: '1.3.0'
           },
           data: {
             metrics,

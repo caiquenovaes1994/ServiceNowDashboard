@@ -78,9 +78,14 @@ const AutocompleteInput = ({
                 {secondaryKey && item[secondaryKey] ? (
                   <span className="badge-rid">{item[secondaryKey]}</span>
                 ) : (
-                  item.rede === 'Intercity' && (
-                    <span className="badge-intercity">Intercity</span>
-                  )
+                  <>
+                    {item.rede === 'Intercity' && (
+                      <span className="badge-intercity">Intercity</span>
+                    )}
+                    {item.rede === 'Emiliano' && (
+                      <span className="badge-emiliano">Emiliano</span>
+                    )}
+                  </>
                 )}
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item[displayKey]}

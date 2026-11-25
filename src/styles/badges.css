@@ -92,6 +92,24 @@
   flex-shrink: 0;
 }
 
+.badge-emiliano {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.45rem;
+  background: rgba(201, 174, 139, 0.14);
+  border: 1px solid rgba(201, 174, 139, 0.4);
+  border-radius: 4px;
+  color: #e2caa7;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 /* ── Badges de Ativo / Inativo (Cadastros) ────────────────────────────────── */
 .badge-active {
   display: inline-flex;

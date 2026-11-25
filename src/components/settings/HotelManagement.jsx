@@ -9,7 +9,7 @@ const HotelManagement = ({
   onUpdateHotel,
   onDeleteHotel
 }) => {
-  // Rede selecionada: 'Accor' ou 'Intercity'
+  // Rede selecionada: 'Accor', 'Intercity' ou 'Emiliano'
   const [selectedRede, setSelectedRede] = useState('Accor');
   const [statusFilter, setStatusFilter] = useState('ativos'); // 'ativos', 'inativos', 'ambos'
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +24,15 @@ const HotelManagement = ({
     return hotels.filter(h => h.rede === 'Intercity');
   }, [hotels]);
 
-  const activeChainHotels = selectedRede === 'Intercity' ? intercityHotels : accorHotels;
+  const emilianoHotels = useMemo(() => {
+    return hotels.filter(h => h.rede === 'Emiliano');
+  }, [hotels]);
+
+  const activeChainHotels = useMemo(() => {
+    if (selectedRede === 'Intercity') return intercityHotels;
+    if (selectedRede === 'Emiliano') return emilianoHotels;
+    return accorHotels;
+  }, [selectedRede, accorHotels, intercityHotels, emilianoHotels]);
 
   // Resetar página quando rede ou filtros mudarem
   useEffect(() => {
@@ -83,7 +91,7 @@ const HotelManagement = ({
     try {
       const payload = {
         ...formData,
-        rid: formData.rede === 'Intercity' ? null : (formData.rid ? formData.rid.trim() : null)
+        rid: formData.rede !== 'Accor' ? null : (formData.rid ? formData.rid.trim() : null)
       };
 
       if (editingHotel) {
@@ -121,6 +129,16 @@ const HotelManagement = ({
           <img src="/intercity_logo.png" alt="Intercity" className="network-logo" />
           <span className="network-name">Intercity</span>
           <span className="network-badge">{intercityHotels.length}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`network-tab-btn emiliano ${selectedRede === 'Emiliano' ? 'active' : ''}`}
+          onClick={() => setSelectedRede('Emiliano')}
+          title="Exibir catálogo de hotéis da Rede Emiliano"
+        >
+          <img src="/Hotel_Emiliano_Logo.png" alt="Emiliano" className="network-logo emiliano-logo" />
+          <span className="network-badge">{emilianoHotels.length}</span>
         </button>
       </div>
 
@@ -160,7 +178,7 @@ const HotelManagement = ({
               placeholder={
                 selectedRede === 'Accor'
                   ? 'Pesquisar por RID ou Nome na Accor...'
-                  : 'Pesquisar por Nome na Intercity...'
+                  : `Pesquisar por Nome na ${selectedRede}...`
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -310,7 +328,9 @@ const HotelManagement = ({
                     placeholder={
                       formData.rede === 'Intercity'
                         ? 'Ex: Intercity Berrini'
-                        : 'Ex: Novotel São Paulo Morumbi'
+                        : formData.rede === 'Emiliano'
+                          ? 'Ex: Emiliano SP'
+                          : 'Ex: Novotel São Paulo Morumbi'
                     }
                     value={formData.nome}
                     onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}

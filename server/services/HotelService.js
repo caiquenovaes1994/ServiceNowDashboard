@@ -25,7 +25,7 @@ class HotelService {
   static async create(data) {
     const { rid, nome, ativo, rede } = data;
     const cleanRid = rid && typeof rid === 'string' && rid.trim() !== '' ? rid.trim() : null;
-    const hotelRede = rede === 'Intercity' ? 'Intercity' : 'Accor';
+    const hotelRede = ['Accor', 'Intercity', 'Emiliano'].includes(rede) ? rede : 'Accor';
     const statusAtivo = ativo !== undefined ? (ativo ? 1 : 0) : 1;
     const result = await dbRun(
       'INSERT INTO hoteis (rid, nome, ativo, rede) VALUES (?, ?, ?, ?)',

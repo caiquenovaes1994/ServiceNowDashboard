@@ -464,6 +464,11 @@
   transition: transform 0.2s ease;
 }
 
+.network-tab-btn .network-logo.emiliano-logo {
+  height: 18px;
+  max-width: 115px;
+}
+
 .network-tab-btn.accor.active {
   background: linear-gradient(135deg, rgba(0, 43, 73, 0.65) 0%, rgba(15, 23, 42, 0.95) 100%);
   border-color: #38bdf8;
@@ -476,6 +481,13 @@
   border-color: #f25c05;
   color: #f8fafc;
   box-shadow: 0 0 16px rgba(242, 92, 5, 0.25);
+}
+
+.network-tab-btn.emiliano.active {
+  background: linear-gradient(135deg, rgba(201, 174, 139, 0.2) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-color: #c9ae8b;
+  color: #f8fafc;
+  box-shadow: 0 0 16px rgba(201, 174, 139, 0.22);
 }
 
 .network-tab-btn .network-badge {
@@ -496,6 +508,11 @@
 .network-tab-btn.intercity.active .network-badge {
   background: rgba(242, 92, 5, 0.25);
   color: #ff7b2b;
+}
+
+.network-tab-btn.emiliano.active .network-badge {
+  background: rgba(201, 174, 139, 0.22);
+  color: #e2caa7;
 }
 
 .network-info-box {

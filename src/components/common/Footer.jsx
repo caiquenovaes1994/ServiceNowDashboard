@@ -2,7 +2,7 @@ import React from 'react';
 import packageJson from '../../../package.json';
 
 const Footer = () => {
-  const version = packageJson?.version || '1.2.0';
+  const version = packageJson?.version || '1.3.0';
 
   return (
     <footer className="app-footer-fixed">
@@ -14,7 +14,7 @@ const Footer = () => {
             </td>
             <td className="footer-col-center">
               <span>
-                Desenvolvido por <b>Caique Novaes</b> com ❤️ e ☕ - 2026
+                Desenvolvido por <b><a href="https://github.com/caiquenovaes1994/" target="_blank">Caique Novaes</a></b> com ❤️ e ☕ - 2026
               </span>
             </td>
             <td className="footer-col-right">

@@ -293,9 +293,14 @@ const OvertimeRecordModal = ({ isOpen, onClose, onSave, record, hotels = [] }) =
                             {h.rid ? (
                               <span className="ot-combobox-rid">{h.rid}</span>
                             ) : (
-                              h.rede === 'Intercity' && (
-                                <span className="badge-intercity" style={{ fontSize: '0.68rem', padding: '0.1rem 0.38rem' }}>Intercity</span>
-                              )
+                              <>
+                                {h.rede === 'Intercity' && (
+                                  <span className="badge-intercity" style={{ fontSize: '0.68rem', padding: '0.1rem 0.38rem' }}>Intercity</span>
+                                )}
+                                {h.rede === 'Emiliano' && (
+                                  <span className="badge-emiliano" style={{ fontSize: '0.68rem', padding: '0.1rem 0.38rem' }}>Emiliano</span>
+                                )}
+                              </>
                             )}
                             <span style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {h.nome}
