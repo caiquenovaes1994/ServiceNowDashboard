@@ -5,7 +5,7 @@ import {
   LineChart, Line, Legend, ReferenceLine
 } from 'recharts';
 import { 
-  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud, ChevronDown, Check
+  Calendar, BarChart3, Users, Activity, ArrowUp, ArrowDown, UploadCloud, ChevronDown
 } from 'lucide-react';
 
 import NavigationTabs, { TABS } from './components/common/NavigationTabs.jsx';
@@ -179,7 +179,6 @@ const YearDropdown = ({ value, onChange, options = [2024, 2025, 2026] }) => {
                 }}
               >
                 <span>{y}</span>
-                {isSelected && <Check size={14} strokeWidth={2.5} className="item-check" />}
               </div>
             );
           })}
